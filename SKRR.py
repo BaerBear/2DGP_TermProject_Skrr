@@ -8,13 +8,16 @@ class IDLE:
         self.skrr.frame = 0
 
     def do(self):
-        pass
+        self.skrr.frame += 1
 
     def exit(self):
         pass
 
     def draw(self):
-        pass
+        if self.skrr.face_dir == 1:
+            pass
+        else:
+            pass
 
 class SKRR:
     def __init__(self):
