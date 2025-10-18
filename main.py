@@ -1,4 +1,5 @@
 from pico2d import *
+from SKRR import *
 
 def handle_events():
     global running
@@ -10,16 +11,25 @@ def handle_events():
             running = False
 
 def reset_world():
-    global running
-    running = True
+    global world
+    world = []
+
+    global Skrr
+    Skrr = SKRR()
+
+    world.append(Skrr)
 
 def update_world():
-    pass
+    for obj in world:
+        obj.update()
 
 def render_world():
     clear_canvas()
-    # Draw game objects here
+    for obj in world:
+        obj.draw()
     update_canvas()
+
+running = True
 
 open_canvas(1440, 900)
 reset_world()
