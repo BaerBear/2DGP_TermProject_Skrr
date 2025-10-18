@@ -1,7 +1,8 @@
 from pico2d import *
 from Image_Loader import SKRR_Image_Loader
+from State_Machine import StateMachine
 
-class IDLE:
+class Idle:
     def __init__(self, skrr):
         self.skrr = skrr
 
@@ -32,9 +33,13 @@ class SKRR:
         self.scale = 2
 
         self.Idle_image = SKRR_Image_Loader('Idle').images
+        self.IDLE = Idle(self)
+
+        self.state_machine = StateMachine(self.IDLE)
 
     def update(self):
         pass
 
     def draw(self):
-        pass
+        self.state_machine.draw()
+
