@@ -29,6 +29,7 @@ class SKRR:
         self.x, self.y = get_canvas_width() // 2, get_canvas_height() // 2
         self.frame = 0
         self.face_dir = 1
+        self.scale = 2
 
         self.Idle_image = SKRR_Image_Loader('Idle').images
 
