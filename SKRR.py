@@ -38,7 +38,7 @@ class SKRR:
         self.state_machine = StateMachine(self.IDLE)
 
     def update(self):
-        pass
+        self.state_machine.update()
 
     def draw(self):
         self.state_machine.draw()
