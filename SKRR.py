@@ -1,4 +1,5 @@
 from pico2d import *
+from Image_Loader import SKRR_Image_Loader
 
 class IDLE:
     def __init__(self, skrr):
@@ -28,6 +29,8 @@ class SKRR:
         self.x, self.y = get_canvas_width() // 2, get_canvas_height() // 2
         self.frame = 0
         self.face_dir = 1
+
+        self.Idle_image = SKRR_Image_Loader('Idle').images
 
     def update(self):
         pass
