@@ -7,10 +7,10 @@ class IDLE:
     def enter(self):
         self.skrr.frame = 0
 
-    def exit(self):
+    def do(self):
         pass
 
-    def update(self):
+    def exit(self):
         pass
 
     def draw(self):
