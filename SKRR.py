@@ -1,28 +1,8 @@
 from pico2d import *
 from Image_Loader import SKRR_Image_Loader
 from State_Machine import StateMachine
+from SKRR_State import Idle, Wait, Walk, Jump, JumpAttack, Attack, Dash, Fall, Dead, Reborn
 
-class Idle:
-    def __init__(self, skrr):
-        self.skrr = skrr
-
-    def enter(self):
-        self.skrr.frame = 0
-
-    def do(self):
-        self.skrr.frame += 1
-
-    def exit(self):
-        pass
-
-    def draw(self):
-        img = self.skrr.Idle_image[self.skrr.frame // 10 % 4]
-        if self.skrr.face_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y,
-                          img.w * self.skrr.scale, img.h * self.skrr.scale)
-        elif self.skrr.face_dir == -1:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y,
-                                    img.w * self.skrr.scale, img.h * self.skrr.scale)
 
 
 class SKRR:
@@ -32,8 +12,31 @@ class SKRR:
         self.face_dir = 1
         self.scale = 2
 
+        # Image Load
         self.Idle_image = SKRR_Image_Loader('Idle').images
+        self.Wait_image = SKRR_Image_Loader('Wait').images
+        self.Walk_image = SKRR_Image_Loader('Walk').images
+        self.AttackA_image = SKRR_Image_Loader('AttackA').images
+        self.AttackB_image = SKRR_Image_Loader('AttackB').images
+        self.Jump_image = SKRR_Image_Loader('Jump').images
+        self.JumpEffect_image = SKRR_Image_Loader('JumpEffect').images
+        self.JumpAttack_image = SKRR_Image_Loader('JumpAttack').images
+        self.Reborn_image = SKRR_Image_Loader('Reborn').images
+        self.Dash_image = SKRR_Image_Loader('Dash').images
+        self.Fall_image = SKRR_Image_Loader('Fall').images
+        self.Dead_image = SKRR_Image_Loader('Dead').images
+
+        # State
         self.IDLE = Idle(self)
+        self.WAIT = Wait(self)
+        self.WALK = Walk(self)
+        self.JUMP = Jump(self)
+        self.JUMPATTACK = JumpAttack(self)
+        self.ATTACK = Attack(self)
+        self.DASH = Dash(self)
+        self.FALL = Fall(self)
+        self.DEAD = Dead(self)
+        self.REBORN = Reborn(self)
 
         self.state_machine = StateMachine(self.IDLE)
 
