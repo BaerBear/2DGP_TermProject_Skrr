@@ -17,8 +17,11 @@ class SKRR:
         self.is_grounded = True
         self.jumping = False
         self.jump_count = 0
-
-
+        self.velocity_y = 0
+        self.gravity = -0.5
+        self.effect_y = 0
+        self.effect_x = 0
+        self.effect_frame = 0
 
         self.attack_type = None
         self.jumpattack_cooldown = 0
@@ -56,6 +59,10 @@ class SKRR:
 
     def update(self):
         self.state_machine.update()
+        if self.jumpattack_cooldown > 0:
+            self.jumpattack_cooldown -= 1
+        if self.dash_cooldown > 0:
+            self.dash_cooldown -= 1
 
     def draw(self):
         self.state_machine.draw()

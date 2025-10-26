@@ -28,7 +28,7 @@ reset_world()
 
 # game loop
 while running:
-    Events.handle_events(running, Skrr)
+    running = Events.handle_events(running, Skrr)
     update_world()
     render_world()
     delay(0.01)
