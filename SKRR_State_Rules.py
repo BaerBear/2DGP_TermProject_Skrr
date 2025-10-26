@@ -6,7 +6,7 @@ from Event_Checker import (
 )
 
 
-def get_state_rules(skrr):
+def Get_State_Rules(skrr):
 
     def land_to_idle(e):
         return land_on_ground(e) and e[1] != 'WALK'

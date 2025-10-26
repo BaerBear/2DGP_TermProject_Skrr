@@ -30,6 +30,7 @@ def render_world():
     update_canvas()
 
 running = True
+Skrr = None
 
 open_canvas(1440, 900)
 reset_world()
