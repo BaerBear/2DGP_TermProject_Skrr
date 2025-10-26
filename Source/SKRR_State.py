@@ -168,6 +168,7 @@ class JumpAttack:
         self.skrr.frame = 0
         self.skrr.jumpattack_last_use_time = get_time()
         self.minX = self.skrr.Walk_image[0].w * self.skrr.scale // 2 - 10
+        SoundManager.play_player_sound('Jump_attack')
 
     def do(self):
         self.skrr.frame = self.skrr.frame + 1
@@ -206,20 +207,27 @@ class Attack:
 
     def enter(self, e):
         self.skrr.frame = 0
-        from Event_Checker import attack_down, combo_available
-        if attack_down(e) and self.skrr.attack_type == 'A' and self.skrr.frame >= 6:
-            self.skrr.attack_type = 'B'
-        elif self.skrr.attack_type is None or not combo_available(e):
-            self.skrr.attack_type = 'A'
+        if self.skrr.attack_type == 'A':
+            SoundManager.play_player_sound('Attack1')
+        elif self.skrr.attack_type == 'B':
+            SoundManager.play_player_sound('Attack2')
 
     def do(self):
         self.skrr.frame = self.skrr.frame + 1
         delay(0.02)
 
         if self.skrr.attack_type == 'A' and self.skrr.frame >= 15:
-            self.skrr.state_machine.handle_event(('ANIMATION_END', None))
+            # 방향키가 눌려있으면 WALK로, 아니면 IDLE로
+            if self.skrr.key_pressed['left'] or self.skrr.key_pressed['right']:
+                self.skrr.state_machine.handle_event(('ANIMATION_END', 'WALK'))
+            else:
+                self.skrr.state_machine.handle_event(('ANIMATION_END', 'IDLE'))
         elif self.skrr.attack_type == 'B' and self.skrr.frame >= 12:
-            self.skrr.state_machine.handle_event(('ANIMATION_END', None))
+            # 방향키가 눌려있으면 WALK로, 아니면 IDLE로
+            if self.skrr.key_pressed['left'] or self.skrr.key_pressed['right']:
+                self.skrr.state_machine.handle_event(('ANIMATION_END', 'WALK'))
+            else:
+                self.skrr.state_machine.handle_event(('ANIMATION_END', 'IDLE'))
 
     def exit(self, e):
         if self.skrr.attack_type == 'A' and self.skrr.frame >= 15:

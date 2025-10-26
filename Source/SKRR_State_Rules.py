@@ -23,6 +23,12 @@ def Get_State_Rules(skrr):
     def dash_to_fall(e):
         return dash_complete(e) and e[1] == 'FALL'
 
+    def attack_to_walk(e):
+        return animation_end(e) and e[1] == 'WALK'
+
+    def attack_to_idle(e):
+        return animation_end(e) and e[1] != 'WALK'
+
     return {
         skrr.IDLE: {
             right_down: skrr.WALK,
@@ -67,7 +73,8 @@ def Get_State_Rules(skrr):
         },
 
         skrr.ATTACK: {
-            animation_end: skrr.IDLE,
+            attack_to_walk: skrr.WALK,
+            attack_to_idle: skrr.IDLE,
             combo_available: skrr.ATTACK,
         },
 
