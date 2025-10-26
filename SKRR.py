@@ -48,3 +48,5 @@ class SKRR:
     def draw(self):
         self.state_machine.draw()
 
+    def handle_event(self, event):
+        self.state_machine.handle_event(event)
