@@ -249,6 +249,9 @@ class Dash:
         self.dash_dir = None
         self.is_air_dash = False
 
+        self.effect_frame = 0
+        self.effect_x, self.effect_y = None, None
+
     def enter(self, e):
         self.skrr.frame = 0
         if self.skrr.dash_type == 0:
@@ -258,11 +261,13 @@ class Dash:
         self.dash_dir = self.skrr.face_dir
         self.is_air_dash = not self.skrr.is_grounded
 
+        self.effect_x, self.effect_y = self.skrr.x, self.skrr.y - 10
+        self.effect_frame = 0
         self.skrr.is_invincible = True
 
     def do(self):
         delay(0.007)
-
+        self.effect_frame += 1
         if self.dash_distance >= 30:
             self.can_second_dash = True
 
@@ -288,6 +293,7 @@ class Dash:
             self.skrr.dash_type = None
         self.dash_distance = 0
         self.is_air_dash = False
+        self.effect_x, self.effect_y = None, None
 
         if self.skrr.key_pressed['left'] and not self.skrr.key_pressed['right']:
             self.skrr.face_dir = -1
@@ -295,11 +301,18 @@ class Dash:
             self.skrr.face_dir = 1
 
     def draw(self):
+        if hasattr(self.skrr, 'DashEffect_image') and self.skrr.DashEffect_image:
+            effect_img = self.skrr.DashEffect_image[self.effect_frame // 2 % len(self.skrr.DashEffect_image)]
+            if self.dash_dir == 1:
+                effect_img.clip_draw(0, 0, effect_img.w, effect_img.h, self.effect_x, self.effect_y, effect_img.w, effect_img.h)
+            elif self.dash_dir == -1:
+                effect_img.clip_composite_draw(0, 0, effect_img.w, effect_img.h, 0, 'h', self.effect_x, self.effect_y, effect_img.w, effect_img.h)
         img = self.skrr.Dash_image[0]
         if self.dash_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.dash_dir == -1:
             img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+
 
 
 class Fall:
