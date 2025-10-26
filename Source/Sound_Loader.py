@@ -30,13 +30,12 @@ class SKRR_Sound_Loader:
 class BGM_Loader:
     bgms = None
 
-    @classmethod
     def load_bgms(cls):
         if cls.bgms is not None:
             return cls.bgms
 
         cls.bgms = {}
-        base_path = os.path.join(os.path.dirname(__file__), r'..\Resources\audio')
+        base_path = os.path.join(os.path.dirname(__file__), r'..\Resources\audio\Bgm')
 
         cls.bgms['chapter1'] = load_music(os.path.join(base_path, 'Chapter1.wav'))
         cls.bgms['chapter1_boss'] = load_music(os.path.join(base_path, 'Chapter1_Boss.wav'))
@@ -47,3 +46,19 @@ class BGM_Loader:
             bgm.set_volume(64)
 
         return cls.bgms
+
+class Enemy_Sound_Loader:
+    sounds = None
+
+    def load_sounds(cls):
+        if cls.sounds is not None:
+            return cls.sounds
+
+        cls.sounds = {}
+        base_path = os.path.join(os.path.dirname(__file__), r'..\Resources\audio\Enemy')
+
+        for sound in cls.sounds.values():
+            sound.set_volume(50)
+
+        return cls.sounds
+
