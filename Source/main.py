@@ -1,9 +1,11 @@
 from pico2d import *
 from SKRR import *
 from Enemy import Knight_Sword, Knight_Bow, Knight_Tackle
+from Sound_Loader import SoundManager
 import Events
 
 def reset_world():
+    SoundManager.initialize()
     global world, enemies
     world = []
     global Skrr
@@ -37,6 +39,7 @@ def render_world():
 running = True
 
 open_canvas(1440, 900)
+
 reset_world()
 
 # game loop

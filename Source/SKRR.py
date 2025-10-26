@@ -3,7 +3,6 @@ from Image_Loader import SKRR_Image_Loader
 from State_Machine import StateMachine
 from SKRR_State import Idle, Wait, Walk, Jump, JumpAttack, Attack, Dash, Fall, Dead, Reborn
 from SKRR_State_Rules import Get_State_Rules
-from Sound_Loader import SoundManager
 
 
 class SKRR:
@@ -13,7 +12,6 @@ class SKRR:
         self.face_dir = 1
         self.scale = 2
         self.key_pressed = {'left': False, 'right': False}
-        self.sounds = SoundManager()
 
         # 대쉬관련
         self.dash_type = None

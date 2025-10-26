@@ -1,5 +1,5 @@
 from pico2d import delay, get_canvas_width, get_time
-
+from Sound_Loader import SoundManager
 
 class Idle:
     def __init__(self, skrr):
@@ -105,13 +105,14 @@ class Jump:
             self.skrr.jump_count = 1
             self.skrr.is_grounded = False
             self.skrr.velocity_y = self.jump_power
-            self.sound = self.skrr.sounds.play_player_sound('Jump')
+            SoundManager.play_player_sound('Jump')
         elif self.skrr.jump_count == 1:
             self.skrr.jump_count = 2
             self.skrr.velocity_y = self.jump_power
             self.effect_x = self.skrr.x
             self.effect_y = self.skrr.y
             self.effect_frame = 0
+            SoundManager.play_player_sound('Jump_air')
 
     def do(self):
         self.skrr.frame = self.skrr.frame + 1
