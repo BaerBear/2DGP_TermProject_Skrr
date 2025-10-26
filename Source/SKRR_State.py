@@ -105,6 +105,7 @@ class Jump:
             self.skrr.jump_count = 1
             self.skrr.is_grounded = False
             self.skrr.velocity_y = self.jump_power
+            self.sound = self.skrr.sounds.play_player_sound('Jump')
         elif self.skrr.jump_count == 1:
             self.skrr.jump_count = 2
             self.skrr.velocity_y = self.jump_power
