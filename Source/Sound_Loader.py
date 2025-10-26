@@ -11,6 +11,9 @@ class SoundManager:
     bgms = None
     current_bgm = None
 
+    Effect_Volume = 10
+    BGM_Volume = 20
+
     @classmethod
     def initialize(cls):
         if cls._initialized:
@@ -30,7 +33,7 @@ class SoundManager:
         cls.player_sounds['Dead'] = load_wav(os.path.join(skul_path, 'Default_Dead.wav'))
 
         for sound in cls.player_sounds.values():
-            sound.set_volume(15)
+            sound.set_volume(cls.Effect_Volume)
 
         # 적 사운드
         Enemy_path = os.path.join(audio_path, 'Enemy')
@@ -41,7 +44,7 @@ class SoundManager:
         cls.enemy_sounds['blast_hit'] = load_wav(os.path.join(Enemy_path, 'Attack_Sword.wav'))
 
         for sound in cls.enemy_sounds.values():
-            sound.set_volume(50)
+            sound.set_volume(cls.Effect_Volume)
 
         # 오브젝트 사운드
         Object_path = os.path.join(audio_path, 'Object')
@@ -51,7 +54,7 @@ class SoundManager:
         cls.object_sounds['open_box'] = load_wav(os.path.join(Object_path, 'Object_OpenBox.wav'))
 
         for sound in cls.object_sounds.values():
-            sound.set_volume(50)
+            sound.set_volume(cls.Effect_Volume)
 
         # UI 사운드
         UI_path = os.path.join(audio_path, 'UI')
@@ -66,7 +69,7 @@ class SoundManager:
         cls.ui_sounds['mythology_unlock'] = load_wav(os.path.join(UI_path, 'UI_MythologyUnlock.wav'))
 
         for sound in cls.ui_sounds.values():
-            sound.set_volume(40)
+            sound.set_volume(cls.Effect_Volume)
 
         # 배경 음악
         Bgm_path = os.path.join(audio_path, 'Bgm')
@@ -76,7 +79,7 @@ class SoundManager:
         cls.bgms['main_title'] = load_music(os.path.join(Bgm_path, 'MainTitle_Hardmode.wav'))
 
         for bgm in cls.bgms.values():
-            bgm.set_volume(64)
+            bgm.set_volume(cls.BGM_Volume)
 
         cls._initialized = True
 

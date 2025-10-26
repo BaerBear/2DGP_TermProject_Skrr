@@ -6,6 +6,7 @@ import Events
 
 def reset_world():
     SoundManager.initialize()
+    SoundManager.play_bgm('chapter1', repeat=True)
     global world, enemies
     world = []
     global Skrr

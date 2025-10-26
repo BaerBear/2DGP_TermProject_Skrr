@@ -267,6 +267,8 @@ class Dash:
         self.effect_frame = 0
         self.skrr.is_invincible = True
 
+        SoundManager.play_player_sound('Dash')
+
     def do(self):
         delay(0.007)
         self.effect_frame += 1
