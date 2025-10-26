@@ -1,6 +1,25 @@
 import os
 from pico2d import load_wav, load_music
 
+class BGM_Loader:
+    bgms = None
+
+    def load_bgms(cls):
+        if cls.bgms is not None:
+            return cls.bgms
+
+        cls.bgms = {}
+        base_path = os.path.join(os.path.dirname(__file__), r'..\Resources\audio\Bgm')
+
+        cls.bgms['chapter1'] = load_music(os.path.join(base_path, 'Chapter1.wav'))
+        cls.bgms['chapter1_boss'] = load_music(os.path.join(base_path, 'Chapter1_Boss.wav'))
+        cls.bgms['main_title'] = load_music(os.path.join(base_path, 'MainTitle_Hardmode.wav'))
+
+        # 볼륨 조절
+        for bgm in cls.bgms.values():
+            bgm.set_volume(64)
+
+        return cls.bgms
 
 class SKRR_Sound_Loader:
     sounds = None
@@ -26,27 +45,6 @@ class SKRR_Sound_Loader:
 
         return cls.sounds
 
-
-class BGM_Loader:
-    bgms = None
-
-    def load_bgms(cls):
-        if cls.bgms is not None:
-            return cls.bgms
-
-        cls.bgms = {}
-        base_path = os.path.join(os.path.dirname(__file__), r'..\Resources\audio\Bgm')
-
-        cls.bgms['chapter1'] = load_music(os.path.join(base_path, 'Chapter1.wav'))
-        cls.bgms['chapter1_boss'] = load_music(os.path.join(base_path, 'Chapter1_Boss.wav'))
-        cls.bgms['main_title'] = load_music(os.path.join(base_path, 'MainTitle_Hardmode.wav'))
-
-        # 볼륨 조절
-        for bgm in cls.bgms.values():
-            bgm.set_volume(64)
-
-        return cls.bgms
-
 class Enemy_Sound_Loader:
     sounds = None
 
@@ -56,6 +54,36 @@ class Enemy_Sound_Loader:
 
         cls.sounds = {}
         base_path = os.path.join(os.path.dirname(__file__), r'..\Resources\audio\Enemy')
+
+        for sound in cls.sounds.values():
+            sound.set_volume(50)
+
+        return cls.sounds
+
+class Object_Sound_Loader:
+    sounds = None
+
+    def load_sounds(cls):
+        if cls.sounds is not None:
+            return cls.sounds
+
+        cls.sounds = {}
+        base_path = os.path.join(os.path.dirname(__file__), r'..\Resources\audio\Object')
+
+        for sound in cls.sounds.values():
+            sound.set_volume(50)
+
+        return cls.sounds
+
+class UI_Sound_Loader:
+    sounds = None
+
+    def load_sounds(cls):
+        if cls.sounds is not None:
+            return cls.sounds
+
+        cls.sounds = {}
+        base_path = os.path.join(os.path.dirname(__file__), r'..\Resources\audio\UI')
 
         for sound in cls.sounds.values():
             sound.set_volume(50)
