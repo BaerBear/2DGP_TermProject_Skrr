@@ -22,7 +22,7 @@ class Idle:
         pass
 
     def draw(self):
-        img = self.skrr.Idle_image[self.skrr.frame // 10 % 4]
+        img = self.skrr.Idle_image[self.skrr.frame // 10 % len(self.skrr.Idle_image)]
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
@@ -46,7 +46,7 @@ class Wait:
         pass
 
     def draw(self):
-        img = self.skrr.Wait_image[self.skrr.frame % 47]
+        img = self.skrr.Wait_image[self.skrr.frame % len(self.skrr.Wait_image)]
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
@@ -80,7 +80,7 @@ class Walk:
         pass
 
     def draw(self):
-        img = self.skrr.Walk_image[self.skrr.frame // 3 % 8]
+        img = self.skrr.Walk_image[self.skrr.frame // 3 % len(self.skrr.Walk_image)]
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
@@ -143,7 +143,7 @@ class Jump:
         self.effect_frame = 0
 
     def draw(self):
-        img = self.skrr.Jump_image[self.skrr.frame // 5 % 2]
+        img = self.skrr.Jump_image[self.skrr.frame // 5 % len(self.skrr.Jump_image)]
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
@@ -191,7 +191,7 @@ class JumpAttack:
         pass
 
     def draw(self):
-        img = self.skrr.JumpAttack_image[self.skrr.frame // 4 % 2]
+        img = self.skrr.JumpAttack_image[self.skrr.frame // 4 % len(self.skrr.JumpAttack_image)]
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
@@ -227,9 +227,9 @@ class Attack:
 
     def draw(self):
         if self.skrr.attack_type == 'A':
-            img = self.skrr.AttackA_image[self.skrr.frame // 3 % 5]
+            img = self.skrr.AttackA_image[self.skrr.frame // 3 % len(self.skrr.AttackA_image)]
         elif self.skrr.attack_type == 'B':
-            img = self.skrr.AttackB_image[self.skrr.frame // 3 % 4]
+            img = self.skrr.AttackB_image[self.skrr.frame // 3 % len(self.skrr.AttackB_image)]
         else:
             return
 
@@ -375,7 +375,7 @@ class Dead:
         pass
 
     def draw(self):
-        img = self.skrr.Dead_image[self.skrr.frame // 3 % 10]
+        img = self.skrr.Dead_image[self.skrr.frame // 3 % len(self.skrr.Dead_image)]
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
@@ -399,7 +399,7 @@ class Reborn:
         pass
 
     def draw(self):
-        img = self.skrr.Reborn_image[self.skrr.frame // 3 % 26]
+        img = self.skrr.Reborn_image[self.skrr.frame // 3 % len(self.skrr.Reborn_image)]
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
