@@ -7,10 +7,6 @@ def reset_world():
     global world, enemies
     world = []
 
-    global Skrr
-    Skrr = SKRR()
-    world.append(Skrr)
-
     # 테스트용 몬스터 생성
     sword_knight = Knight_Sword(900, get_canvas_height() // 2)
     sword_knight.target = Skrr
@@ -23,6 +19,10 @@ def reset_world():
     tackle_knight = Knight_Tackle(700, get_canvas_height() // 2)
     tackle_knight.target = Skrr
     world.append(tackle_knight)
+
+    global Skrr
+    Skrr = SKRR()
+    world.append(Skrr)
 
 def update_world():
     for obj in world:
