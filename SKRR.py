@@ -11,11 +11,15 @@ class SKRR:
         self.frame = 0
         self.face_dir = 1
         self.scale = 2
+        self.key_pressed = {'left': False, 'right': False}
+
+        # 대쉬관련
         self.dash_type = None
         self.dash_cooldown_time = 0.8  # 대쉬 쿨타임
         self.dash_last_use_time = 0
         self.attack_type = None
 
+        # 점프관련
         self.jumping = False
         self.jump_count = 0
         self.jumpattack_cooldown_time = 0.5 # 점프공격 쿨타임
@@ -25,7 +29,6 @@ class SKRR:
         self.velocity_y = 0
         self.velocity_x = 0
         self.ground_y = get_canvas_height() // 2
-        self.key_pressed = {'left': False, 'right': False}
         self.is_invincible = False
 
         # Image Load
