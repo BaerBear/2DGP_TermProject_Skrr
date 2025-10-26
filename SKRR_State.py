@@ -246,6 +246,7 @@ class Dash:
         self.dash_distance = 0
         self.max_dash_distance = 150
         self.can_second_dash = False
+        self.dash_dir = None
         self.is_air_dash = False
 
     def enter(self, e):
@@ -254,7 +255,7 @@ class Dash:
             self.dash_distance = 0
             self.can_second_dash = False
         self.minX = self.skrr.Walk_image[0].w * self.skrr.scale // 2 - 10
-
+        self.dash_dir = self.skrr.face_dir
         self.is_air_dash = not self.skrr.is_grounded
 
         self.skrr.is_invincible = True
@@ -266,23 +267,24 @@ class Dash:
             self.can_second_dash = True
 
         if (self.dash_distance < self.max_dash_distance
-                and ((self.skrr.face_dir == 1 and self.skrr.x < get_canvas_width() - self.minX)
-                     or (self.skrr.face_dir == -1 and self.skrr.x > self.minX))):
-            self.skrr.x += self.skrr.face_dir * 10
+                and ((self.dash_dir == 1 and self.skrr.x < get_canvas_width() - self.minX)
+                     or (self.dash_dir == -1 and self.skrr.x > self.minX))):
+            self.skrr.x += self.dash_dir * 10
             self.dash_distance += 10
         else:
             if self.is_air_dash:
                 self.skrr.state_machine.handle_event(('DASH_COMPLETE', 'FALL'))
-            elif self.skrr.is_moving:
-                self.skrr.state_machine.handle_event(('DASH_COMPLETE', 'WALK'))
             else:
-                self.skrr.state_machine.handle_event(('DASH_COMPLETE', 'IDLE'))
+                if self.skrr.is_moving:
+                    self.skrr.state_machine.handle_event(('DASH_COMPLETE', 'WALK'))
+                else:
+                    self.skrr.state_machine.handle_event(('DASH_COMPLETE', 'IDLE'))
 
     def exit(self, e):
         self.skrr.is_invincible = False
 
         if self.skrr.dash_type == 0 or self.skrr.dash_type == 1:
-            self.skrr.dash_cooldown = 30
+            self.skrr.dash_cooldown = 40
             self.skrr.dash_type = None
         self.dash_distance = 0
         self.is_air_dash = False
@@ -294,9 +296,9 @@ class Dash:
 
     def draw(self):
         img = self.skrr.Dash_image[0]
-        if self.skrr.face_dir == 1:
+        if self.dash_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
-        elif self.skrr.face_dir == -1:
+        elif self.dash_dir == -1:
             img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
 
 
@@ -319,6 +321,15 @@ class Fall:
         self.skrr.velocity_y += self.gravity
         self.skrr.y += self.skrr.velocity_y
 
+        if self.skrr.y <= self.skrr.ground_y:
+            self.skrr.y = self.skrr.ground_y
+            self.skrr.is_grounded = True
+            if self.skrr.is_moving:
+                self.skrr.state_machine.handle_event(('LAND_ON_GROUND', 'WALK'))
+            else:
+                self.skrr.state_machine.handle_event(('LAND_ON_GROUND', 'IDLE'))
+            return
+
         # 좌우 이동
         if self.skrr.is_moving:
             move_speed = 5
@@ -329,7 +340,9 @@ class Fall:
                 self.skrr.x = new_x
 
     def exit(self, e):
-        pass
+        self.skrr.velocity_y = 0
+        self.skrr.jumping = False
+        self.skrr.jump_count = 0
 
     def draw(self):
         if not self.skrr.Fall_image:
