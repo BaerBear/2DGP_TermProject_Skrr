@@ -25,3 +25,25 @@ class SKRR_Sound_Loader:
             sound.set_volume(50)
 
         return cls.sounds
+
+
+class BGM_Loader:
+    bgms = None
+
+    @classmethod
+    def load_bgms(cls):
+        if cls.bgms is not None:
+            return cls.bgms
+
+        cls.bgms = {}
+        base_path = os.path.join(os.path.dirname(__file__), r'..\Resources\audio')
+
+        cls.bgms['chapter1'] = load_music(os.path.join(base_path, 'Chapter1.wav'))
+        cls.bgms['chapter1_boss'] = load_music(os.path.join(base_path, 'Chapter1_Boss.wav'))
+        cls.bgms['main_title'] = load_music(os.path.join(base_path, 'MainTitle_Hardmode.wav'))
+
+        # 볼륨 조절
+        for bgm in cls.bgms.values():
+            bgm.set_volume(64)
+
+        return cls.bgms
