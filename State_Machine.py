@@ -4,10 +4,6 @@ class StateMachine:
         self.rules = rules
         self.cur_state.enter(('START', None))
 
-    def __init__(self, initial_state):
-        self.current_state = initial_state
-        self.current_state.enter()
-
     def change_state(self, new_state):
         self.current_state.exit()
         self.current_state = new_state
