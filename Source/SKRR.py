@@ -42,6 +42,7 @@ class SKRR:
         self.JumpAttack_image = SKRR_Image_Loader('JumpAttack').images
         self.Reborn_image = SKRR_Image_Loader('Reborn').images
         self.Dash_image = SKRR_Image_Loader('Dash').images
+        self.DashEffect_image = SKRR_Image_Loader('DashEffect').images
         self.Fall_image = SKRR_Image_Loader('Fall').images
         self.Dead_image = SKRR_Image_Loader('Dead').images
 

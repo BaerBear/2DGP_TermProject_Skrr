@@ -36,6 +36,9 @@ class SKRR_Image_Loader:
                 self.images.append(load_image(os.path.join(self.resource_path, r'Reborn', f'Reborn1(Castle)_{i + 1}.png')))
         elif state == 'Dash':
             self.images.append(load_image(os.path.join(self.resource_path, r'Dash', 'Dash_0.png')))
+        elif state == 'DashEffect':
+            for i in range(15):
+                self.images.append(load_image(os.path.join(self.resource_path, r'Dash', f'Dash_Smoke_{i}.png')))
         elif state == 'Fall':
             for i in range(2):
                 self.images.append(load_image(os.path.join(self.resource_path, r'Fall', f'Fall_{i}.png')))
