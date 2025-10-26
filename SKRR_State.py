@@ -1,14 +1,20 @@
-from pico2d import get_canvas_width
+from pico2d import delay, get_canvas_width, get_time
 
 class Idle:
     def __init__(self, skrr):
         self.skrr = skrr
+        self.timer = 0
 
     def enter(self, e):
         self.skrr.frame = 0
+        self.skrr.is_grounded = True
+        self.skrr.jump_count = 0
+        self.timer = get_time()
 
     def do(self):
-        self.skrr.frame += 1
+        self.skrr.frame = self.skrr.frame + 1
+        if get_time() - self.timer > 4.0:
+            self.skrr.state_machine.handle_event(('TIME_OUT', None))
 
     def exit(self, e):
         pass
@@ -16,11 +22,9 @@ class Idle:
     def draw(self):
         img = self.skrr.Idle_image[self.skrr.frame // 10 % 4]
         if self.skrr.face_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y,
-                          img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y,
-                                    img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
 
 class Wait:
     def __init__(self, skrr):
