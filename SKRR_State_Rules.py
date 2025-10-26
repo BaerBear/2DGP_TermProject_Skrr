@@ -14,7 +14,6 @@ def get_state_rules(skrr):
     def land_to_walk(e):
         return land_on_ground(e) and e[1] == 'WALK'
 
-    # 대시 완료 시 상태 결정
     def dash_to_walk(e):
         return dash_complete(e) and e[1] == 'WALK'
 
