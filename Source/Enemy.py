@@ -63,3 +63,46 @@ class Knight_Sword(Enemy):
             img.clip_draw(0, 0, img.w, img.h, self.x, self.y, img.w * self.scale, img.h * self.scale)
         else:
             img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.x, self.y, img.w * self.scale, img.h * self.scale)
+
+class Knight_Bow(Enemy):
+    images = None
+
+    def __init__(self, x, y):
+        super().__init__(x, y)
+        if Knight_Bow.images == None:
+            Knight_Bow.images = {}
+            Knight_Bow.images['walk'] = Enemy_Image_Loader('Knight_Bow', 'Walk').images
+            Knight_Bow.images['attack'] = Enemy_Image_Loader('Knight_Bow', 'Attack').images
+            Knight_Bow.images['hit'] = Enemy_Image_Loader('Knight_Bow', 'Hit').images
+            Knight_Bow.images['idle'] = Enemy_Image_Loader('Knight_Bow', 'Idle').images
+
+    def update(self):
+        self.frame += 1
+
+    def draw(self):
+        if not self.is_alive:
+            if 'dead' in Knight_Bow.images and Knight_Bow.images['dead']:
+                img = Knight_Bow.images['dead'][(self.frame // 3) % len(Knight_Bow.images['dead'])]
+            else:
+                return
+        elif self.state == 'ATTACK':
+            if 'attack' in Knight_Bow.images and Knight_Bow.images['attack']:
+                img = Knight_Bow.images['attack'][(self.frame // 3) % len(Knight_Bow.images['attack'])]
+            else:
+                return
+        elif self.state == 'WALK':
+            if 'walk' in Knight_Bow.images and Knight_Bow.images['walk']:
+                img = Knight_Bow.images['walk'][(self.frame // 3) % len(Knight_Bow.images['walk'])]
+            else:
+                return
+        else:  # IDLE
+            if 'idle' in Knight_Bow.images and Knight_Bow.images['idle']:
+                img = Knight_Bow.images['idle'][(self.frame // 10) % len(Knight_Bow.images['idle'])]
+            else:
+                return
+
+        if self.face_dir == 1:
+            img.clip_draw(0, 0, img.w, img.h, self.x, self.y, img.w * self.scale, img.h * self.scale)
+        else:
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.x, self.y, img.w * self.scale, img.h * self.scale)
+
