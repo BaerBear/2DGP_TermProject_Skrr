@@ -51,7 +51,7 @@ def Get_State_Rules(skrr):
 
         skrr.JUMP: {
             jump_down: skrr.JUMP,
-            dash_down: skrr.DASH,  # 점프 중 대시 → DASH 상태로 (공중 대시)
+            dash_down: skrr.DASH,
             attack_down: skrr.JUMPATTACK,
             start_falling: skrr.FALL,
             land_to_walk: skrr.WALK,
@@ -59,7 +59,8 @@ def Get_State_Rules(skrr):
         },
 
         skrr.FALL: {
-            dash_down: skrr.DASH,  # 낙하 중 대시 가능
+            jump_down: skrr.JUMP,
+            dash_down: skrr.DASH,
             attack_down: skrr.JUMPATTACK,
             land_to_walk: skrr.WALK,
             land_to_idle: skrr.IDLE,
@@ -77,10 +78,10 @@ def Get_State_Rules(skrr):
         },
 
         skrr.DASH: {
-            dash_down: skrr.DASH,  # 2단 대시
+            dash_down: skrr.DASH,
             dash_to_walk: skrr.WALK,
             dash_to_idle: skrr.IDLE,
-            dash_to_fall: skrr.FALL,  # 공중 대시 완료 → Fall
+            dash_to_fall: skrr.FALL,
         },
 
         skrr.DEAD: {

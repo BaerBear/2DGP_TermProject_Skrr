@@ -342,6 +342,9 @@ class Fall:
                 self.skrr.state_machine.handle_event(('LAND_ON_GROUND', 'WALK'))
             else:
                 self.skrr.state_machine.handle_event(('LAND_ON_GROUND', 'IDLE'))
+            self.skrr.velocity_y = 0
+            self.skrr.jumping = False
+            self.skrr.jump_count = 0
             return
 
         # 좌우 이동
@@ -354,9 +357,7 @@ class Fall:
                 self.skrr.x = new_x
 
     def exit(self, e):
-        self.skrr.velocity_y = 0
-        self.skrr.jumping = False
-        self.skrr.jump_count = 0
+        pass
 
     def draw(self):
         if not self.skrr.Fall_image:
