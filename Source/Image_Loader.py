@@ -59,6 +59,9 @@ class Enemy_Image_Loader:
             elif state == 'Hit':
                 for i in range(1, 3):
                     self.images.append(load_image(os.path.join(self.resource_path, f'Hit0{i}.png')))
+            elif state == 'Idle':
+                for i in range(6):
+                    self.images.append(load_image(os.path.join(self.resource_path, f'Idle_{i}.png')))
 
         elif enemy_type == 'Knight_Bow':
             if state == 'Walk':
@@ -70,6 +73,9 @@ class Enemy_Image_Loader:
             elif state == 'Hit':
                 for i in range(1, 3):
                     self.images.append(load_image(os.path.join(self.resource_path, f'Hit0{i}.png')))
+            elif state == 'Idle':
+                for i in range(4):
+                    self.images.append(load_image(os.path.join(self.resource_path, f'Idle_{i}.png')))
 
         elif enemy_type == 'Knight_Tackle':
             if state == 'Walk':
@@ -81,3 +87,6 @@ class Enemy_Image_Loader:
             elif state == 'Tackle':
                 for i in range(3):
                     self.images.append(load_image(os.path.join(self.resource_path, f'Tackle_{i}.png')))
+            elif state == 'Idle':
+                for i in range(5):
+                    self.images.append(load_image(os.path.join(self.resource_path, f'Idle_{i}.png')))
