@@ -53,7 +53,7 @@ class Knight_Sword(Enemy):
                 img = Knight_Sword.images['walk'][(self.frame // 3) % len(Knight_Sword.images['walk'])]
             else:
                 return
-        else:  # IDLE
+        else:
             if 'idle' in Knight_Sword.images and Knight_Sword.images['idle']:
                 img = Knight_Sword.images['idle'][(self.frame // 10) % len(Knight_Sword.images['idle'])]
             else:
@@ -63,6 +63,7 @@ class Knight_Sword(Enemy):
             img.clip_draw(0, 0, img.w, img.h, self.x, self.y, img.w * self.scale, img.h * self.scale)
         else:
             img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.x, self.y, img.w * self.scale, img.h * self.scale)
+
 
 class Knight_Bow(Enemy):
     images = None
@@ -95,9 +96,57 @@ class Knight_Bow(Enemy):
                 img = Knight_Bow.images['walk'][(self.frame // 3) % len(Knight_Bow.images['walk'])]
             else:
                 return
-        else:  # IDLE
+        else:
             if 'idle' in Knight_Bow.images and Knight_Bow.images['idle']:
                 img = Knight_Bow.images['idle'][(self.frame // 10) % len(Knight_Bow.images['idle'])]
+            else:
+                return
+
+        if self.face_dir == 1:
+            img.clip_draw(0, 0, img.w, img.h, self.x, self.y, img.w * self.scale, img.h * self.scale)
+        else:
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.x, self.y, img.w * self.scale, img.h * self.scale)
+
+
+class Knight_Tackle(Enemy):
+    images = None
+
+    def __init__(self, x, y):
+        super().__init__(x, y)
+        if Knight_Tackle.images == None:
+            Knight_Tackle.images = {}
+            Knight_Tackle.images['walk'] = Enemy_Image_Loader('Knight_Tackle', 'Walk').images
+            Knight_Tackle.images['attack'] = Enemy_Image_Loader('Knight_Tackle', 'Attack').images
+            Knight_Tackle.images['tackle'] = Enemy_Image_Loader('Knight_Tackle', 'Tackle').images
+            Knight_Tackle.images['idle'] = Enemy_Image_Loader('Knight_Tackle', 'Idle').images
+
+    def update(self):
+        self.frame += 1
+
+    def draw(self):
+        if not self.is_alive:
+            if 'dead' in Knight_Tackle.images and Knight_Tackle.images['dead']:
+                img = Knight_Tackle.images['dead'][(self.frame // 3) % len(Knight_Tackle.images['dead'])]
+            else:
+                return
+        elif self.state == 'ATTACK':
+            if 'attack' in Knight_Tackle.images and Knight_Tackle.images['attack']:
+                img = Knight_Tackle.images['attack'][(self.frame // 3) % len(Knight_Tackle.images['attack'])]
+            else:
+                return
+        elif self.state == 'TACKLE':
+            if 'tackle' in Knight_Tackle.images and Knight_Tackle.images['tackle']:
+                img = Knight_Tackle.images['tackle'][(self.frame // 3) % len(Knight_Tackle.images['tackle'])]
+            else:
+                return
+        elif self.state == 'WALK':
+            if 'walk' in Knight_Tackle.images and Knight_Tackle.images['walk']:
+                img = Knight_Tackle.images['walk'][(self.frame // 3) % len(Knight_Tackle.images['walk'])]
+            else:
+                return
+        else:
+            if 'idle' in Knight_Tackle.images and Knight_Tackle.images['idle']:
+                img = Knight_Tackle.images['idle'][(self.frame // 10) % len(Knight_Tackle.images['idle'])]
             else:
                 return
 
