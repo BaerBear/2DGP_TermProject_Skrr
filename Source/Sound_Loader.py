@@ -90,3 +90,55 @@ class UI_Sound_Loader:
 
         return cls.sounds
 
+class SoundManager:
+    _initialized = False
+    player_sounds = None
+    enemy_sounds = None
+    object_sounds = None
+    ui_sounds = None
+    bgms = None
+    current_bgm = None
+
+    def initialize(cls):
+        if cls._initialized:
+            return
+
+        cls.player_sounds = SKRR_Sound_Loader.load_sounds()
+        cls.enemy_sounds = Enemy_Sound_Loader.load_sounds()
+        cls.object_sounds = Object_Sound_Loader.load_sounds()
+        cls.ui_sounds = UI_Sound_Loader.load_sounds()
+        cls.bgms = BGM_Loader.load_bgms()
+        cls._initialized = True
+
+    def play_player_sound(cls, sound_name):
+        if cls.player_sounds and sound_name in cls.player_sounds:
+            cls.player_sounds[sound_name].play()
+
+    def play_enemy_sound(cls, sound_name):
+        if cls.enemy_sounds and sound_name in cls.enemy_sounds:
+            cls.enemy_sounds[sound_name].play()
+
+    def play_object_sound(cls, sound_name):
+        if cls.object_sounds and sound_name in cls.object_sounds:
+            cls.object_sounds[sound_name].play()
+
+    def play_ui_sound(cls, sound_name):
+        if cls.ui_sounds and sound_name in cls.ui_sounds:
+            cls.ui_sounds[sound_name].play()
+
+    def play_bgm(cls, bgm_name, repeat=True):
+        if cls.bgms and bgm_name in cls.bgms:
+            if cls.current_bgm:
+                cls.current_bgm.stop()
+
+            cls.current_bgm = cls.bgms[bgm_name]
+            if repeat:
+                cls.current_bgm.repeat_play()
+            else:
+                cls.current_bgm.play()
+
+    def stop_bgm(cls):
+        if cls.current_bgm:
+            cls.current_bgm.stop()
+            cls.current_bgm = None
+
