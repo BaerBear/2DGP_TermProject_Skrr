@@ -6,6 +6,8 @@ import Events
 def reset_world():
     global world, enemies
     world = []
+    global Skrr
+    Skrr = SKRR()
 
     # 테스트용 몬스터 생성
     sword_knight = Knight_Sword(900, get_canvas_height() // 2)
@@ -20,8 +22,6 @@ def reset_world():
     tackle_knight.target = Skrr
     world.append(tackle_knight)
 
-    global Skrr
-    Skrr = SKRR()
     world.append(Skrr)
 
 def update_world():
