@@ -49,7 +49,7 @@ def handle_attack(skrr, event):
     if skrr.state_machine.current_state == skrr.ATTACK and skrr.attack_type == 'A' and 6 <= skrr.frame < 15:
         skrr.attack_type = 'B'
         skrr.state_machine.handle_event(('COMBO_AVAILABLE', None))
-    elif skrr.jumping and skrr.jumpattack_cooldown <= 0:
+    elif skrr.jumping and skrr.is_jumpattack_ready():
         skrr.handle_event(('INPUT', event))
     elif not skrr.jumping:
         if skrr.attack_type is None:
@@ -68,7 +68,7 @@ def handle_jump(skrr, event):
 
 
 def handle_dash(skrr, event):
-    if skrr.dash_cooldown > 0:
+    if not skrr.is_dash_ready():
         return
     if skrr.state_machine.current_state == skrr.ATTACK or skrr.state_machine.current_state == skrr.JUMPATTACK:
         return

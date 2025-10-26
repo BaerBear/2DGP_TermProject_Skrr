@@ -164,7 +164,7 @@ class JumpAttack:
 
     def enter(self, e):
         self.skrr.frame = 0
-        self.skrr.jumpattack_cooldown = 15
+        self.skrr.jumpattack_last_use_time = get_time()
         self.minX = self.skrr.Walk_image[0].w * self.skrr.scale // 2 - 10
 
     def do(self):
@@ -188,7 +188,7 @@ class JumpAttack:
             self.skrr.state_machine.handle_event(('ANIMATION_END', None))
 
     def exit(self, e):
-        self.skrr.jumpattack_cooldown = 15
+        pass
 
     def draw(self):
         img = self.skrr.JumpAttack_image[self.skrr.frame // 4 % 2]
@@ -284,7 +284,7 @@ class Dash:
         self.skrr.is_invincible = False
 
         if self.skrr.dash_type == 0 or self.skrr.dash_type == 1:
-            self.skrr.dash_cooldown = 40
+            self.skrr.dash_last_use_time = get_time()
             self.skrr.dash_type = None
         self.dash_distance = 0
         self.is_air_dash = False

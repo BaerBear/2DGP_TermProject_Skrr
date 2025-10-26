@@ -12,12 +12,14 @@ class SKRR:
         self.face_dir = 1
         self.scale = 2
         self.dash_type = None
-        self.dash_cooldown = 0
+        self.dash_cooldown_time = 0.8  # 대쉬 쿨타임
+        self.dash_last_use_time = 0
         self.attack_type = None
 
         self.jumping = False
         self.jump_count = 0
-        self.jumpattack_cooldown = 0
+        self.jumpattack_cooldown_time = 0.5 # 점프공격 쿨타임
+        self.jumpattack_last_use_time = 0
         self.is_grounded = True
         self.is_moving = False
         self.velocity_y = 0
@@ -56,10 +58,12 @@ class SKRR:
 
     def update(self):
         self.state_machine.update()
-        if self.dash_cooldown > 0:
-            self.dash_cooldown -= 1
-        if self.jumpattack_cooldown > 0:
-            self.jumpattack_cooldown -= 1
+
+    def is_dash_ready(self):
+        return get_time() - self.dash_last_use_time >= self.dash_cooldown_time
+
+    def is_jumpattack_ready(self):
+        return get_time() - self.jumpattack_last_use_time >= self.jumpattack_cooldown_time
 
     def draw(self):
         self.state_machine.draw()
