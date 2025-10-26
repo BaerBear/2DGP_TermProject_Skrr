@@ -6,7 +6,7 @@ from pico2d import load_image
 class SKRR_Image_Loader:
     def __init__(self, state):
         self.images = []
-        self.resource_path = os.path.join(os.path.dirname(__file__), r'..\2DGP_TermProject_Skrr\Resources\Image\Object', 'Skul')
+        self.resource_path = os.path.join(os.path.dirname(__file__), r'..\Resources\Image\Object', 'Skul')
         if state == 'Idle':
             for i in range(4):
                 self.images.append(load_image(os.path.join(self.resource_path, r'Idle', f'Idle_{i}.png')))
@@ -42,3 +42,42 @@ class SKRR_Image_Loader:
         elif state == 'Dead':
             for i in range(3):
                 self.images.append(load_image(os.path.join(self.resource_path, r'Dead', f'Fall_Dead_{i}.png')))
+
+
+class Enemy_Image_Loader:
+    def __init__(self, enemy_type, state):
+        self.images = []
+        self.resource_path = os.path.join(os.path.dirname(__file__), r'..\Resources\Image\Object', enemy_type)
+
+        if enemy_type == 'Knight_Sword':
+            if state == 'Walk':
+                for i in range(8):
+                    self.images.append(load_image(os.path.join(self.resource_path, f'Walk_{i}.png')))
+            elif state == 'Attack':
+                for i in range(5):
+                    self.images.append(load_image(os.path.join(self.resource_path, f'Attack_{i}.png')))
+            elif state == 'Hit':
+                for i in range(1, 3):
+                    self.images.append(load_image(os.path.join(self.resource_path, f'Hit0{i}.png')))
+
+        elif enemy_type == 'Knight_Bow':
+            if state == 'Walk':
+                for i in range(4):
+                    self.images.append(load_image(os.path.join(self.resource_path, f'Walk_{i}.png')))
+            elif state == 'Attack':
+                for i in range(4):
+                    self.images.append(load_image(os.path.join(self.resource_path, f'Attack_{i}.png')))
+            elif state == 'Hit':
+                for i in range(1, 3):
+                    self.images.append(load_image(os.path.join(self.resource_path, f'Hit0{i}.png')))
+
+        elif enemy_type == 'Knight_Tackle':
+            if state == 'Walk':
+                for i in range(8):
+                    self.images.append(load_image(os.path.join(self.resource_path, f'Walk_{i}.png')))
+            elif state == 'Attack':
+                for i in range(8):
+                    self.images.append(load_image(os.path.join(self.resource_path, f'Attack_{i}.png')))
+            elif state == 'Tackle':
+                for i in range(3):
+                    self.images.append(load_image(os.path.join(self.resource_path, f'Tackle_{i}.png')))
