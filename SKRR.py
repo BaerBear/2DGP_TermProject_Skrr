@@ -11,23 +11,20 @@ class SKRR:
         self.frame = 0
         self.face_dir = 1
         self.scale = 2
-
-        self.key_pressed = {'left': False, 'right': False}
-        self.is_moving = False
-        self.is_grounded = True
-        self.jumping = False
-        self.jump_count = 0
-        self.velocity_y = 0
-        self.gravity = -0.5
-        self.effect_y = 0
-        self.effect_x = 0
-        self.effect_frame = 0
-
-        self.attack_type = None
-        self.jumpattack_cooldown = 0
-
         self.dash_type = None
         self.dash_cooldown = 0
+        self.attack_type = None
+
+        self.jumping = False
+        self.jump_count = 0
+        self.jumpattack_cooldown = 0
+        self.is_grounded = True
+        self.is_moving = False
+        self.velocity_y = 0
+        self.velocity_x = 0
+        self.ground_y = get_canvas_height() // 2
+        self.key_pressed = {'left': False, 'right': False}
+        self.is_invincible = False
 
         # Image Load
         self.Idle_image = SKRR_Image_Loader('Idle').images
@@ -59,10 +56,10 @@ class SKRR:
 
     def update(self):
         self.state_machine.update()
-        if self.jumpattack_cooldown > 0:
-            self.jumpattack_cooldown -= 1
         if self.dash_cooldown > 0:
             self.dash_cooldown -= 1
+        if self.jumpattack_cooldown > 0:
+            self.jumpattack_cooldown -= 1
 
     def draw(self):
         self.state_machine.draw()
