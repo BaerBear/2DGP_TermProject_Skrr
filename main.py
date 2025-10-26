@@ -1,6 +1,6 @@
 from pico2d import *
 from SKRR import *
-from Events import *
+import Events
 
 def reset_world():
     global world
@@ -28,7 +28,7 @@ reset_world()
 
 # game loop
 while running:
-    handle_events(running, Skrr)
+    Events.handle_events(running, Skrr)
     update_world()
     render_world()
     delay(0.01)

@@ -12,6 +12,20 @@ class SKRR:
         self.face_dir = 1
         self.scale = 2
 
+        self.key_pressed = {'left': False, 'right': False}
+        self.is_moving = False
+        self.is_grounded = True
+        self.jumping = False
+        self.jump_count = 0
+
+
+
+        self.attack_type = None
+        self.jumpattack_cooldown = 0
+
+        self.dash_type = None
+        self.dash_cooldown = 0
+
         # Image Load
         self.Idle_image = SKRR_Image_Loader('Idle').images
         self.Wait_image = SKRR_Image_Loader('Wait').images
@@ -38,9 +52,7 @@ class SKRR:
         self.DEAD = Dead(self)
         self.REBORN = Reborn(self)
 
-        self.Rules = Get_State_Rules(self)
-
-        self.state_machine = StateMachine(self.IDLE, self.Rules)
+        self.state_machine = StateMachine(self.IDLE, Get_State_Rules(self))
 
     def update(self):
         self.state_machine.update()

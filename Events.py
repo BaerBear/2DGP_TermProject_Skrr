@@ -1,5 +1,6 @@
 from pico2d import get_events, SDL_QUIT, SDL_KEYDOWN, SDL_KEYUP, SDLK_ESCAPE, SDLK_RIGHT, SDLK_LEFT, SDLK_c, SDLK_x, SDLK_z
 
+
 def handle_events(running, skrr):
     event_list = get_events()
     for event in event_list:
@@ -33,7 +34,7 @@ def handle_right_down(skrr, event):
     if skrr.state_machine.current_state != skrr.DASH:
         skrr.face_dir = 1
     skrr.is_moving = True
-    skrr.handle_event(event)
+    skrr.handle_event(('INPUT', event))
 
 
 def handle_left_down(skrr, event):
@@ -41,7 +42,7 @@ def handle_left_down(skrr, event):
     if skrr.state_machine.current_state != skrr.DASH:
         skrr.face_dir = -1
     skrr.is_moving = True
-    skrr.handle_event(event)
+    skrr.handle_event(('INPUT', event))
 
 
 def handle_attack(skrr, event):
@@ -49,11 +50,11 @@ def handle_attack(skrr, event):
         skrr.attack_type = 'B'
         skrr.state_machine.handle_event(('COMBO_AVAILABLE', None))
     elif skrr.jumping and skrr.jumpattack_cooldown <= 0:
-        skrr.handle_event(event)
+        skrr.handle_event(('INPUT', event))
     elif not skrr.jumping:
         if skrr.attack_type is None:
             skrr.attack_type = 'A'
-        skrr.handle_event(event)
+        skrr.handle_event(('INPUT', event))
 
 
 def handle_jump(skrr, event):
@@ -61,9 +62,9 @@ def handle_jump(skrr, event):
         return
 
     if skrr.is_grounded and skrr.jump_count == 0:
-        skrr.handle_event(event)
+        skrr.handle_event(('INPUT', event))
     elif not skrr.is_grounded and skrr.jump_count == 1:
-        skrr.handle_event(event)
+        skrr.handle_event(('INPUT', event))
 
 
 def handle_dash(skrr, event):
@@ -74,10 +75,10 @@ def handle_dash(skrr, event):
 
     if skrr.dash_type is None:
         skrr.dash_type = 0
-        skrr.handle_event(event)
+        skrr.handle_event(('INPUT', event))
     elif skrr.dash_type == 0 and skrr.state_machine.current_state == skrr.DASH and skrr.DASH.can_second_dash:
         skrr.dash_type = 1
-        skrr.handle_event(event)
+        skrr.handle_event(('INPUT', event))
 
 
 def handle_key_up(event, skrr):
@@ -94,6 +95,7 @@ def handle_right_up(skrr):
         skrr.is_moving = True
     else:
         skrr.is_moving = False
+        skrr.state_machine.handle_event(('STOP_MOVING', None))
 
 
 def handle_left_up(skrr):
@@ -103,3 +105,4 @@ def handle_left_up(skrr):
         skrr.is_moving = True
     else:
         skrr.is_moving = False
+        skrr.state_machine.handle_event(('STOP_MOVING', None))
