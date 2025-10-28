@@ -5,7 +5,7 @@ import random
 class Enemy:
     def __init__(self, x, y):
         self.x, self.y = x, y
-        self.frame = 0
+        self.frame = random.randint(0,3)
         self.face_dir = -1 if random.randint(-100, 100) < 0 else 1
         self.scale = 2
         self.is_alive = True
