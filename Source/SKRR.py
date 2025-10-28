@@ -4,10 +4,16 @@ from State_Machine import StateMachine
 from SKRR_State import Idle, Wait, Walk, Jump, JumpAttack, Attack, Dash, Fall, Dead, Reborn
 from SKRR_State_Rules import Get_State_Rules
 
+_player_instance = None
+
+def set_player(player):
+    global _player_instance
+    _player_instance = player
+
+def get_player():
+    return _player_instance
 
 class SKRR:
-    player_instance = None
-
     def __init__(self):
         self.x, self.y = get_canvas_width() // 2, get_canvas_height() // 2
         self.frame = 0
@@ -61,6 +67,7 @@ class SKRR:
         self.REBORN = Reborn(self)
 
         self.state_machine = StateMachine(self.REBORN, Get_State_Rules(self))
+        set_player(self)
 
     def update(self):
         self.state_machine.update()
@@ -76,8 +83,3 @@ class SKRR:
 
     def handle_event(self, event):
         self.state_machine.handle_event(event)
-
-    @classmethod
-    def get_player(cls):
-        return cls.player_instance
-
