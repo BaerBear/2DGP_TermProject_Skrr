@@ -189,6 +189,11 @@ class JumpAttack:
 
         if self.skrr.frame >= 10:
             self.skrr.state_machine.handle_event(('ANIMATION_END', None))
+        elif self.skrr.y <= self.skrr.ground_y:
+            self.skrr.y = self.skrr.ground_y
+            self.skrr.is_grounded = True
+            self.skrr.velocity_y = 0
+            self.skrr.state_machine.handle_event(('ANIMATION_END', None))
 
     def exit(self, e):
         pass
@@ -424,11 +429,8 @@ class Reborn:
             self.skrr.state_machine.handle_event(('ANIMATION_END', None))
 
     def exit(self, e):
-        pass
+        self.face_dir = 1
 
     def draw(self):
         img = self.skrr.Reborn_image[self.skrr.frame // 3 % len(self.skrr.Reborn_image)]
-        if self.skrr.face_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
-        elif self.skrr.face_dir == -1:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+        img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
