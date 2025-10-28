@@ -27,7 +27,7 @@ class Knight_Sword(Enemy):
 
     def __init__(self, x, y):
         super().__init__(x, y)
-        if Knight_Sword.images == None:
+        if not Knight_Sword.images:
             Knight_Sword.images = {}
             Knight_Sword.images['walk'] = Enemy_Image_Loader('Knight_Sword', 'Walk').images
             Knight_Sword.images['attack'] = Enemy_Image_Loader('Knight_Sword', 'Attack').images
@@ -70,7 +70,7 @@ class Knight_Bow(Enemy):
 
     def __init__(self, x, y):
         super().__init__(x, y)
-        if Knight_Bow.images == None:
+        if not Knight_Bow.images:
             Knight_Bow.images = {}
             Knight_Bow.images['walk'] = Enemy_Image_Loader('Knight_Bow', 'Walk').images
             Knight_Bow.images['attack'] = Enemy_Image_Loader('Knight_Bow', 'Attack').images
@@ -113,7 +113,7 @@ class Knight_Tackle(Enemy):
 
     def __init__(self, x, y):
         super().__init__(x, y)
-        if Knight_Tackle.images == None:
+        if not Knight_Tackle.images:
             Knight_Tackle.images = {}
             Knight_Tackle.images['walk'] = Enemy_Image_Loader('Knight_Tackle', 'Walk').images
             Knight_Tackle.images['attack'] = Enemy_Image_Loader('Knight_Tackle', 'Attack').images
