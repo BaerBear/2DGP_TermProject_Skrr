@@ -204,6 +204,7 @@ class JumpAttack:
 class Attack:
     def __init__(self, skrr):
         self.skrr = skrr
+        self.attack_dir = None
 
     def enter(self, e):
         self.skrr.frame = 0
@@ -211,6 +212,7 @@ class Attack:
             SoundManager.play_player_sound('Attack1')
         elif self.skrr.attack_type == 'B':
             SoundManager.play_player_sound('Attack2')
+        self.attack_dir = self.skrr.face_dir
 
     def do(self):
         self.skrr.frame = self.skrr.frame + 1
@@ -243,9 +245,9 @@ class Attack:
         else:
             return
 
-        if self.skrr.face_dir == 1:
+        if self.attack_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
-        elif self.skrr.face_dir == -1:
+        elif self.attack_dir == -1:
             img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
 
 

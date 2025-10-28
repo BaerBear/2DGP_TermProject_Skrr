@@ -58,7 +58,7 @@ class SKRR:
         self.DEAD = Dead(self)
         self.REBORN = Reborn(self)
 
-        self.state_machine = StateMachine(self.IDLE, Get_State_Rules(self))
+        self.state_machine = StateMachine(self.REBORN, Get_State_Rules(self))
 
     def update(self):
         self.state_machine.update()
