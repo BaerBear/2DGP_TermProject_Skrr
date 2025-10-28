@@ -1,5 +1,6 @@
 from pico2d import *
 from Image_Loader import Enemy_Image_Loader
+import SKRR
 import random
 
 class Enemy:
@@ -10,6 +11,11 @@ class Enemy:
         self.scale = 2
         self.is_alive = True
 
+        # 임의 스탯
+        self.hp = 150
+        self.velocity = 5
+        self.dis_to_player = 0
+
         self.is_attacking = False
         self.is_hit = False
         self.attack_cooldown_time = 1.5  # 공격 쿨타임
@@ -17,7 +23,7 @@ class Enemy:
         self.state = 'IDLE'
 
     def update(self):
-        pass
+        self.frame += 1
 
     def draw(self):
         pass
@@ -35,7 +41,7 @@ class Knight_Sword(Enemy):
             Knight_Sword.images['idle'] = Enemy_Image_Loader('Knight_Sword', 'Idle').images
 
     def update(self):
-        self.frame += 1
+        super().update()
 
     def draw(self):
         if not self.is_alive:
@@ -78,7 +84,7 @@ class Knight_Bow(Enemy):
             Knight_Bow.images['idle'] = Enemy_Image_Loader('Knight_Bow', 'Idle').images
 
     def update(self):
-        self.frame += 1
+        super().update()
 
     def draw(self):
         if not self.is_alive:
@@ -121,7 +127,7 @@ class Knight_Tackle(Enemy):
             Knight_Tackle.images['idle'] = Enemy_Image_Loader('Knight_Tackle', 'Idle').images
 
     def update(self):
-        self.frame += 1
+        super().update()
 
     def draw(self):
         if not self.is_alive:
