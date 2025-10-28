@@ -13,7 +13,7 @@ class Enemy:
 
         # 임의 스탯
         self.hp = 150
-        self.velocity = 5
+        self.velocity = 2
         self.dis_to_player = 0
 
         self.is_attacking = False
@@ -80,17 +80,17 @@ class Knight_Sword(Enemy):
     def draw(self):
         if not self.is_alive:
             if 'dead' in Knight_Sword.images and Knight_Sword.images['dead']:
-                img = Knight_Sword.images['dead'][(self.frame // 3) % len(Knight_Sword.images['dead'])]
+                img = Knight_Sword.images['dead'][(self.frame // 6) % len(Knight_Sword.images['dead'])]
             else:
                 return
         elif self.state == 'ATTACK':
             if 'attack' in Knight_Sword.images and Knight_Sword.images['attack']:
-                img = Knight_Sword.images['attack'][(self.frame // 3) % len(Knight_Sword.images['attack'])]
+                img = Knight_Sword.images['attack'][(self.frame // 6) % len(Knight_Sword.images['attack'])]
             else:
                 return
         elif self.state == 'WALK':
             if 'walk' in Knight_Sword.images and Knight_Sword.images['walk']:
-                img = Knight_Sword.images['walk'][(self.frame // 3) % len(Knight_Sword.images['walk'])]
+                img = Knight_Sword.images['walk'][(self.frame // 6) % len(Knight_Sword.images['walk'])]
             else:
                 return
         else:
@@ -123,17 +123,17 @@ class Knight_Bow(Enemy):
     def draw(self):
         if not self.is_alive:
             if 'dead' in Knight_Bow.images and Knight_Bow.images['dead']:
-                img = Knight_Bow.images['dead'][(self.frame // 3) % len(Knight_Bow.images['dead'])]
+                img = Knight_Bow.images['dead'][(self.frame // 6) % len(Knight_Bow.images['dead'])]
             else:
                 return
         elif self.state == 'ATTACK':
             if 'attack' in Knight_Bow.images and Knight_Bow.images['attack']:
-                img = Knight_Bow.images['attack'][(self.frame // 3) % len(Knight_Bow.images['attack'])]
+                img = Knight_Bow.images['attack'][(self.frame // 6) % len(Knight_Bow.images['attack'])]
             else:
                 return
         elif self.state == 'WALK':
             if 'walk' in Knight_Bow.images and Knight_Bow.images['walk']:
-                img = Knight_Bow.images['walk'][(self.frame // 3) % len(Knight_Bow.images['walk'])]
+                img = Knight_Bow.images['walk'][(self.frame // 6) % len(Knight_Bow.images['walk'])]
             else:
                 return
         else:
@@ -166,22 +166,22 @@ class Knight_Tackle(Enemy):
     def draw(self):
         if not self.is_alive:
             if 'dead' in Knight_Tackle.images and Knight_Tackle.images['dead']:
-                img = Knight_Tackle.images['dead'][(self.frame // 3) % len(Knight_Tackle.images['dead'])]
+                img = Knight_Tackle.images['dead'][(self.frame // 6) % len(Knight_Tackle.images['dead'])]
             else:
                 return
         elif self.state == 'ATTACK':
             if 'attack' in Knight_Tackle.images and Knight_Tackle.images['attack']:
-                img = Knight_Tackle.images['attack'][(self.frame // 3) % len(Knight_Tackle.images['attack'])]
+                img = Knight_Tackle.images['attack'][(self.frame // 6) % len(Knight_Tackle.images['attack'])]
             else:
                 return
         elif self.state == 'TACKLE':
             if 'tackle' in Knight_Tackle.images and Knight_Tackle.images['tackle']:
-                img = Knight_Tackle.images['tackle'][(self.frame // 3) % len(Knight_Tackle.images['tackle'])]
+                img = Knight_Tackle.images['tackle'][(self.frame // 6) % len(Knight_Tackle.images['tackle'])]
             else:
                 return
         elif self.state == 'WALK':
             if 'walk' in Knight_Tackle.images and Knight_Tackle.images['walk']:
-                img = Knight_Tackle.images['walk'][(self.frame // 3) % len(Knight_Tackle.images['walk'])]
+                img = Knight_Tackle.images['walk'][(self.frame // 6) % len(Knight_Tackle.images['walk'])]
             else:
                 return
         else:
