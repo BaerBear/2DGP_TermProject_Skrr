@@ -15,7 +15,8 @@ def get_player():
 
 class SKRR:
     def __init__(self):
-        self.x, self.y = get_canvas_width() // 2, get_canvas_height() // 2
+        self.x, self.y = 100, get_canvas_height() // 2
+        self.velocity_x, self.velocity_y = 4, 0
         self.frame = 0
         self.face_dir = 1
         self.scale = 2
@@ -34,8 +35,6 @@ class SKRR:
         self.jumpattack_last_use_time = 0
         self.is_grounded = True
         self.is_moving = False
-        self.velocity_y = 0
-        self.velocity_x = 0
         self.ground_y = get_canvas_height() // 2
         self.is_invincible = False
 
@@ -66,7 +65,7 @@ class SKRR:
         self.DEAD = Dead(self)
         self.REBORN = Reborn(self)
 
-        self.state_machine = StateMachine(self.REBORN, Get_State_Rules(self))
+        self.state_machine = StateMachine(self.IDLE, Get_State_Rules(self))
         set_player(self)
 
     def update(self):

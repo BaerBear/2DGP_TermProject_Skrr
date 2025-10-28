@@ -71,13 +71,13 @@ class Walk:
         elif self.skrr.x >= get_canvas_width() - minX and self.skrr.face_dir == 1:
             self.skrr.x = get_canvas_width() - minX
         else:
-            self.skrr.x += self.skrr.face_dir * 5
+            self.skrr.x += self.skrr.face_dir * self.skrr.velocity_x
 
     def exit(self, e):
         pass
 
     def draw(self):
-        img = self.skrr.Walk_image[self.skrr.frame // 3 % len(self.skrr.Walk_image)]
+        img = self.skrr.Walk_image[self.skrr.frame // 6 % len(self.skrr.Walk_image)]
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
@@ -128,7 +128,7 @@ class Jump:
 
         # 좌우 이동
         if self.skrr.is_moving:
-            move_speed = 5
+            move_speed = self.skrr.velocity_x
             new_x = self.skrr.x + self.skrr.face_dir * move_speed
 
             # 화면 경계 체크 (임시)
@@ -147,9 +147,9 @@ class Jump:
         elif self.skrr.face_dir == -1:
             img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
 
-        if self.effect_y is not None and self.effect_frame < 60:
+        if self.effect_y is not None and self.effect_frame < 30:
             if hasattr(self.skrr, 'JumpEffect_image') and self.skrr.JumpEffect_image:
-                effect_img = self.skrr.JumpEffect_image[self.effect_frame // 9 % len(self.skrr.JumpEffect_image)]
+                effect_img = self.skrr.JumpEffect_image[self.effect_frame // 3 % len(self.skrr.JumpEffect_image)]
                 effect_img.clip_draw(0, 0, effect_img.w, effect_img.h, self.effect_x, self.effect_y,
                                      effect_img.w * self.skrr.scale, effect_img.h * self.skrr.scale)
 
@@ -175,14 +175,14 @@ class JumpAttack:
 
         # 좌우 이동
         if self.skrr.is_moving:
-            move_speed = 5
+            move_speed = self.skrr.velocity_x
             new_x = self.skrr.x + self.skrr.face_dir * move_speed
 
             # 화면 경계 체크 (임시)
             if self.minX <= new_x <= get_canvas_width() - self.minX:
                 self.skrr.x = new_x
 
-        if self.skrr.frame >= 10:
+        if self.skrr.frame >= 16:
             self.skrr.state_machine.handle_event(('ANIMATION_END', None))
         elif self.skrr.y <= self.skrr.ground_y:
             self.skrr.y = self.skrr.ground_y
@@ -194,7 +194,7 @@ class JumpAttack:
         pass
 
     def draw(self):
-        img = self.skrr.JumpAttack_image[self.skrr.frame // 4 % len(self.skrr.JumpAttack_image)]
+        img = self.skrr.JumpAttack_image[self.skrr.frame // 8 % len(self.skrr.JumpAttack_image)]
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
@@ -271,6 +271,8 @@ class Dash:
         self.minX = self.skrr.Walk_image[0].w * self.skrr.scale // 2 - 10
         self.dash_dir = self.skrr.face_dir
         self.is_air_dash = not self.skrr.is_grounded
+        if self.skrr.velocity_y > 0:
+            self.skrr.velocity_y = 0
 
         self.effect_x, self.effect_y = self.skrr.x, self.skrr.y - 10
         self.effect_frame = 0
@@ -286,8 +288,8 @@ class Dash:
         if (self.dash_distance < self.max_dash_distance
                 and ((self.dash_dir == 1 and self.skrr.x < get_canvas_width() - self.minX)
                      or (self.dash_dir == -1 and self.skrr.x > self.minX))):
-            self.skrr.x += self.dash_dir * 15
-            self.dash_distance += 15
+            self.skrr.x += self.dash_dir * 8
+            self.dash_distance += 8
         else:
             if self.is_air_dash:
                 self.skrr.state_machine.handle_event(('DASH_COMPLETE', 'FALL'))
@@ -306,6 +308,8 @@ class Dash:
         self.dash_distance = 0
         self.is_air_dash = False
         self.effect_x, self.effect_y = None, None
+
+        self.skrr.velocity_y = 0
 
         if self.skrr.key_pressed['left'] and not self.skrr.key_pressed['right']:
             self.skrr.face_dir = -1
@@ -359,7 +363,7 @@ class Fall:
 
         # 좌우 이동
         if self.skrr.is_moving:
-            move_speed = 5
+            move_speed = self.skrr.velocity_x
             new_x = self.skrr.x + self.skrr.face_dir * move_speed
 
             # 화면 경계 체크 (임시)
