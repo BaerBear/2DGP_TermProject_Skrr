@@ -23,6 +23,12 @@ class Enemy:
         self.state = 'IDLE'
 
     def update(self):
+        if not self.is_alive:
+            return
+
+        # 플레이어와의 거리
+        player = SKRR.get_player()
+
         self.frame += 1
 
     def draw(self):
