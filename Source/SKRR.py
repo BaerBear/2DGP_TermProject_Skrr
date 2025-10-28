@@ -6,6 +6,8 @@ from SKRR_State_Rules import Get_State_Rules
 
 
 class SKRR:
+    player_instance = None
+
     def __init__(self):
         self.x, self.y = get_canvas_width() // 2, get_canvas_height() // 2
         self.frame = 0
@@ -44,7 +46,7 @@ class SKRR:
         self.Dash_image = SKRR_Image_Loader('Dash').images
         self.DashEffect_image = SKRR_Image_Loader('DashEffect').images
         self.Fall_image = SKRR_Image_Loader('Fall').images
-        self.Dead_image = SKRR_Image_Loader('Dead').images  
+        self.Dead_image = SKRR_Image_Loader('Dead').images
 
         # State
         self.IDLE = Idle(self)
@@ -74,3 +76,8 @@ class SKRR:
 
     def handle_event(self, event):
         self.state_machine.handle_event(event)
+
+    @classmethod
+    def get_player(cls):
+        return cls.player_instance
+

@@ -28,6 +28,8 @@ class Enemy:
 
         # 플레이어와의 거리
         player = SKRR.get_player()
+        if player:
+            pass
 
         self.frame += 1
 
