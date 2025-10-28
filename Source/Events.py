@@ -46,7 +46,10 @@ def handle_left_down(skrr, event):
 
 
 def handle_attack(skrr, event):
-    if skrr.state_machine.current_state == skrr.ATTACK and skrr.attack_type == 'A' and 12 <= skrr.frame < 30:
+    if skrr.attack_type == 'B':
+        return
+
+    if skrr.state_machine.current_state == skrr.ATTACK and skrr.attack_type == 'A' and 18 <= skrr.frame < 30:
         skrr.attack_type = 'B'
         skrr.state_machine.handle_event(('COMBO_AVAILABLE', None))
     elif skrr.jumping and skrr.is_jumpattack_ready():
@@ -54,7 +57,7 @@ def handle_attack(skrr, event):
     elif not skrr.jumping:
         if skrr.attack_type is None:
             skrr.attack_type = 'A'
-        skrr.handle_event(('INPUT', event))
+            skrr.handle_event(('INPUT', event))
 
 
 def handle_jump(skrr, event):

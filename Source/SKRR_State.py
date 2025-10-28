@@ -223,18 +223,17 @@ class Attack:
                 self.skrr.state_machine.handle_event(('ANIMATION_END', 'WALK'))
             else:
                 self.skrr.state_machine.handle_event(('ANIMATION_END', 'IDLE'))
+            self.skrr.attack_type = None
         elif self.skrr.attack_type == 'B' and self.skrr.frame >= 12 * 2:
             # 방향키가 눌려있으면 WALK로, 아니면 IDLE로
             if self.skrr.key_pressed['left'] or self.skrr.key_pressed['right']:
                 self.skrr.state_machine.handle_event(('ANIMATION_END', 'WALK'))
             else:
                 self.skrr.state_machine.handle_event(('ANIMATION_END', 'IDLE'))
+            self.skrr.attack_type = None
 
     def exit(self, e):
-        if self.skrr.attack_type == 'A' and self.skrr.frame >= 15 * 2:
-            self.skrr.attack_type = None
-        elif self.skrr.attack_type == 'B' and self.skrr.frame >= 12 * 2:
-            self.skrr.attack_type = None
+        pass
 
     def draw(self):
         if self.skrr.attack_type == 'A':
