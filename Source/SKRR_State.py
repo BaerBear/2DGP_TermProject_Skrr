@@ -286,8 +286,8 @@ class Dash:
         if (self.dash_distance < self.max_dash_distance
                 and ((self.dash_dir == 1 and self.skrr.x < get_canvas_width() - self.minX)
                      or (self.dash_dir == -1 and self.skrr.x > self.minX))):
-            self.skrr.x += self.dash_dir * 14.3
-            self.dash_distance += 14.3
+            self.skrr.x += self.dash_dir * 15
+            self.dash_distance += 15
         else:
             if self.is_air_dash:
                 self.skrr.state_machine.handle_event(('DASH_COMPLETE', 'FALL'))
