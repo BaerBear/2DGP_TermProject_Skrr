@@ -31,6 +31,31 @@ class Enemy:
         if player:
             self.dis_to_player = abs(self.x - player.x)
 
+            if player.x > self.x:
+                self.face_dir = 1
+            else:
+                self.face_dir = -1
+
+            attack_range = 100
+            detect_range = 400
+
+            current_time = get_time()
+
+            # 공격 상태 처리
+            if self.dis_to_player <= attack_range:
+                if current_time - self.attack_last_use_time >= self.attack_cooldown_time:
+                    self.state = 'ATTACK'
+                    self.is_attacking = True
+                    self.attack_last_use_time = current_time
+                elif not self.is_attacking:
+                    self.state = 'IDLE'
+            # 추적 상태 처리
+            elif self.dis_to_player <= detect_range:
+                self.state = 'WALK'
+                self.x += self.velocity * self.face_dir
+            # 대기 상태
+            else:
+                self.state = 'IDLE'
 
         self.frame += 1
 
