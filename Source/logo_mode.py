@@ -7,7 +7,7 @@ logo_start_time = 0.0
 
 def init():
     global image, logo_start_time
-    image = load_image('../Resources/Image/Skrr_Ai_image.png')
+    image = load_image('../Resources/Image/Skrr_Ai_image_fill.png')
     logo_start_time = get_time()
 
 def update():

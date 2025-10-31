@@ -6,14 +6,17 @@ image = None
 
 def init():
     global image
-    image = load_image('../Resources/Image/Title_Logo.png')
+    image = []
+    image.append(load_image('../Resources/Image/Title_Art.png'))
+    image.append(load_image('../Resources/Image/Title_Logo.png'))
 
 def update():
     pass
 
 def draw():
     clear_canvas()
-    image.draw(1440 // 2, 900 // 2)
+    image[0].draw(1440 // 2, 900 // 2)
+    image[1].draw(1440 // 2, 900 // 2)
     update_canvas()
 
 def finish():
