@@ -1,4 +1,5 @@
 from pico2d import *
+<<<<<<< HEAD
 from SKRR import *
 from Enemy import Knight_Sword, Knight_Bow, Knight_Tackle
 from Sound_Loader import SoundManager
@@ -37,16 +38,11 @@ def render_world():
     update_canvas()
 
 running = True
+=======
+import logo_mode as start_mode
+import game_framework
+>>>>>>> 84fd82643ea7d81f0fede83c1a7a1d0f3d4f9b69
 
 open_canvas(1440, 900)
-
-reset_world()
-
-# game loop
-while running:
-    running = Events.handle_events(running, Skrr)
-    update_world()
-    render_world()
-    delay(0.01)
-
+game_framework.run(start_mode)
 close_canvas()
