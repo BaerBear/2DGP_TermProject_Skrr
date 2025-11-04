@@ -14,7 +14,30 @@ def get_player():
     return _player_instance
 
 class SKRR:
+    images = None
+
+    @classmethod
+    def load_images(cls):
+        if cls.images is None:
+            cls.images = {
+                'Idle': SKRR_Image_Loader('Idle').images,
+                'Wait': SKRR_Image_Loader('Wait').images,
+                'Walk': SKRR_Image_Loader('Walk').images,
+                'AttackA': SKRR_Image_Loader('AttackA').images,
+                'AttackB': SKRR_Image_Loader('AttackB').images,
+                'Jump': SKRR_Image_Loader('Jump').images,
+                'JumpEffect': SKRR_Image_Loader('JumpEffect').images,
+                'JumpAttack': SKRR_Image_Loader('JumpAttack').images,
+                'Reborn': SKRR_Image_Loader('Reborn').images,
+                'Dash': SKRR_Image_Loader('Dash').images,
+                'DashEffect': SKRR_Image_Loader('DashEffect').images,
+                'Fall': SKRR_Image_Loader('Fall').images,
+                'Dead': SKRR_Image_Loader('Dead').images,
+            }
+
     def __init__(self):
+        SKRR.load_images()
+
         self.x, self.y = 100, get_canvas_height() // 2
         self.velocity_x, self.velocity_y = 4, 0
         self.frame = 0
@@ -38,20 +61,6 @@ class SKRR:
         self.ground_y = get_canvas_height() // 2
         self.is_invincible = False
 
-        # Image Load
-        self.Idle_image = SKRR_Image_Loader('Idle').images
-        self.Wait_image = SKRR_Image_Loader('Wait').images
-        self.Walk_image = SKRR_Image_Loader('Walk').images
-        self.AttackA_image = SKRR_Image_Loader('AttackA').images
-        self.AttackB_image = SKRR_Image_Loader('AttackB').images
-        self.Jump_image = SKRR_Image_Loader('Jump').images
-        self.JumpEffect_image = SKRR_Image_Loader('JumpEffect').images
-        self.JumpAttack_image = SKRR_Image_Loader('JumpAttack').images
-        self.Reborn_image = SKRR_Image_Loader('Reborn').images
-        self.Dash_image = SKRR_Image_Loader('Dash').images
-        self.DashEffect_image = SKRR_Image_Loader('DashEffect').images
-        self.Fall_image = SKRR_Image_Loader('Fall').images
-        self.Dead_image = SKRR_Image_Loader('Dead').images
 
         # State
         self.IDLE = Idle(self)

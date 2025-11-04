@@ -21,7 +21,7 @@ class Idle:
         pass
 
     def draw(self):
-        img = self.skrr.Idle_image[self.skrr.frame // 10 % len(self.skrr.Idle_image)]
+        img = self.skrr.images['Idle'][self.skrr.frame // 10 % len(self.skrr.images['Idle'])]
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
@@ -44,7 +44,7 @@ class Wait:
         pass
 
     def draw(self):
-        img = self.skrr.Wait_image[self.skrr.frame // 6 % len(self.skrr.Wait_image)]
+        img = self.skrr.images['Wait'][self.skrr.frame // 6 % len(self.skrr.images['Wait'])]
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
@@ -59,7 +59,7 @@ class Walk:
         self.skrr.frame = 0
 
     def do(self):
-        minX = self.skrr.Walk_image[0].w * self.skrr.scale // 2 - 10
+        minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 10
         self.skrr.frame = self.skrr.frame + 1
 
         if not self.skrr.is_moving:
@@ -77,7 +77,7 @@ class Walk:
         pass
 
     def draw(self):
-        img = self.skrr.Walk_image[self.skrr.frame // 6 % len(self.skrr.Walk_image)]
+        img = self.skrr.images['Walk'][self.skrr.frame // 6 % len(self.skrr.images['Walk'])]
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
@@ -96,7 +96,7 @@ class Jump:
 
     def enter(self, e):
         self.skrr.frame = 0
-        self.minX = self.skrr.Walk_image[0].w * self.skrr.scale // 2 - 10
+        self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 10
         self.skrr.jumping = True
         if self.skrr.jump_count == 0:
             self.skrr.jump_count = 1
@@ -117,21 +117,17 @@ class Jump:
         if self.effect_y is not None:
             self.effect_frame += 1
 
-        # 중력 적용
         self.skrr.velocity_y += self.gravity
         self.skrr.y += self.skrr.velocity_y
 
-        # 낙하 시작 감지
         if self.skrr.velocity_y < 0 and not self.skrr.is_grounded:
             self.skrr.state_machine.handle_event(('START_FALLING', None))
             return
 
-        # 좌우 이동
         if self.skrr.is_moving:
             move_speed = self.skrr.velocity_x
             new_x = self.skrr.x + self.skrr.face_dir * move_speed
 
-            # 화면 경계 체크 (임시)
             if self.minX <= new_x <= get_canvas_width() - self.minX:
                 self.skrr.x = new_x
 
@@ -141,15 +137,15 @@ class Jump:
         self.effect_frame = 0
 
     def draw(self):
-        img = self.skrr.Jump_image[self.skrr.frame // 15 % len(self.skrr.Jump_image)]
+        img = self.skrr.images['Jump'][self.skrr.frame // 15 % len(self.skrr.images['Jump'])]
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
             img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
 
         if self.effect_y is not None and self.effect_frame < 30:
-            if hasattr(self.skrr, 'JumpEffect_image') and self.skrr.JumpEffect_image:
-                effect_img = self.skrr.JumpEffect_image[self.effect_frame // 3 % len(self.skrr.JumpEffect_image)]
+            if self.skrr.images['JumpEffect']:
+                effect_img = self.skrr.images['JumpEffect'][self.effect_frame // 3 % len(self.skrr.images['JumpEffect'])]
                 effect_img.clip_draw(0, 0, effect_img.w, effect_img.h, self.effect_x, self.effect_y,
                                      effect_img.w * self.skrr.scale, effect_img.h * self.skrr.scale)
 
@@ -163,22 +159,19 @@ class JumpAttack:
     def enter(self, e):
         self.skrr.frame = 0
         self.skrr.jumpattack_last_use_time = get_time()
-        self.minX = self.skrr.Walk_image[0].w * self.skrr.scale // 2 - 10
+        self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 10
         SoundManager.play_player_sound('Jump_attack')
 
     def do(self):
         self.skrr.frame = self.skrr.frame + 1
 
-        # 중력 적용
         self.skrr.velocity_y += self.gravity
         self.skrr.y += self.skrr.velocity_y
 
-        # 좌우 이동
         if self.skrr.is_moving:
             move_speed = self.skrr.velocity_x
             new_x = self.skrr.x + self.skrr.face_dir * move_speed
 
-            # 화면 경계 체크 (임시)
             if self.minX <= new_x <= get_canvas_width() - self.minX:
                 self.skrr.x = new_x
 
@@ -194,7 +187,7 @@ class JumpAttack:
         pass
 
     def draw(self):
-        img = self.skrr.JumpAttack_image[self.skrr.frame // 8 % len(self.skrr.JumpAttack_image)]
+        img = self.skrr.images['JumpAttack'][self.skrr.frame // 8 % len(self.skrr.images['JumpAttack'])]
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
@@ -218,14 +211,12 @@ class Attack:
         self.skrr.frame = self.skrr.frame + 1
 
         if self.skrr.attack_type == 'A' and self.skrr.frame >= 15 * 2:
-            # 방향키가 눌려있으면 WALK로, 아니면 IDLE로
             if self.skrr.key_pressed['left'] or self.skrr.key_pressed['right']:
                 self.skrr.state_machine.handle_event(('ANIMATION_END', 'WALK'))
             else:
                 self.skrr.state_machine.handle_event(('ANIMATION_END', 'IDLE'))
             self.skrr.attack_type = None
         elif self.skrr.attack_type == 'B' and self.skrr.frame >= 12 * 2:
-            # 방향키가 눌려있으면 WALK로, 아니면 IDLE로
             if self.skrr.key_pressed['left'] or self.skrr.key_pressed['right']:
                 self.skrr.state_machine.handle_event(('ANIMATION_END', 'WALK'))
             else:
@@ -237,9 +228,9 @@ class Attack:
 
     def draw(self):
         if self.skrr.attack_type == 'A':
-            img = self.skrr.AttackA_image[self.skrr.frame // 6 % len(self.skrr.AttackA_image)]
+            img = self.skrr.images['AttackA'][self.skrr.frame // 6 % len(self.skrr.images['AttackA'])]
         elif self.skrr.attack_type == 'B':
-            img = self.skrr.AttackB_image[self.skrr.frame // 6 % len(self.skrr.AttackB_image)]
+            img = self.skrr.images['AttackB'][self.skrr.frame // 6 % len(self.skrr.images['AttackB'])]
         else:
             return
 
@@ -267,7 +258,7 @@ class Dash:
         if self.skrr.dash_type == 0:
             self.dash_distance = 0
             self.can_second_dash = False
-        self.minX = self.skrr.Walk_image[0].w * self.skrr.scale // 2 - 10
+        self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 10
         self.dash_dir = self.skrr.face_dir
         self.is_air_dash = not self.skrr.is_grounded
         if self.skrr.velocity_y > 0:
@@ -316,13 +307,13 @@ class Dash:
             self.skrr.face_dir = 1
 
     def draw(self):
-        if hasattr(self.skrr, 'DashEffect_image') and self.skrr.DashEffect_image:
-            effect_img = self.skrr.DashEffect_image[self.effect_frame // 3 % len(self.skrr.DashEffect_image)]
+        if self.skrr.images['DashEffect']:
+            effect_img = self.skrr.images['DashEffect'][self.effect_frame // 3 % len(self.skrr.images['DashEffect'])]
             if self.dash_dir == 1:
                 effect_img.clip_draw(0, 0, effect_img.w, effect_img.h, self.effect_x, self.effect_y, effect_img.w, effect_img.h)
             elif self.dash_dir == -1:
                 effect_img.clip_composite_draw(0, 0, effect_img.w, effect_img.h, 0, 'h', self.effect_x, self.effect_y, effect_img.w, effect_img.h)
-        img = self.skrr.Dash_image[0]
+        img = self.skrr.images['Dash'][0]
         if self.dash_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.dash_dir == -1:
@@ -339,12 +330,11 @@ class Fall:
     def enter(self, e):
         self.skrr.frame = 0
         self.skrr.jumping = True
-        self.minX = self.skrr.Walk_image[0].w * self.skrr.scale // 2 - 10
+        self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 10
 
     def do(self):
         self.skrr.frame = self.skrr.frame + 1
 
-        # 중력 적용
         self.skrr.velocity_y += self.gravity
         self.skrr.y += self.skrr.velocity_y
 
@@ -360,12 +350,10 @@ class Fall:
             self.skrr.jump_count = 0
             return
 
-        # 좌우 이동
         if self.skrr.is_moving:
             move_speed = self.skrr.velocity_x
             new_x = self.skrr.x + self.skrr.face_dir * move_speed
 
-            # 화면 경계 체크 (임시)
             if self.minX <= new_x <= get_canvas_width() - self.minX:
                 self.skrr.x = new_x
 
@@ -373,11 +361,11 @@ class Fall:
         pass
 
     def draw(self):
-        if not self.skrr.Fall_image:
+        if not self.skrr.images['Fall']:
             return
 
-        idx = (self.skrr.frame // 15) % len(self.skrr.Fall_image)
-        img = self.skrr.Fall_image[idx]
+        idx = (self.skrr.frame // 15) % len(self.skrr.images['Fall'])
+        img = self.skrr.images['Fall'][idx]
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale,
                           img.h * self.skrr.scale)
@@ -402,7 +390,7 @@ class Dead:
         pass
 
     def draw(self):
-        img = self.skrr.Dead_image[self.skrr.frame // 15 % len(self.skrr.Dead_image)]
+        img = self.skrr.images['Dead'][self.skrr.frame // 15 % len(self.skrr.images['Dead'])]
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
@@ -425,5 +413,5 @@ class Reborn:
         self.face_dir = 1
 
     def draw(self):
-        img = self.skrr.Reborn_image[self.skrr.frame // 6 % len(self.skrr.Reborn_image)]
+        img = self.skrr.images['Reborn'][self.skrr.frame // 6 % len(self.skrr.images['Reborn'])]
         img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
