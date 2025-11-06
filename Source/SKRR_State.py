@@ -8,8 +8,8 @@ RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 
-GRAVITY_PPS = -9.8
-JUMP_POWER_PPS = 15 * 60
+GRAVITY = 9.8
+JUMP_POWER_PPS = 15
 DASH_SPEED_PPS = 8 * 60
 
 class Idle:
@@ -161,8 +161,8 @@ class Jump:
         if self.effect_y is not None:
             self.effect_frame_time += game_framework.frame_time
 
-        self.skrr.velocity_y += GRAVITY_PPS * game_framework.frame_time
-        self.skrr.y += self.skrr.velocity_y * game_framework.frame_time
+        self.skrr.y += self.skrr.velocity_y * game_framework.frame_time * PIXEL_PER_METER
+        self.skrr.velocity_y -= GRAVITY * game_framework.frame_time
 
         if self.skrr.velocity_y < 0 and not self.skrr.is_grounded:
             self.skrr.state_machine.handle_event(('START_FALLING', None))
@@ -217,7 +217,7 @@ class JumpAttack:
         self.frame_time += game_framework.frame_time
         self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
 
-        self.skrr.velocity_y += GRAVITY_PPS * game_framework.frame_time
+        self.skrr.velocity_y += GRAVITY * game_framework.frame_time
         self.skrr.y += self.skrr.velocity_y * game_framework.frame_time
 
         if self.skrr.is_moving:
@@ -406,7 +406,7 @@ class Fall:
         self.frame_time += game_framework.frame_time
         self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
 
-        self.skrr.velocity_y += GRAVITY_PPS * game_framework.frame_time
+        self.skrr.velocity_y += GRAVITY * game_framework.frame_time
         self.skrr.y += self.skrr.velocity_y * game_framework.frame_time
 
         if self.skrr.y <= self.skrr.ground_y:
@@ -422,7 +422,7 @@ class Fall:
             return
 
         if self.skrr.is_moving:
-            move_speed = self.skrr.velocity_x * game_framework.frame_time
+            move_speed = RUN_SPEED_PPS * game_framework.frame_time * PIXEL_PER_METER
             new_x = self.skrr.x + self.skrr.face_dir * move_speed
 
             if self.minX <= new_x <= get_canvas_width() - self.minX:
