@@ -1,5 +1,12 @@
 from pico2d import get_canvas_width, get_time
 from Sound_Loader import SoundManager
+import game_framework
+
+PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
+RUN_SPEED_KMPH = 20.0
+RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
+RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
+RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 
 class Idle:
     def __init__(self, skrr):
@@ -71,7 +78,7 @@ class Walk:
         elif self.skrr.x >= get_canvas_width() - minX and self.skrr.face_dir == 1:
             self.skrr.x = get_canvas_width() - minX
         else:
-            self.skrr.x += self.skrr.face_dir * self.skrr.velocity_x
+            self.skrr.x += self.skrr.face_dir * self.skrr.velocity_x * RUN_SPEED_PPS * game_framework.frame_time
 
     def exit(self, e):
         pass
