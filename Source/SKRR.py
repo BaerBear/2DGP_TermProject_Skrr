@@ -39,7 +39,6 @@ class SKRR:
         SKRR.load_images()
 
         self.x, self.y = 100, get_canvas_height() // 2
-        self.velocity_x, self.velocity_y = 4, 0
         self.frame = 0
         self.face_dir = 1
         self.scale = 2
