@@ -8,9 +8,14 @@ RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 
-GRAVITY = 9.8
-JUMP_POWER_PPS = 15
-DASH_SPEED_PPS = 8 * 60
+GRAVITY_MULTIPLIER = 4.0
+BASE_GRAVITY = 9.8
+GRAVITY = BASE_GRAVITY * GRAVITY_MULTIPLIER
+
+BASE_JUMP_POWER_PPS = 10.0
+JUMP_POWER_PPS = BASE_JUMP_POWER_PPS * (GRAVITY_MULTIPLIER ** 0.5)
+
+DASH_SPEED_PPS = 10 * 60
 
 class Idle:
     TIME_PER_ACTION = 0.167
@@ -217,11 +222,11 @@ class JumpAttack:
         self.frame_time += game_framework.frame_time
         self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
 
-        self.skrr.velocity_y += GRAVITY * game_framework.frame_time
-        self.skrr.y += self.skrr.velocity_y * game_framework.frame_time
+        self.skrr.y += self.skrr.velocity_y * game_framework.frame_time * PIXEL_PER_METER
+        self.skrr.velocity_y -= GRAVITY * game_framework.frame_time
 
         if self.skrr.is_moving:
-            move_speed = self.skrr.velocity_x * game_framework.frame_time
+            move_speed = RUN_SPEED_PPS * game_framework.frame_time
             new_x = self.skrr.x + self.skrr.face_dir * move_speed
 
             if self.minX <= new_x <= get_canvas_width() - self.minX:
@@ -232,7 +237,6 @@ class JumpAttack:
         elif self.skrr.y <= self.skrr.ground_y:
             self.skrr.y = self.skrr.ground_y
             self.skrr.is_grounded = True
-            self.skrr.velocity_y = 0
             self.skrr.state_machine.handle_event(('ANIMATION_END', None))
 
     def exit(self, e):
@@ -308,7 +312,7 @@ class Dash:
         self.skrr = skrr
         self.minX = 0
         self.dash_distance = 0
-        self.max_dash_distance = 150
+        self.max_dash_distance = 175
         self.can_second_dash = False
         self.dash_dir = None
         self.is_air_dash = False
@@ -406,9 +410,8 @@ class Fall:
         self.frame_time += game_framework.frame_time
         self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
 
-        self.skrr.velocity_y += GRAVITY * game_framework.frame_time
-        self.skrr.y += self.skrr.velocity_y * game_framework.frame_time
-
+        self.skrr.velocity_y -= GRAVITY * game_framework.frame_time
+        self.skrr.y += self.skrr.velocity_y * game_framework.frame_time * PIXEL_PER_METER
         if self.skrr.y <= self.skrr.ground_y:
             self.skrr.y = self.skrr.ground_y
             self.skrr.is_grounded = True
@@ -422,7 +425,7 @@ class Fall:
             return
 
         if self.skrr.is_moving:
-            move_speed = RUN_SPEED_PPS * game_framework.frame_time * PIXEL_PER_METER
+            move_speed = RUN_SPEED_PPS * game_framework.frame_time
             new_x = self.skrr.x + self.skrr.face_dir * move_speed
 
             if self.minX <= new_x <= get_canvas_width() - self.minX:
