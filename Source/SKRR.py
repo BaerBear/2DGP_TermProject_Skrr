@@ -1,7 +1,7 @@
 from pico2d import *
 from ResourceManager import ResourceManager
 from State_Machine import StateMachine
-from SKRR_State import Idle, Wait, Walk, Jump, JumpAttack, Attack, Dash, Fall, Dead, Reborn
+from SKRR_State import Idle, Wait, Walk, Jump, JumpAttack, Attack, Dash, Fall, Dead, Reborn, Skill1, Skill2, Skill3
 from SKRR_State_Rules import Get_State_Rules
 
 _player_instance = None
@@ -46,6 +46,17 @@ class SKRR:
         self.ground_y = get_canvas_height() // 2
         self.is_invincible = False
 
+        # 스킬 시스템
+        self.skill_cooldowns = {
+            'skill1': 5.0,   # 스킬1 쿨타임 (초)
+            'skill2': 8.0,   # 스킬2 쿨타임 (초)
+            'skill3': 12.0   # 스킬3 쿨타임 (초)
+        }
+        self.skill_last_use_time = {
+            'skill1': 0,
+            'skill2': 0,
+            'skill3': 0
+        }
 
         # State
         self.IDLE = Idle(self)
@@ -59,6 +70,11 @@ class SKRR:
         self.DEAD = Dead(self)
         self.REBORN = Reborn(self)
 
+        # 스킬 State
+        self.SKILL1 = Skill1(self)
+        self.SKILL2 = Skill2(self)
+        self.SKILL3 = Skill3(self)
+
         self.state_machine = StateMachine(self.IDLE, Get_State_Rules(self))
         set_player(self)
 
@@ -70,6 +86,17 @@ class SKRR:
 
     def is_jumpattack_ready(self):
         return get_time() - self.jumpattack_last_use_time >= self.jumpattack_cooldown_time
+
+    def is_skill_ready(self, skill_name): # 쿨타임 체크
+        return get_time() - self.skill_last_use_time[skill_name] >= self.skill_cooldowns[skill_name]
+
+    def use_skill(self, skill_name): # 스킬 사용
+        self.skill_last_use_time[skill_name] = get_time()
+
+    def get_skill_cooldown_remaining(self, skill_name): # 남은 쿨타임 반환 (UI에 쓰기)
+        elapsed = get_time() - self.skill_last_use_time[skill_name]
+        remaining = self.skill_cooldowns[skill_name] - elapsed
+        return max(0, remaining)
 
     def draw(self):
         self.state_machine.draw()
