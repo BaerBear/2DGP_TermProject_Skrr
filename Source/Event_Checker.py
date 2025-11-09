@@ -1,4 +1,4 @@
-from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_RIGHT, SDLK_LEFT, SDLK_c, SDLK_x, SDLK_z
+from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_RIGHT, SDLK_LEFT, SDLK_c, SDLK_x, SDLK_z, SDLK_a, SDLK_s, SDLK_d
 
 # 이벤트 체크 함수들
 
@@ -22,6 +22,15 @@ def jump_down(e):
 
 def dash_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_z
+
+def skill1_down(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_a
+
+def skill2_down(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_s
+
+def skill3_down(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_d
 
 def time_out(e):
     return e[0] == 'TIME_OUT'
