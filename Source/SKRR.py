@@ -1,5 +1,5 @@
 from pico2d import *
-from Image_Loader import SKRR_Image_Loader
+from ResourceManager import ResourceManager
 from State_Machine import StateMachine
 from SKRR_State import Idle, Wait, Walk, Jump, JumpAttack, Attack, Dash, Fall, Dead, Reborn
 from SKRR_State_Rules import Get_State_Rules
@@ -19,21 +19,7 @@ class SKRR:
     @classmethod
     def load_images(cls):
         if cls.images is None:
-            cls.images = {
-                'Idle': SKRR_Image_Loader('Idle').images,
-                'Wait': SKRR_Image_Loader('Wait').images,
-                'Walk': SKRR_Image_Loader('Walk').images,
-                'AttackA': SKRR_Image_Loader('AttackA').images,
-                'AttackB': SKRR_Image_Loader('AttackB').images,
-                'Jump': SKRR_Image_Loader('Jump').images,
-                'JumpEffect': SKRR_Image_Loader('JumpEffect').images,
-                'JumpAttack': SKRR_Image_Loader('JumpAttack').images,
-                'Reborn': SKRR_Image_Loader('Reborn').images,
-                'Dash': SKRR_Image_Loader('Dash').images,
-                'DashEffect': SKRR_Image_Loader('DashEffect').images,
-                'Fall': SKRR_Image_Loader('Fall').images,
-                'Dead': SKRR_Image_Loader('Dead').images,
-            }
+            cls.images = ResourceManager.get_player_images()
 
     def __init__(self):
         SKRR.load_images()

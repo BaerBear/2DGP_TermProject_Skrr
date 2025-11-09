@@ -1,5 +1,5 @@
 from pico2d import *
-from Image_Loader import Enemy_Image_Loader
+from ResourceManager import ResourceManager
 import SKRR
 import random
 import game_framework
@@ -7,6 +7,9 @@ import game_framework
 ENEMY_WALK_SPEED_PPS = 100.0
 
 class Enemy:
+    dead_effect = None
+    hit_effect = None
+
     IDLE_TIME_PER_ACTION = 0.167
     IDLE_ACTION_PER_TIME = 1.0 / IDLE_TIME_PER_ACTION
     IDLE_FRAMES_PER_ACTION = 10
@@ -19,7 +22,16 @@ class Enemy:
     ATTACK_ACTION_PER_TIME = 1.0 / ATTACK_TIME_PER_ACTION
     ATTACK_FRAMES_PER_ACTION = 6
 
+    @classmethod
+    def load_common_effects(cls):
+        if cls.dead_effect is None:
+            cls.dead_effect = ResourceManager.get_effect_images('enemy_dead')
+        if cls.hit_effect is None:
+            cls.hit_effect = ResourceManager.get_effect_images('hit_effect')
+
     def __init__(self, x, y):
+        Enemy.load_common_effects()
+
         self.x, self.y = x, y
         self.frame = 0
         self.frame_time = 0
@@ -95,11 +107,7 @@ class Knight_Sword(Enemy):
         self.velocity = ENEMY_WALK_SPEED_PPS
         self.attack_cooldown_time = 1.5
         if not Knight_Sword.images:
-            Knight_Sword.images = {}
-            Knight_Sword.images['walk'] = Enemy_Image_Loader('Knight_Sword', 'Walk').images
-            Knight_Sword.images['attack'] = Enemy_Image_Loader('Knight_Sword', 'Attack').images
-            Knight_Sword.images['hit'] = Enemy_Image_Loader('Knight_Sword', 'Hit').images
-            Knight_Sword.images['idle'] = Enemy_Image_Loader('Knight_Sword', 'Idle').images
+            Knight_Sword.images = ResourceManager.get_enemy_images('Knight_Sword')
 
     def update(self):
         super().update()
@@ -151,11 +159,7 @@ class Knight_Bow(Enemy):
         self.aim_timer = 0
         self.aim_frames = 4
         if not Knight_Bow.images:
-            Knight_Bow.images = {}
-            Knight_Bow.images['walk'] = Enemy_Image_Loader('Knight_Bow', 'Walk').images
-            Knight_Bow.images['attack'] = Enemy_Image_Loader('Knight_Bow', 'Attack').images
-            Knight_Bow.images['hit'] = Enemy_Image_Loader('Knight_Bow', 'Hit').images
-            Knight_Bow.images['idle'] = Enemy_Image_Loader('Knight_Bow', 'Idle').images
+            Knight_Bow.images = ResourceManager.get_enemy_images('Knight_Bow')
 
     def update(self):
         if not self.is_alive:
@@ -227,7 +231,6 @@ class Knight_Bow(Enemy):
             else:
                 return
         elif self.state == 'AIM':
-            # 조준 중에는 attack 이미지의 계산된 프레임 사용 (0~3)
             if 'attack' in Knight_Bow.images and Knight_Bow.images['attack']:
                 if self.frame < len(Knight_Bow.images['attack']):
                     img = Knight_Bow.images['attack'][self.frame]
@@ -236,7 +239,6 @@ class Knight_Bow(Enemy):
             else:
                 return
         elif self.state == 'ATTACK':
-            # 공격 중에는 3번 프레임 고정
             if 'attack' in Knight_Bow.images and Knight_Bow.images['attack']:
                 if 3 < len(Knight_Bow.images['attack']):
                     img = Knight_Bow.images['attack'][3]
@@ -282,11 +284,7 @@ class Knight_Tackle(Enemy):
         self.tackle_distance = 400
         self.tackle_traveled = 0
         if not Knight_Tackle.images:
-            Knight_Tackle.images = {}
-            Knight_Tackle.images['walk'] = Enemy_Image_Loader('Knight_Tackle', 'Walk').images
-            Knight_Tackle.images['attack'] = Enemy_Image_Loader('Knight_Tackle', 'Attack').images
-            Knight_Tackle.images['tackle'] = Enemy_Image_Loader('Knight_Tackle', 'Tackle').images
-            Knight_Tackle.images['idle'] = Enemy_Image_Loader('Knight_Tackle', 'Idle').images
+            Knight_Tackle.images = ResourceManager.get_enemy_images('Knight_Tackle')
 
     def update(self):
         if not self.is_alive:

@@ -1,4 +1,5 @@
 from pico2d import *
+from ResourceManager import ResourceManager
 from SKRR import SKRR
 from Enemy import Knight_Sword, Knight_Bow, Knight_Tackle
 from Sound_Loader import SoundManager
@@ -10,6 +11,8 @@ Skrr = None
 
 def init():
     global Skrr
+
+    ResourceManager.preload_resources()
 
     SoundManager.initialize()
     SoundManager.play_bgm('chapter1', repeat=True)
