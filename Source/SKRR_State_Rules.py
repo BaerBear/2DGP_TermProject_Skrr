@@ -1,6 +1,7 @@
 from Event_Checker import (
     right_down, left_down,
     attack_down, jump_down, dash_down,
+    skill1_down, skill2_down, skill3_down,
     time_out, animation_end, land_on_ground, start_falling,
     combo_available, dash_complete, stop_moving
 )
@@ -29,6 +30,22 @@ def Get_State_Rules(skrr):
     def attack_to_idle(e):
         return animation_end(e) and e[1] != 'WALK'
 
+    # 스킬 전환 조건 (쿨타임 체크 포함)
+    def can_use_skill1(e):
+        return skill1_down(e) and skrr.is_skill_ready('skill1')
+
+    def can_use_skill2(e):
+        return skill2_down(e) and skrr.is_skill_ready('skill2')
+
+    def can_use_skill3(e):
+        return skill3_down(e) and skrr.is_skill_ready('skill3')
+
+    def skill_to_idle(e):
+        return animation_end(e) and e[1] == 'IDLE'
+
+    def skill_to_fall(e):
+        return animation_end(e) and e[1] == 'FALL'
+
     return {
         skrr.IDLE: {
             right_down: skrr.WALK,
@@ -36,6 +53,9 @@ def Get_State_Rules(skrr):
             attack_down: skrr.ATTACK,
             jump_down: skrr.JUMP,
             dash_down: skrr.DASH,
+            can_use_skill1: skrr.SKILL1,
+            can_use_skill2: skrr.SKILL2,
+            can_use_skill3: skrr.SKILL3,
             time_out: skrr.WAIT,
         },
 
@@ -45,6 +65,9 @@ def Get_State_Rules(skrr):
             attack_down: skrr.ATTACK,
             jump_down: skrr.JUMP,
             dash_down: skrr.DASH,
+            can_use_skill1: skrr.SKILL1,
+            can_use_skill2: skrr.SKILL2,
+            can_use_skill3: skrr.SKILL3,
             animation_end: skrr.IDLE,
         },
 
@@ -52,6 +75,9 @@ def Get_State_Rules(skrr):
             attack_down: skrr.ATTACK,
             jump_down: skrr.JUMP,
             dash_down: skrr.DASH,
+            can_use_skill1: skrr.SKILL1,
+            can_use_skill2: skrr.SKILL2,
+            can_use_skill3: skrr.SKILL3,
             stop_moving: skrr.IDLE,
         },
 
@@ -97,5 +123,21 @@ def Get_State_Rules(skrr):
 
         skrr.REBORN: {
             animation_end: skrr.IDLE,
+        },
+
+        # 스킬 State 규칙
+        skrr.SKILL1: {
+            skill_to_idle: skrr.IDLE,
+            skill_to_fall: skrr.FALL,
+        },
+
+        skrr.SKILL2: {
+            skill_to_idle: skrr.IDLE,
+            skill_to_fall: skrr.FALL,
+        },
+
+        skrr.SKILL3: {
+            skill_to_idle: skrr.IDLE,
+            skill_to_fall: skrr.FALL,
         },
     }
