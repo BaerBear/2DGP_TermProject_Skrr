@@ -524,3 +524,134 @@ class Reborn:
     def draw(self):
         img = self.skrr.images['Reborn'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Reborn'])]
         img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+
+
+
+class Skill1:
+    TIME_PER_ACTION = 0.08
+    ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+    FRAMES_PER_ACTION = 8  # 프레임 수는 실제 이미지에 맞게 조정 필요
+
+    def __init__(self, skrr):
+        self.skrr = skrr
+        self.frame_time = 0
+        self.total_frames = 8  # 실제 애니메이션 프레임 수에 맞게 조정
+
+    def enter(self, e):
+        self.skrr.frame = 0
+        self.frame_time = 0
+        self.skrr.use_skill('skill1')  # 쿨타임 기록
+        # 스킬 사용 사운드 재생 (필요시)
+        # SoundManager.play_sound('skill1')
+
+    def do(self):
+        self.frame_time += game_framework.frame_time
+        self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
+
+        if self.skrr.frame >= self.total_frames:
+            if self.skrr.is_grounded:
+                self.skrr.state_machine.handle_event(('ANIMATION_END', 'IDLE'))
+            else:
+                self.skrr.state_machine.handle_event(('ANIMATION_END', 'FALL'))
+
+    def exit(self, e):
+        pass
+
+    def draw(self):
+        # TODO: 실제 스킬1 이미지로 교체 필요
+        # 현재는 Attack 이미지를 임시로 사용
+        if 'Skill1' in self.skrr.images and len(self.skrr.images['Skill1']) > 0:
+            img = self.skrr.images['Skill1'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Skill1'])]
+        else:
+            img = self.skrr.images['Attack'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Attack'])]
+
+        if self.skrr.face_dir == 1:
+            img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+        elif self.skrr.face_dir == -1:
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+
+
+class Skill2:
+    TIME_PER_ACTION = 0.1
+    ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+    FRAMES_PER_ACTION = 10  # 프레임 수는 실제 이미지에 맞게 조정 필요
+
+    def __init__(self, skrr):
+        self.skrr = skrr
+        self.frame_time = 0
+        self.total_frames = 10  # 실제 애니메이션 프레임 수에 맞게 조정
+
+    def enter(self, e):
+        self.skrr.frame = 0
+        self.frame_time = 0
+        self.skrr.use_skill('skill2')  # 쿨타임 기록
+        # 스킬 사용 사운드 재생 (필요시)
+        # SoundManager.play_sound('skill2')
+
+    def do(self):
+        self.frame_time += game_framework.frame_time
+        self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
+
+        if self.skrr.frame >= self.total_frames:
+            if self.skrr.is_grounded:
+                self.skrr.state_machine.handle_event(('ANIMATION_END', 'IDLE'))
+            else:
+                self.skrr.state_machine.handle_event(('ANIMATION_END', 'FALL'))
+
+    def exit(self, e):
+        pass
+
+    def draw(self):
+        # TODO: 실제 스킬2 이미지로 교체 필요
+        if 'Skill2' in self.skrr.images and len(self.skrr.images['Skill2']) > 0:
+            img = self.skrr.images['Skill2'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Skill2'])]
+        else:
+            img = self.skrr.images['Attack'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Attack'])]
+
+        if self.skrr.face_dir == 1:
+            img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+        elif self.skrr.face_dir == -1:
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+
+
+class Skill3:
+    TIME_PER_ACTION = 0.12
+    ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+    FRAMES_PER_ACTION = 12  # 프레임 수는 실제 이미지에 맞게 조정 필요
+
+    def __init__(self, skrr):
+        self.skrr = skrr
+        self.frame_time = 0
+        self.total_frames = 12  # 실제 애니메이션 프레임 수에 맞게 조정
+
+    def enter(self, e):
+        self.skrr.frame = 0
+        self.frame_time = 0
+        self.skrr.use_skill('skill3')  # 쿨타임 기록
+        self.skrr.is_invincible = True  # 스킬 시전 중 무적 (옵션)
+        # SoundManager.play_sound('skill3')
+
+    def do(self):
+        self.frame_time += game_framework.frame_time
+        self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
+
+        if self.skrr.frame >= self.total_frames:
+            if self.skrr.is_grounded:
+                self.skrr.state_machine.handle_event(('ANIMATION_END', 'IDLE'))
+            else:
+                self.skrr.state_machine.handle_event(('ANIMATION_END', 'FALL'))
+
+    def exit(self, e):
+        self.skrr.is_invincible = False  # 무적 해제
+
+    def draw(self):
+        # TODO: 실제 스킬3 이미지로 교체 필요
+        if 'Skill3' in self.skrr.images and len(self.skrr.images['Skill3']) > 0:
+            img = self.skrr.images['Skill3'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Skill3'])]
+        else:
+            img = self.skrr.images['Attack'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Attack'])]
+
+        if self.skrr.face_dir == 1:
+            img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+        elif self.skrr.face_dir == -1:
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
