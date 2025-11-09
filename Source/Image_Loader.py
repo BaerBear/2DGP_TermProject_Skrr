@@ -42,6 +42,8 @@ class SKRR_Image_Loader:
         elif state == 'Fall':
             for i in range(2):
                 self.images.append(load_image(os.path.join(self.resource_path, r'Fall', f'Fall_{i}.png')))
+            for i in range(3):
+                self.images.append(load_image(os.path.join(self.resource_path, r'Fall', f'FallRepeat_{i}.png')))
         elif state == 'Dead':
             for i in range(3):
                 self.images.append(load_image(os.path.join(self.resource_path, r'Dead', f'Fall_Dead_{i}.png')))

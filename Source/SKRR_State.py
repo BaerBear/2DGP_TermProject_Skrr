@@ -399,16 +399,29 @@ class Fall:
         self.skrr = skrr
         self.minX = 0
         self.frame_time = 0
+        self.has_played_intro = False  # 0, 1 프레임 재생 완료 여부
 
     def enter(self, e):
         self.skrr.frame = 0
         self.frame_time = 0
+        self.has_played_intro = False
         self.skrr.jumping = True
         self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 10
 
     def do(self):
         self.frame_time += game_framework.frame_time
-        self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
+
+        if not self.has_played_intro:
+            frame_index = int(self.frame_time * self.ACTION_PER_TIME * 2)
+            if frame_index >= 2:
+                self.has_played_intro = True
+                self.frame_time = 0
+                self.skrr.frame = 2
+            else:
+                self.skrr.frame = frame_index
+        else:
+            loop_frame = int(self.frame_time * self.ACTION_PER_TIME * 3) % 3
+            self.skrr.frame = 2 + loop_frame
 
         self.skrr.velocity_y -= GRAVITY * game_framework.frame_time
         self.skrr.y += self.skrr.velocity_y * game_framework.frame_time * PIXEL_PER_METER
@@ -438,8 +451,12 @@ class Fall:
         if not self.skrr.images['Fall']:
             return
 
-        idx = int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Fall'])
-        img = self.skrr.images['Fall'][idx]
+        # self.skrr.frame을 직접 사용 (do에서 계산된 값)
+        if self.skrr.frame < len(self.skrr.images['Fall']):
+            img = self.skrr.images['Fall'][self.skrr.frame]
+        else:
+            img = self.skrr.images['Fall'][0]
+
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale,
                           img.h * self.skrr.scale)
