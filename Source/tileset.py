@@ -4,10 +4,9 @@ import os
 def create_tileset():
     # 타일 이미지 경로 (사용자가 제공한 순서대로)
     tile_images = [
-        '../Resources/tile/3_Tile02_16.png',  # 0
-        '../Resources/tile/3_Tile02_17.png',  # 1
-        '../Resources/tile/3_Tile02_18.png',  # 2
-        '../Resources/tile/3_Tile02_19.png',  # 3
+        '../Resources/tile/TileSet_0.png',  # 0
+        '../Resources/tile/TileSet_1.png',  # 1
+        '../Resources/tile/TileSet_2.png',  # 2
     ]
 
     # 첫 번째 이미지를 열어서 타일 크기 확인
@@ -15,7 +14,7 @@ def create_tileset():
     tile_width, tile_height = first_img.size
 
     # 4열 x 3행 타일셋 생성
-    cols, rows = 2,2
+    cols, rows = 1,3
     tileset_width = tile_width * cols
     tileset_height = tile_height * rows
 
