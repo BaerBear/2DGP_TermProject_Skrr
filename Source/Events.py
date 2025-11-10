@@ -37,7 +37,10 @@ def handle_key_down(event, skrr):
 
 def handle_right_down(skrr, event):
     skrr.key_pressed['right'] = True
-    if skrr.state_machine.current_state != skrr.DASH:
+    if (skrr.state_machine.current_state != skrr.DASH
+        and not skrr.state_machine.current_state == skrr.SKILL1
+        and not skrr.state_machine.current_state == skrr.SKILL2
+        and not skrr.state_machine.current_state == skrr.SKILL3):
         skrr.face_dir = 1
     skrr.is_moving = True
     skrr.handle_event(('INPUT', event))
@@ -45,7 +48,10 @@ def handle_right_down(skrr, event):
 
 def handle_left_down(skrr, event):
     skrr.key_pressed['left'] = True
-    if skrr.state_machine.current_state != skrr.DASH:
+    if (skrr.state_machine.current_state != skrr.DASH
+        and not skrr.state_machine.current_state == skrr.SKILL1
+        and not skrr.state_machine.current_state == skrr.SKILL2
+        and not skrr.state_machine.current_state == skrr.SKILL3):
         skrr.face_dir = -1
     skrr.is_moving = True
     skrr.handle_event(('INPUT', event))

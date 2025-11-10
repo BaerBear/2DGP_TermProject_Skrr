@@ -528,14 +528,13 @@ class Reborn:
 
 
 class Skill1:
-    TIME_PER_ACTION = 0.08
+    TIME_PER_ACTION = 0.1
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
-    FRAMES_PER_ACTION = 8  # 프레임 수는 실제 이미지에 맞게 조정 필요
-
+    FRAMES_PER_ACTION = 7
     def __init__(self, skrr):
         self.skrr = skrr
         self.frame_time = 0
-        self.total_frames = 8  # 실제 애니메이션 프레임 수에 맞게 조정
+        self.total_frames = 7 * 20  # 실제 애니메이션 프레임 수에 맞게 조정
 
     def enter(self, e):
         self.skrr.frame = 0
@@ -545,12 +544,23 @@ class Skill1:
         # SoundManager.play_sound('skill1')
 
     def do(self):
+        minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 10
         self.frame_time += game_framework.frame_time
         self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
 
+        if self.skrr.x <= minX and self.skrr.face_dir == -1:
+            self.skrr.x = minX
+        elif self.skrr.x >= get_canvas_width() - minX and self.skrr.face_dir == 1:
+            self.skrr.x = get_canvas_width() - minX
+        else:
+            self.skrr.x += self.skrr.face_dir * RUN_SPEED_PPS * game_framework.frame_time
+
         if self.skrr.frame >= self.total_frames:
             if self.skrr.is_grounded:
-                self.skrr.state_machine.handle_event(('ANIMATION_END', 'IDLE'))
+                if self.skrr.key_pressed['left'] or self.skrr.key_pressed['right']:
+                    self.skrr.state_machine.handle_event(('ANIMATION_END', 'WALK'))
+                else:
+                    self.skrr.state_machine.handle_event(('ANIMATION_END', 'IDLE'))
             else:
                 self.skrr.state_machine.handle_event(('ANIMATION_END', 'FALL'))
 
@@ -558,12 +568,7 @@ class Skill1:
         pass
 
     def draw(self):
-        # TODO: 실제 스킬1 이미지로 교체 필요
-        # 현재는 Attack 이미지를 임시로 사용
-        if 'Skill1' in self.skrr.images and len(self.skrr.images['Skill1']) > 0:
-            img = self.skrr.images['Skill1'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Skill1'])]
-        else:
-            img = self.skrr.images['AttackA'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['AttackA'])]
+        img = self.skrr.images['Skill1'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Skill1'])]
 
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
@@ -574,12 +579,12 @@ class Skill1:
 class Skill2:
     TIME_PER_ACTION = 0.1
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
-    FRAMES_PER_ACTION = 10  # 프레임 수는 실제 이미지에 맞게 조정 필요
+    FRAMES_PER_ACTION = 8  # 프레임 수는 실제 이미지에 맞게 조정 필요
 
     def __init__(self, skrr):
         self.skrr = skrr
         self.frame_time = 0
-        self.total_frames = 10  # 실제 애니메이션 프레임 수에 맞게 조정
+        self.total_frames = 8 * 8 # 실제 애니메이션 프레임 수에 맞게 조정
 
     def enter(self, e):
         self.skrr.frame = 0
@@ -594,7 +599,10 @@ class Skill2:
 
         if self.skrr.frame >= self.total_frames:
             if self.skrr.is_grounded:
-                self.skrr.state_machine.handle_event(('ANIMATION_END', 'IDLE'))
+                if self.skrr.key_pressed['left'] or self.skrr.key_pressed['right']:
+                    self.skrr.state_machine.handle_event(('ANIMATION_END', 'WALK'))
+                else:
+                    self.skrr.state_machine.handle_event(('ANIMATION_END', 'IDLE'))
             else:
                 self.skrr.state_machine.handle_event(('ANIMATION_END', 'FALL'))
 
@@ -602,11 +610,7 @@ class Skill2:
         pass
 
     def draw(self):
-        # TODO: 실제 스킬2 이미지로 교체 필요
-        if 'Skill2' in self.skrr.images and len(self.skrr.images['Skill2']) > 0:
-            img = self.skrr.images['Skill2'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Skill2'])]
-        else:
-            img = self.skrr.images['AttackA'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['AttackA'])]
+        img = self.skrr.images['Skill2'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Skill2'])]
 
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
@@ -617,19 +621,24 @@ class Skill2:
 class Skill3:
     TIME_PER_ACTION = 0.12
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
-    FRAMES_PER_ACTION = 12  # 프레임 수는 실제 이미지에 맞게 조정 필요
+    FRAMES_PER_ACTION = 6
 
     def __init__(self, skrr):
         self.skrr = skrr
         self.frame_time = 0
-        self.total_frames = 12  # 실제 애니메이션 프레임 수에 맞게 조정
+        self.total_frames = 6 * 6
+        self.is_air_skill = False
+        self.minX = 0
 
     def enter(self, e):
         self.skrr.frame = 0
         self.frame_time = 0
-        self.skrr.use_skill('skill3')  # 쿨타임 기록
-        self.skrr.is_invincible = True  # 스킬 시전 중 무적 (옵션)
-        # SoundManager.play_sound('skill3')
+        self.skrr.use_skill('skill3')
+        self.skrr.is_invincible = True
+        self.is_air_skill = not self.skrr.is_grounded
+        self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 10
+
+        # SoundManager.play_player_sound('Skill3')
 
     def do(self):
         self.frame_time += game_framework.frame_time
@@ -637,19 +646,21 @@ class Skill3:
 
         if self.skrr.frame >= self.total_frames:
             if self.skrr.is_grounded:
-                self.skrr.state_machine.handle_event(('ANIMATION_END', 'IDLE'))
+                if self.skrr.key_pressed['left'] or self.skrr.key_pressed['right']:
+                    self.skrr.state_machine.handle_event(('ANIMATION_END', 'WALK'))
+                else:
+                    self.skrr.state_machine.handle_event(('ANIMATION_END', 'IDLE'))
             else:
                 self.skrr.state_machine.handle_event(('ANIMATION_END', 'FALL'))
 
     def exit(self, e):
-        self.skrr.is_invincible = False  # 무적 해제
+        self.skrr.is_invincible = False
 
     def draw(self):
-        # TODO: 실제 스킬3 이미지로 교체 필요
-        if 'Skill3' in self.skrr.images and len(self.skrr.images['Skill3']) > 0:
-            img = self.skrr.images['Skill3'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Skill3'])]
-        else:
-            img = self.skrr.images['AttackA'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['AttackA'])]
+        if self.is_air_skill and 'Skill3_air' in self.skrr.images and len(self.skrr.images['Skill3_air']) > 0:
+            img = self.skrr.images['Skill3_air'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Skill3_air'])]
+        elif not self.is_air_skill and 'Skill3_ground' in self.skrr.images and len(self.skrr.images['Skill3_ground']) > 0:
+            img = self.skrr.images['Skill3_ground'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Skill3_ground'])]
 
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
