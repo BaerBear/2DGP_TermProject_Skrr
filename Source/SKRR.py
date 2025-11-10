@@ -53,9 +53,9 @@ class SKRR:
             'skill3': 12.0   # 스킬3 쿨타임 (초)
         }
         self.skill_last_use_time = {
-            'skill1': 0,
-            'skill2': 0,
-            'skill3': 0
+            'skill1': -5.0,
+            'skill2': -8.0,
+            'skill3': -12.0
         }
 
         # State

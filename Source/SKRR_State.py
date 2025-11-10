@@ -563,7 +563,7 @@ class Skill1:
         if 'Skill1' in self.skrr.images and len(self.skrr.images['Skill1']) > 0:
             img = self.skrr.images['Skill1'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Skill1'])]
         else:
-            img = self.skrr.images['Attack'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Attack'])]
+            img = self.skrr.images['AttackA'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['AttackA'])]
 
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
@@ -606,7 +606,7 @@ class Skill2:
         if 'Skill2' in self.skrr.images and len(self.skrr.images['Skill2']) > 0:
             img = self.skrr.images['Skill2'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Skill2'])]
         else:
-            img = self.skrr.images['Attack'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Attack'])]
+            img = self.skrr.images['AttackA'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['AttackA'])]
 
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
@@ -649,7 +649,7 @@ class Skill3:
         if 'Skill3' in self.skrr.images and len(self.skrr.images['Skill3']) > 0:
             img = self.skrr.images['Skill3'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Skill3'])]
         else:
-            img = self.skrr.images['Attack'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Attack'])]
+            img = self.skrr.images['AttackA'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['AttackA'])]
 
         if self.skrr.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
