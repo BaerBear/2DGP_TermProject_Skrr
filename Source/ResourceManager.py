@@ -62,6 +62,11 @@ class ResourceManager:
             'DashEffect': SKRR_Image_Loader('DashEffect').images,
             'Fall': SKRR_Image_Loader('Fall').images,
             'Dead': SKRR_Image_Loader('Dead').images,
+            'Touch': SKRR_Image_Loader('Touch').images if hasattr(SKRR_Image_Loader, 'Touch') else [],
+            'Skill1': SKRR_Image_Loader('Skill1').images if hasattr(SKRR_Image_Loader, 'Skill1') else [],
+            'Skill2': SKRR_Image_Loader('Skill2').images if hasattr(SKRR_Image_Loader, 'Skill2') else [],
+            'Skill3_ground': SKRR_Image_Loader('Skill3_ground').images if hasattr(SKRR_Image_Loader, 'Skill3_ground') else [],
+            'Skill3_air': SKRR_Image_Loader('Skill3_air').images if hasattr(SKRR_Image_Loader, 'Skill3_air') else [],
         }
 
     @classmethod
