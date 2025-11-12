@@ -62,6 +62,11 @@ class ResourceManager:
             'DashEffect': SKRR_Image_Loader('DashEffect').images,
             'Fall': SKRR_Image_Loader('Fall').images,
             'Dead': SKRR_Image_Loader('Dead').images,
+            'Touch': SKRR_Image_Loader('Touch').images,
+            'Skill1': SKRR_Image_Loader('Skill1').images,
+            'Skill2': SKRR_Image_Loader('Skill2').images,
+            'Skill3_ground': SKRR_Image_Loader('Skill3_ground').images,
+            'Skill3_air': SKRR_Image_Loader('Skill3_air').images,
         }
 
     @classmethod

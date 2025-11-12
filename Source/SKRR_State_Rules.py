@@ -46,6 +46,9 @@ def Get_State_Rules(skrr):
     def skill_to_fall(e):
         return animation_end(e) and e[1] == 'FALL'
 
+    def skill_to_walk(e):
+        return animation_end(e) and e[1] == 'WALK'
+
     return {
         skrr.IDLE: {
             right_down: skrr.WALK,
@@ -85,6 +88,7 @@ def Get_State_Rules(skrr):
             jump_down: skrr.JUMP,
             dash_down: skrr.DASH,
             attack_down: skrr.JUMPATTACK,
+            can_use_skill3: skrr.SKILL3,
             start_falling: skrr.FALL,
             land_to_walk: skrr.WALK,
             land_to_idle: skrr.IDLE,
@@ -94,6 +98,7 @@ def Get_State_Rules(skrr):
             jump_down: skrr.JUMP,
             dash_down: skrr.DASH,
             attack_down: skrr.JUMPATTACK,
+            can_use_skill3: skrr.SKILL3,
             land_to_walk: skrr.WALK,
             land_to_idle: skrr.IDLE,
         },
@@ -129,15 +134,18 @@ def Get_State_Rules(skrr):
         skrr.SKILL1: {
             skill_to_idle: skrr.IDLE,
             skill_to_fall: skrr.FALL,
+            skill_to_walk: skrr.WALK,
         },
 
         skrr.SKILL2: {
             skill_to_idle: skrr.IDLE,
             skill_to_fall: skrr.FALL,
+            skill_to_walk: skrr.WALK,
         },
 
         skrr.SKILL3: {
             skill_to_idle: skrr.IDLE,
             skill_to_fall: skrr.FALL,
+            skill_to_walk: skrr.WALK,
         },
     }

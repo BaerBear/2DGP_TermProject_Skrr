@@ -47,7 +47,27 @@ class SKRR_Image_Loader:
         elif state == 'Dead':
             for i in range(3):
                 self.images.append(load_image(os.path.join(self.resource_path, r'Dead', f'Fall_Dead_{i}.png')))
-
+        elif state == 'Touch':
+            for i in range(6):
+                self.images.append(load_image(os.path.join(self.resource_path, r'Touch', f'Touch_{i}.png')))
+        elif state == 'Skill1':
+            for i in range(7):
+                self.images.append(load_image(os.path.join(self.resource_path, r'Skill1', f'Skill1_{i}.png')))
+        elif state == 'Skill2':
+            for i in range(3):
+                self.images.append(load_image(os.path.join(self.resource_path, r'Skill2', f'HeavenEarthSlam_Ready_{i}.png')))
+            for i in range(5):
+                self.images.append(load_image(os.path.join(self.resource_path, r'Skill2', f'HeavenEarthSlam_Attack_{i}.png')))
+        elif state == 'Skill3_ground':
+            for i in range(2):
+                self.images.append(load_image(os.path.join(self.resource_path, r'Skill3', f'FlashBladeDance_Ready_{i}.png')))
+            for i in range(4):
+                self.images.append(load_image(os.path.join(self.resource_path, r'Skill3', f'FlashBladeDance_Attack_{i}.png')))
+        elif state == 'Skill3_air':
+            for i in range(2):
+                self.images.append(load_image(os.path.join(self.resource_path, r'Skill3', f'FlashBladeDance_Ready_{i}.png')))
+            for i in range(4):
+                self.images.append(load_image(os.path.join(self.resource_path, r'Skill3', f'FlashBladeDance_Air_Attack_{i}.png')))
 
 class Enemy_Image_Loader:
     def __init__(self, enemy_type, state):

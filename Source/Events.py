@@ -1,4 +1,4 @@
-from pico2d import get_events, SDL_QUIT, SDL_KEYDOWN, SDL_KEYUP, SDLK_ESCAPE, SDLK_RIGHT, SDLK_LEFT, SDLK_c, SDLK_x, SDLK_z
+from pico2d import *
 
 
 def handle_events(running, skrr):
@@ -26,12 +26,21 @@ def handle_key_down(event, skrr):
         handle_jump(skrr, event)
     elif event.key == SDLK_z:
         handle_dash(skrr, event)
+    elif event.key == SDLK_a:
+        handle_a_down(skrr, event)
+    elif event.key == SDLK_s:
+        handle_s_down(skrr, event)
+    elif event.key == SDLK_d:
+        handle_d_down(skrr, event)
     return True
 
 
 def handle_right_down(skrr, event):
     skrr.key_pressed['right'] = True
-    if skrr.state_machine.current_state != skrr.DASH:
+    if (skrr.state_machine.current_state != skrr.DASH
+        and not skrr.state_machine.current_state == skrr.SKILL1
+        and not skrr.state_machine.current_state == skrr.SKILL2
+        and not skrr.state_machine.current_state == skrr.SKILL3):
         skrr.face_dir = 1
     skrr.is_moving = True
     skrr.handle_event(('INPUT', event))
@@ -39,7 +48,10 @@ def handle_right_down(skrr, event):
 
 def handle_left_down(skrr, event):
     skrr.key_pressed['left'] = True
-    if skrr.state_machine.current_state != skrr.DASH:
+    if (skrr.state_machine.current_state != skrr.DASH
+        and not skrr.state_machine.current_state == skrr.SKILL1
+        and not skrr.state_machine.current_state == skrr.SKILL2
+        and not skrr.state_machine.current_state == skrr.SKILL3):
         skrr.face_dir = -1
     skrr.is_moving = True
     skrr.handle_event(('INPUT', event))
@@ -109,3 +121,12 @@ def handle_left_up(skrr):
     else:
         skrr.is_moving = False
         skrr.state_machine.handle_event(('STOP_MOVING', None))
+
+def handle_a_down(skrr, event):
+    skrr.state_machine.handle_event(('INPUT', event))
+
+def handle_s_down(skrr, event):
+    skrr.state_machine.handle_event(('INPUT', event))
+
+def handle_d_down(skrr, event):
+    skrr.state_machine.handle_event(('INPUT', event))

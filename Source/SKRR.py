@@ -48,14 +48,17 @@ class SKRR:
 
         # 스킬 시스템
         self.skill_cooldowns = {
-            'skill1': 5.0,   # 스킬1 쿨타임 (초)
-            'skill2': 8.0,   # 스킬2 쿨타임 (초)
-            'skill3': 12.0   # 스킬3 쿨타임 (초)
+            # 'skill1': 5.0,   # 스킬1 쿨타임 (초)
+            # 'skill2': 8.0,   # 스킬2 쿨타임 (초)
+            # 'skill3': 12.0   # 스킬3 쿨타임 (초)
+            'skill1': 1.0,  # 디버깅용
+            'skill2': 1.0,  # 디버깅용
+            'skill3': 1.0   # 디버깅용
         }
         self.skill_last_use_time = {
-            'skill1': 0,
-            'skill2': 0,
-            'skill3': 0
+            'skill1': -5.0,
+            'skill2': -8.0,
+            'skill3': -12.0
         }
 
         # State
