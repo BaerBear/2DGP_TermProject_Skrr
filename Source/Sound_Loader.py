@@ -11,8 +11,8 @@ class SoundManager:
     bgms = None
     current_bgm = None
 
-    Effect_Volume = 10
-    BGM_Volume = 15
+    Effect_Volume = 7
+    BGM_Volume = 10
 
     @classmethod
     def initialize(cls):

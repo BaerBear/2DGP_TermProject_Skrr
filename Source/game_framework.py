@@ -3,7 +3,8 @@ import time
 frame_time = 0.0
 running = None
 stack = None
-
+width = 1600
+height = 900
 
 def change_mode(mode):
     global stack
