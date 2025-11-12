@@ -16,7 +16,7 @@ def update():
 
 def draw():
     clear_canvas()
-    image.draw(1440 // 2, 900 // 2)
+    image.draw(game_framework.width // 2, game_framework.height // 2)
     update_canvas()
 
 def finish():
