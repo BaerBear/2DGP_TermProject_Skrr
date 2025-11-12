@@ -39,7 +39,7 @@ class SKRR:
         # 점프관련
         self.jumping = False
         self.jump_count = 0
-        self.jumpattack_cooldown_time = 0.5 # 점프공격 쿨타임
+        self.jumpattack_cooldown_time = 0.4 # 점프공격 쿨타임
         self.jumpattack_last_use_time = 0
         self.is_grounded = True
         self.is_moving = False
