@@ -661,14 +661,15 @@ class Skill3:
         self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
 
         if self.skrr.frame >= self.total_frames:
-            if self.skrr.key_pressed['left']:
-                self.skrr.face_dir = -1
-                self.skrr.state_machine.handle_event(('ANIMATION_END', 'WALK'))
-            elif self.skrr.key_pressed['right']:
-                self.skrr.face_dir = 1
-                self.skrr.state_machine.handle_event(('ANIMATION_END', 'WALK'))
             if self.skrr.is_grounded:
-                self.skrr.state_machine.handle_event(('ANIMATION_END', 'IDLE'))
+                if self.skrr.key_pressed['left']:
+                    self.skrr.face_dir = -1
+                    self.skrr.state_machine.handle_event(('ANIMATION_END', 'WALK'))
+                elif self.skrr.key_pressed['right']:
+                    self.skrr.face_dir = 1
+                    self.skrr.state_machine.handle_event(('ANIMATION_END', 'WALK'))
+                else:
+                    self.skrr.state_machine.handle_event(('ANIMATION_END', 'IDLE'))
             else:
                 self.skrr.state_machine.handle_event(('ANIMATION_END', 'FALL'))
 
