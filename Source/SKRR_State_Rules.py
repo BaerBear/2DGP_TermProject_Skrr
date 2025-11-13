@@ -63,6 +63,7 @@ def Get_State_Rules(skrr):
             can_use_skill2: skrr.SKILL2,
             can_use_skill3: skrr.SKILL3,
             time_out: skrr.WAIT,
+            start_falling: skrr.FALL,  # 낙하 전환 추가
         },
 
         skrr.WAIT: {
@@ -85,6 +86,7 @@ def Get_State_Rules(skrr):
             can_use_skill2: skrr.SKILL2,
             can_use_skill3: skrr.SKILL3,
             stop_moving: skrr.IDLE,
+            start_falling: skrr.FALL,
         },
 
         skrr.JUMP: {

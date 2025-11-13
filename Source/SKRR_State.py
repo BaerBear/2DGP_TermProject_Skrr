@@ -37,7 +37,8 @@ class Idle:
         self.frame_time += game_framework.frame_time
         self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
 
-        if get_time() - self.timer > 4.0:
+        # 타임아웃 체크는 바닥에 있을 때만
+        if self.skrr.is_grounded and get_time() - self.timer > 4.0:
             self.skrr.state_machine.handle_event(('TIME_OUT', None))
 
     def exit(self, e):
@@ -723,10 +724,14 @@ class Skill3:
         self.start_x = None
 
     def draw(self):
+        img = None
         if self.is_air_skill and 'Skill3_air' in self.skrr.images and len(self.skrr.images['Skill3_air']) > 0:
             img = self.skrr.images['Skill3_air'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Skill3_air'])]
         elif not self.is_air_skill and 'Skill3_ground' in self.skrr.images and len(self.skrr.images['Skill3_ground']) > 0:
             img = self.skrr.images['Skill3_ground'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Skill3_ground'])]
+
+        if img is None:
+            return
 
         cam_x, cam_y = self.skrr.x, self.skrr.y
         if game_world.camera:

@@ -25,7 +25,7 @@ class SKRR:
     def __init__(self):
         SKRR.load_images()
 
-        self.x, self.y = 300, 600
+        self.x, self.y = 300, 650
         self.frame = 0
         self.face_dir = 1
         self.scale = 2
@@ -52,6 +52,7 @@ class SKRR:
         self.jumpattack_cooldown_time = 0.4 # 점프공격 쿨타임
         self.jumpattack_last_use_time = 0
         self.is_grounded = False
+        self.was_grounded = False  # 이전 프레임의 바닥 상태 추적
         self.is_moving = False
         self.ground_y = 300  # 더미 값
         self.is_invincible = False
@@ -95,13 +96,19 @@ class SKRR:
         self.tile_map = tile_map
 
     def update(self):
+        # 이전 프레임의 바닥 상태 저장
+        self.was_grounded = self.is_grounded
+
+        # 상태 머신 업데이트
         self.state_machine.update()
 
-        if not self.is_grounded:
+        # 공중에 있고 대쉬 상태가 아닐 때만 중력 적용
+        if not self.is_grounded and self.state_machine.current_state != self.DASH:
             import game_framework
             self.velocity_y += self.gravity * game_framework.frame_time
             self.y += self.velocity_y * game_framework.frame_time
 
+        # 이동/중력 적용 후 충돌 체크
         if self.tile_map:
             self.check_tile_collision()
 
@@ -109,18 +116,30 @@ class SKRR:
         left, bottom, right, top = self.get_bb()
         colliding_tiles = self.tile_map.check_collision(left, bottom, right, top)
 
-        was_grounded = self.is_grounded
-        self.is_grounded = False
+        has_ground_collision = False
 
         for tile in colliding_tiles:
             if tile['layer'] == 'tile':
-                self.handle_tile_collision(tile)
+                if self.handle_tile_collision(tile):
+                    has_ground_collision = True
             elif tile['layer'] == 'flatform':
-                self.handle_platform_collision(tile)
+                if self.handle_platform_collision(tile):
+                    has_ground_collision = True
 
+        # 이전 상태 저장
+        was_grounded = self.is_grounded
+        self.is_grounded = has_ground_collision
+
+        # 바닥에 착지했을 때
         if self.is_grounded and not was_grounded:
             self.velocity_y = 0
             self.jump_count = 0
+        # 바닥에서 떨어졌을 때 - velocity_y가 음수(하강 중)일 때만 Fall로 전환
+        if (self.state_machine.current_state == self.IDLE or
+            self.state_machine.current_state == self.WALK):
+            # 실제로 떨어지고 있는지 확인 (중력이 적용되어 속도가 충분히 낮아졌을 때)
+            if self.velocity_y < -1:  # 임계값: 실제 낙하 중일 때만
+                self.state_machine.handle_event(('START_FALLING', None))
 
     def handle_tile_collision(self, tile):
         left, bottom, right, top = self.get_bb()
@@ -137,22 +156,32 @@ class SKRR:
             if horizontal_overlap > self.width * 0.5:
                 self.y = tile['bottom'] - self.height / 2
                 self.velocity_y = 0
+                return False  # 천장 충돌
         elif min_overlap == overlap_top and self.velocity_y <= 0:
+            # 바닥 충돌 - 항상 위치 보정
             self.y = tile['top'] + self.height / 2
             self.velocity_y = 0
-            self.is_grounded = True
+            return True  # 바닥에 있음!
         elif min_overlap == overlap_left:
             self.x = tile['left'] - self.width / 2
+            return False  # 벽 충돌
         elif min_overlap == overlap_right:
             self.x = tile['right'] + self.width / 2
+            return False  # 벽 충돌
+
+        return False
 
     def handle_platform_collision(self, tile):
         left, bottom, right, top = self.get_bb()
 
+        # 플랫폼 위에 있는지 체크
         if self.velocity_y <= 0 and bottom <= tile['top'] and bottom >= tile['top'] - 10:
+            # 플랫폼 위로 위치 보정
             self.y = tile['top'] + self.height / 2
             self.velocity_y = 0
-            self.is_grounded = True
+            return True  # 플랫폼 위에 있음!
+
+        return False
 
     def get_bb(self):
         return (self.x - self.width / 2, self.y - self.height / 2,
