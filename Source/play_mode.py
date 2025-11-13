@@ -27,11 +27,15 @@ def init():
 
     Skrr = SKRR()
 
-    Skrr.set_tile_map(tile_map)
 
     camera = Camera.get_instance()
     camera.set_target(Skrr)
-    camera.set_bounds(0, tile_map.map_width * tile_map.tile_width, 0, game_framework.height)
+    camera.set_bounds(
+        0,
+        tile_map.map_width * tile_map.tile_width,
+        0,
+        tile_map.map_height * tile_map.tile_height
+    )
     game_world.set_camera(camera)
 
     tile_map.set_camera(camera)
