@@ -98,7 +98,7 @@ def Get_State_Rules(skrr):
         },
 
         skrr.FALL: {
-            jump_down: skrr.JUMP,
+            can_jump: skrr.JUMP,
             dash_down: skrr.DASH,
             attack_down: skrr.JUMPATTACK,
             can_use_skill3: skrr.SKILL3,

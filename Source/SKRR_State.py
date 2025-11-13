@@ -31,8 +31,6 @@ class Idle:
     def enter(self, e):
         self.skrr.frame = 0
         self.frame_time = 0
-        self.skrr.is_grounded = True
-        self.skrr.jump_count = 0
         self.timer = get_time()
 
     def do(self):
@@ -469,7 +467,7 @@ class Fall:
             self.skrr.x = new_x
 
     def exit(self, e):
-        print(f"SKRR is_grounded: {self.skrr.is_grounded}, jump_count: {self.skrr.jump_count}")
+        pass
 
     def draw(self):
         if not self.skrr.images['Fall']:

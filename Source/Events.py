@@ -24,7 +24,6 @@ def handle_key_down(event, skrr):
         handle_attack(skrr, event)
     elif event.key == SDLK_x:
         handle_jump(skrr, event)
-        print(f"SKRR is_grounded: {skrr.is_grounded}, jump_count: {skrr.jump_count}")
     elif event.key == SDLK_z:
         handle_dash(skrr, event)
     elif event.key == SDLK_a:
@@ -77,9 +76,7 @@ def handle_jump(skrr, event):
     if skrr.state_machine.current_state == skrr.ATTACK or skrr.state_machine.current_state == skrr.JUMPATTACK:
         return
 
-    if skrr.is_grounded and skrr.jump_count == 0:
-        skrr.handle_event(('INPUT', event))
-    elif not skrr.is_grounded and skrr.jump_count == 1:
+    if skrr.is_grounded or skrr.jump_count < 2:
         skrr.handle_event(('INPUT', event))
 
 
