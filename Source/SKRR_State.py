@@ -106,7 +106,7 @@ class Walk:
         self.frame_time = 0
 
     def do(self):
-        minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 10
+        minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 20
         self.frame_time += game_framework.frame_time
         self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
 
@@ -114,12 +114,27 @@ class Walk:
             self.skrr.state_machine.handle_event(('STOP_MOVING', None))
             return
 
-        if self.skrr.x <= minX and self.skrr.face_dir == -1:
-            self.skrr.x = minX
-        elif self.skrr.x >= get_canvas_width() - minX and self.skrr.face_dir == 1:
-            self.skrr.x = get_canvas_width() - minX
+        # 타일맵 경계 체크
+        if self.skrr.tile_map:
+            max_x = self.skrr.tile_map.map_width * self.skrr.tile_map.tile_width
+            min_x = max(0, minX)  # 0 미만으로 못 가게
+
+            if self.skrr.x <= min_x and self.skrr.face_dir == -1:
+                self.skrr.x = min_x
+            elif self.skrr.x >= max_x - minX and self.skrr.face_dir == 1:
+                self.skrr.x = max_x - minX
+            else:
+                new_x = self.skrr.x + self.skrr.face_dir * RUN_SPEED_PPS * game_framework.frame_time
+                self.skrr.x = max(min_x, min(new_x, max_x - minX))  # 범위 제한
         else:
-            self.skrr.x += self.skrr.face_dir * RUN_SPEED_PPS * game_framework.frame_time
+            min_x = max(0, minX)
+            if self.skrr.x <= min_x and self.skrr.face_dir == -1:
+                self.skrr.x = min_x
+            elif self.skrr.x >= get_canvas_width() - minX and self.skrr.face_dir == 1:
+                self.skrr.x = get_canvas_width() - minX
+            else:
+                new_x = self.skrr.x + self.skrr.face_dir * RUN_SPEED_PPS * game_framework.frame_time
+                self.skrr.x = max(min_x, min(new_x, get_canvas_width() - minX))
 
     def exit(self, e):
         pass
@@ -156,7 +171,7 @@ class Jump:
     def enter(self, e):
         self.skrr.frame = 0
         self.frame_time = 0
-        self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 10
+        self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 20
         self.skrr.jumping = True
         if self.skrr.jump_count == 0:
             self.skrr.jump_count = 1
@@ -186,7 +201,21 @@ class Jump:
         if self.skrr.is_moving:
             move_speed = RUN_SPEED_PPS * game_framework.frame_time
             new_x = self.skrr.x + self.skrr.face_dir * move_speed
-            self.skrr.x = new_x
+
+            # 타일맵 경계 체크
+            if self.skrr.tile_map:
+                max_x = self.skrr.tile_map.map_width * self.skrr.tile_map.tile_width
+                min_x = max(0, self.minX)
+                if min_x <= new_x <= max_x - self.minX:
+                    self.skrr.x = new_x
+                else:
+                    self.skrr.x = max(min_x, min(new_x, max_x - self.minX))
+            else:
+                min_x = max(0, self.minX)
+                if min_x <= new_x <= get_canvas_width() - self.minX:
+                    self.skrr.x = new_x
+                else:
+                    self.skrr.x = max(min_x, min(new_x, get_canvas_width() - self.minX))
 
     def exit(self, e):
         self.effect_x = None
@@ -230,22 +259,31 @@ class JumpAttack:
         self.skrr.frame = 0
         self.frame_time = 0
         self.skrr.jumpattack_last_use_time = get_time()
-        self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 10
+        self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 20
         SoundManager.play_player_sound('Jump_attack')
 
     def do(self):
         self.frame_time += game_framework.frame_time
         self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
 
-        self.skrr.y += self.skrr.velocity_y * game_framework.frame_time * PIXEL_PER_METER
-        self.skrr.velocity_y -= GRAVITY * game_framework.frame_time
-
         if self.skrr.is_moving:
             move_speed = RUN_SPEED_PPS * game_framework.frame_time
             new_x = self.skrr.x + self.skrr.face_dir * move_speed
 
-            if self.minX <= new_x <= get_canvas_width() - self.minX:
-                self.skrr.x = new_x
+            # 타일맵 경계 체크
+            if self.skrr.tile_map:
+                max_x = self.skrr.tile_map.map_width * self.skrr.tile_map.tile_width
+                min_x = max(0, self.minX)
+                if min_x <= new_x <= max_x - self.minX:
+                    self.skrr.x = new_x
+                else:
+                    self.skrr.x = max(min_x, min(new_x, max_x - self.minX))
+            else:
+                min_x = max(0, self.minX)
+                if min_x <= new_x <= get_canvas_width() - self.minX:
+                    self.skrr.x = new_x
+                else:
+                    self.skrr.x = max(min_x, min(new_x, get_canvas_width() - self.minX))
 
         if self.skrr.frame >= self.total_frames:
             self.skrr.state_machine.handle_event(('ANIMATION_END', None))
@@ -348,7 +386,7 @@ class Dash:
         if self.skrr.dash_type == 0:
             self.dash_distance = 0
             self.can_second_dash = False
-        self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 10
+        self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 20
         self.dash_dir = self.skrr.face_dir
         self.is_air_dash = not self.skrr.is_grounded
 
@@ -366,9 +404,18 @@ class Dash:
 
         dash_move = DASH_SPEED_PPS * game_framework.frame_time
 
-        if (self.dash_distance < self.max_dash_distance
-                and ((self.dash_dir == 1 and self.skrr.x < get_canvas_width() - self.minX)
-                     or (self.dash_dir == -1 and self.skrr.x > self.minX))):
+        # 타일맵 경계 체크
+        if self.skrr.tile_map:
+            max_x = self.skrr.tile_map.map_width * self.skrr.tile_map.tile_width
+            can_move = (self.dash_distance < self.max_dash_distance and
+                       ((self.dash_dir == 1 and self.skrr.x < max_x - self.minX) or
+                        (self.dash_dir == -1 and self.skrr.x > self.minX)))
+        else:
+            can_move = (self.dash_distance < self.max_dash_distance and
+                       ((self.dash_dir == 1 and self.skrr.x < get_canvas_width() - self.minX) or
+                        (self.dash_dir == -1 and self.skrr.x > self.minX)))
+
+        if can_move:
             self.skrr.x += self.dash_dir * dash_move
             self.dash_distance += dash_move
         else:
@@ -437,7 +484,7 @@ class Fall:
         self.frame_time = 0
         self.has_played_intro = False
         self.skrr.jumping = True
-        self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 10
+        self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 20
 
     def do(self):
         self.frame_time += game_framework.frame_time
@@ -465,7 +512,21 @@ class Fall:
         if self.skrr.is_moving:
             move_speed = RUN_SPEED_PPS * game_framework.frame_time
             new_x = self.skrr.x + self.skrr.face_dir * move_speed
-            self.skrr.x = new_x
+
+            # 타일맵 경계 체크
+            if self.skrr.tile_map:
+                max_x = self.skrr.tile_map.map_width * self.skrr.tile_map.tile_width
+                min_x = max(0, self.minX)
+                if min_x <= new_x <= max_x - self.minX:
+                    self.skrr.x = new_x
+                else:
+                    self.skrr.x = max(min_x, min(new_x, max_x - self.minX))
+            else:
+                min_x = max(0, self.minX)
+                if min_x <= new_x <= get_canvas_width() - self.minX:
+                    self.skrr.x = new_x
+                else:
+                    self.skrr.x = max(min_x, min(new_x, get_canvas_width() - self.minX))
 
     def exit(self, e):
         pass
@@ -578,16 +639,25 @@ class Skill1:
         # SoundManager.play_sound('skill1')
 
     def do(self):
-        minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 10
+        minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 20
         self.frame_time += game_framework.frame_time
         self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
 
-        if self.skrr.x <= minX and self.skrr.face_dir == -1:
-            self.skrr.x = minX
-        elif self.skrr.x >= get_canvas_width() - minX and self.skrr.face_dir == 1:
-            self.skrr.x = get_canvas_width() - minX
+        if self.skrr.tile_map:
+            max_x = self.skrr.tile_map.map_width * self.skrr.tile_map.tile_width
+            if self.skrr.x <= minX and self.skrr.face_dir == -1:
+                self.skrr.x = minX
+            elif self.skrr.x >= max_x - minX and self.skrr.face_dir == 1:
+                self.skrr.x = max_x - minX
+            else:
+                self.skrr.x += self.skrr.face_dir * RUN_SPEED_PPS * game_framework.frame_time / 2
         else:
-            self.skrr.x += self.skrr.face_dir * RUN_SPEED_PPS * game_framework.frame_time / 2
+            if self.skrr.x <= minX and self.skrr.face_dir == -1:
+                self.skrr.x = minX
+            elif self.skrr.x >= get_canvas_width() - minX and self.skrr.face_dir == 1:
+                self.skrr.x = get_canvas_width() - minX
+            else:
+                self.skrr.x += self.skrr.face_dir * RUN_SPEED_PPS * game_framework.frame_time / 2
 
         if self.skrr.frame >= self.total_frames:
             if self.skrr.frame >= self.total_frames:
@@ -686,12 +756,26 @@ class Skill3:
         self.frame_time = 0
         self.skrr.use_skill('skill3')
         self.skrr.is_invincible = True
-        self.is_air_skill = not self.skrr.is_grounded
+        self.is_air_skill = not self.skrr.is_grounded # 수정하기
         self.start_x = self.skrr.x
-        self.skrr.x += self.skrr.face_dir * self.distance
+
+        # 이동 거리 계산 (범위 제한 적용)
+        distance = self.distance
         if self.is_air_skill:
-            self.skrr.x += self.skrr.face_dir * 50
-        self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 10
+            distance += 50
+
+        new_x = self.skrr.x + self.skrr.face_dir * distance
+
+        # 타일맵 범위 체크
+        if self.skrr.tile_map:
+            max_x = self.skrr.tile_map.map_width * self.skrr.tile_map.tile_width
+            min_x = 0
+            self.skrr.x = max(min_x, min(new_x, max_x))
+        else:
+            min_x = 0
+            self.skrr.x = max(min_x, min(new_x, get_canvas_width()))
+
+        self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 20
         # SoundManager.play_player_sound('Skill3')
 
     def do(self):
@@ -719,7 +803,7 @@ class Skill3:
         self.skrr.is_invincible = False
         if self.is_air_skill:
             self.skrr.velocity_y = 0
-            self.skrr.x -= self.skrr.face_dir * 50
+            self.skrr.x = self.start_x
             self.is_air_skill = False
         self.start_x = None
 

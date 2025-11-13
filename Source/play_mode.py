@@ -69,7 +69,6 @@ def update():
 
 def draw():
     clear_canvas()
-
     if tile_map:
         tile_map.draw()
 
