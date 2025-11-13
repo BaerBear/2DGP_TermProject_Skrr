@@ -22,23 +22,24 @@ def init():
     SoundManager.initialize()
     SoundManager.play_bgm('chapter1', repeat=True)
 
-    # 타일맵 로드
     tmx_path = os.path.join(os.path.dirname(__file__), '..', 'Tilemap_work', 'Stage1.tmx')
     tile_map = TileMap(tmx_path)
 
     Skrr = SKRR()
 
-    # 카메라 설정 - 타일맵 크기에 맞게 조정
+    Skrr.set_tile_map(tile_map)
+
     camera = Camera.get_instance()
     camera.set_target(Skrr)
     camera.set_bounds(0, tile_map.map_width * tile_map.tile_width, 0, game_framework.height)
     game_world.set_camera(camera)
 
-    # 타일맵에도 카메라 설정
     tile_map.set_camera(camera)
 
     # Layer 2: 플레이어
     game_world.add_object(Skrr, 2)
+
+    game_world.add_collision_pair('player:tilemap', Skrr, tile_map)
 
     # Layer 1: 적(Enemy)
     sword_knight = Knight_Sword(900, get_canvas_height() // 2)
@@ -58,19 +59,18 @@ def finish():
 
 def update():
     game_world.update()
+    game_world.handle_collision()
     if tile_map:
         tile_map.update()
 
 def draw():
     clear_canvas()
 
-    # 타일맵 먼저 그리기 (배경)
     if tile_map:
         tile_map.draw()
 
     game_world.render()
 
-    # 충돌 박스 그리기 (디버그용)
     if tile_map and show_collision_boxes:
         tile_map.draw_collision_boxes()
 
