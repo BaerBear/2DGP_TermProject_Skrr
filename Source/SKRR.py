@@ -133,8 +133,10 @@ class SKRR:
         min_overlap = min(overlap_left, overlap_right, overlap_top, overlap_bottom)
 
         if min_overlap == overlap_bottom and self.velocity_y > 0:
-            self.y = tile['bottom'] - self.height / 2
-            self.velocity_y = 0
+            horizontal_overlap = min(overlap_left, overlap_right)
+            if horizontal_overlap > self.width * 0.5:
+                self.y = tile['bottom'] - self.height / 2
+                self.velocity_y = 0
         elif min_overlap == overlap_top and self.velocity_y <= 0:
             self.y = tile['top'] + self.height / 2
             self.velocity_y = 0
@@ -153,12 +155,8 @@ class SKRR:
             self.is_grounded = True
 
     def get_bb(self):
-        if self.face_dir == 1:
-            return (self.x - self.width, self.y - self.height / 2,
-                    self.x + self.width / 2, self.y + self.height / 2)
-        else:
-            return (self.x - self.width / 2, self.y - self.height / 2,
-                    self.x + self.width, self.y + self.height / 2)
+        return (self.x - self.width, self.y - self.height / 2,
+                self.x + self.width / 2, self.y + self.height / 2)
 
     def handle_collision(self, group, other):
         if group == 'player:tilemap':
