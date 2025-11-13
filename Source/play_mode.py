@@ -26,7 +26,7 @@ def init():
     tile_map = TileMap(tmx_path)
 
     Skrr = SKRR()
-
+    Skrr.set_tile_map(tile_map)
 
     camera = Camera.get_instance()
     camera.set_target(Skrr)
