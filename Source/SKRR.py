@@ -25,11 +25,20 @@ class SKRR:
     def __init__(self):
         SKRR.load_images()
 
-        self.x, self.y = 100, get_canvas_height() // 2
+        self.x, self.y = 300, 600
         self.frame = 0
         self.face_dir = 1
         self.scale = 2
         self.key_pressed = {'left': False, 'right': False}
+
+        # 충돌 박스 크기
+        self.width = 15 * self.scale
+        self.height = 35 * self.scale
+
+        # 물리 속성
+        self.velocity_y = 0
+        self.gravity = -1000
+        self.tile_map = None
 
         # 대쉬관련
         self.dash_type = None
@@ -42,9 +51,9 @@ class SKRR:
         self.jump_count = 0
         self.jumpattack_cooldown_time = 0.4 # 점프공격 쿨타임
         self.jumpattack_last_use_time = 0
-        self.is_grounded = True
+        self.is_grounded = False
         self.is_moving = False
-        self.ground_y = get_canvas_height() // 2
+        self.ground_y = 300  # 더미 값
         self.is_invincible = False
 
         # 스킬 시스템
@@ -82,8 +91,78 @@ class SKRR:
         self.state_machine = StateMachine(self.IDLE, Get_State_Rules(self))
         set_player(self)
 
+    def set_tile_map(self, tile_map):
+        self.tile_map = tile_map
+
     def update(self):
+        if not self.is_grounded:
+            import game_framework
+            self.velocity_y += self.gravity * game_framework.frame_time
+            self.y += self.velocity_y * game_framework.frame_time
+
+        if self.tile_map:
+            self.check_tile_collision()
+
         self.state_machine.update()
+
+    def check_tile_collision(self):
+        left, bottom, right, top = self.get_bb()
+        colliding_tiles = self.tile_map.check_collision(left, bottom, right, top)
+
+        was_grounded = self.is_grounded
+        self.is_grounded = False
+
+        for tile in colliding_tiles:
+            if tile['layer'] == 'tile':
+                self.handle_tile_collision(tile)
+            elif tile['layer'] == 'flatform':
+                self.handle_platform_collision(tile)
+
+        if self.is_grounded and not was_grounded:
+            self.velocity_y = 0
+            self.jump_count = 0
+
+    def handle_tile_collision(self, tile):
+        left, bottom, right, top = self.get_bb()
+
+        overlap_left = right - tile['left']
+        overlap_right = tile['right'] - left
+        overlap_top = tile['top'] - bottom
+        overlap_bottom = top - tile['bottom']
+
+        min_overlap = min(overlap_left, overlap_right, overlap_top, overlap_bottom)
+
+        if min_overlap == overlap_bottom and self.velocity_y > 0:
+            self.y = tile['bottom'] - self.height / 2
+            self.velocity_y = 0
+        elif min_overlap == overlap_top and self.velocity_y <= 0:
+            self.y = tile['top'] + self.height / 2
+            self.velocity_y = 0
+            self.is_grounded = True
+        elif min_overlap == overlap_left:
+            self.x = tile['left'] - self.width / 2
+        elif min_overlap == overlap_right:
+            self.x = tile['right'] + self.width / 2
+
+    def handle_platform_collision(self, tile):
+        left, bottom, right, top = self.get_bb()
+
+        if self.velocity_y <= 0 and bottom <= tile['top'] and bottom >= tile['top'] - 10:
+            self.y = tile['top'] + self.height / 2
+            self.velocity_y = 0
+            self.is_grounded = True
+
+    def get_bb(self):
+        if self.face_dir == 1:
+            return (self.x - self.width, self.y - self.height / 2,
+                    self.x + self.width / 2, self.y + self.height / 2)
+        else:
+            return (self.x - self.width / 2, self.y - self.height / 2,
+                    self.x + self.width, self.y + self.height / 2)
+
+    def handle_collision(self, group, other):
+        if group == 'player:tilemap':
+            pass
 
     def is_dash_ready(self):
         return get_time() - self.dash_last_use_time >= self.dash_cooldown_time
@@ -104,6 +183,14 @@ class SKRR:
 
     def draw(self):
         self.state_machine.draw()
+        from pico2d import draw_rectangle
+        from Camera import Camera
+        camera = Camera.get_instance()
+        if camera:
+            camera_x, camera_y = camera.get_position()
+            left, bottom, right, top = self.get_bb()
+            draw_rectangle(left - camera_x, bottom - camera_y,
+                          right - camera_x, top - camera_y)
 
     def handle_event(self, event):
         self.state_machine.handle_event(event)

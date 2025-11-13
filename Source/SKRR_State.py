@@ -162,11 +162,11 @@ class Jump:
         if self.skrr.jump_count == 0:
             self.skrr.jump_count = 1
             self.skrr.is_grounded = False
-            self.skrr.velocity_y = JUMP_POWER_PPS
+            self.skrr.velocity_y = 500
             SoundManager.play_player_sound('Jump')
         elif self.skrr.jump_count == 1:
             self.skrr.jump_count = 2
-            self.skrr.velocity_y = JUMP_POWER_PPS
+            self.skrr.velocity_y = 500
             self.effect_x = self.skrr.x
             self.effect_y = self.skrr.y
             self.effect_frame_time = 0
@@ -179,8 +179,6 @@ class Jump:
         if self.effect_y is not None:
             self.effect_frame_time += game_framework.frame_time
 
-        self.skrr.y += self.skrr.velocity_y * game_framework.frame_time * PIXEL_PER_METER
-        self.skrr.velocity_y -= GRAVITY * game_framework.frame_time
 
         if self.skrr.velocity_y < 0 and not self.skrr.is_grounded:
             self.skrr.state_machine.handle_event(('START_FALLING', None))
@@ -189,9 +187,7 @@ class Jump:
         if self.skrr.is_moving:
             move_speed = RUN_SPEED_PPS * game_framework.frame_time
             new_x = self.skrr.x + self.skrr.face_dir * move_speed
-
-            if self.minX <= new_x <= get_canvas_width() - self.minX:
-                self.skrr.x = new_x
+            self.skrr.x = new_x
 
     def exit(self, e):
         self.effect_x = None
@@ -459,26 +455,18 @@ class Fall:
             loop_frame = int(self.frame_time * self.ACTION_PER_TIME * 3) % 3
             self.skrr.frame = 2 + loop_frame
 
-        self.skrr.velocity_y -= GRAVITY * game_framework.frame_time
-        self.skrr.y += self.skrr.velocity_y * game_framework.frame_time * PIXEL_PER_METER
-        if self.skrr.y <= self.skrr.ground_y:
-            self.skrr.y = self.skrr.ground_y
-            self.skrr.is_grounded = True
+        if self.skrr.is_grounded:
             if self.skrr.is_moving:
                 self.skrr.state_machine.handle_event(('LAND_ON_GROUND', 'WALK'))
             else:
                 self.skrr.state_machine.handle_event(('LAND_ON_GROUND', 'IDLE'))
-            self.skrr.velocity_y = 0
             self.skrr.jumping = False
-            self.skrr.jump_count = 0
             return
 
         if self.skrr.is_moving:
             move_speed = RUN_SPEED_PPS * game_framework.frame_time
             new_x = self.skrr.x + self.skrr.face_dir * move_speed
-
-            if self.minX <= new_x <= get_canvas_width() - self.minX:
-                self.skrr.x = new_x
+            self.skrr.x = new_x
 
     def exit(self, e):
         pass
@@ -581,7 +569,7 @@ class Skill1:
     def __init__(self, skrr):
         self.skrr = skrr
         self.frame_time = 0
-        self.total_frames = 7 * 20  # 실제 애니메이션 프레임 수에 맞게 조정
+        self.total_frames = 7 * 20
 
     def enter(self, e):
         self.skrr.frame = 0
@@ -634,12 +622,12 @@ class Skill1:
 class Skill2:
     TIME_PER_ACTION = 0.1
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
-    FRAMES_PER_ACTION = 8  # 프레임 수는 실제 이미지에 맞게 조정 필요
+    FRAMES_PER_ACTION = 8
 
     def __init__(self, skrr):
         self.skrr = skrr
         self.frame_time = 0
-        self.total_frames = 8 * 8 # 실제 애니메이션 프레임 수에 맞게 조정
+        self.total_frames = 8 * 8
 
     def enter(self, e):
         self.skrr.frame = 0
