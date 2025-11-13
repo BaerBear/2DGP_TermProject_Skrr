@@ -3,6 +3,7 @@ from ResourceManager import ResourceManager
 import SKRR
 import random
 import game_framework
+import game_world
 
 ENEMY_WALK_SPEED_PPS = 100.0
 
@@ -139,10 +140,14 @@ class Knight_Sword(Enemy):
             else:
                 return
 
+        cam_x, cam_y = self.x, self.y
+        if game_world.camera:
+            cam_x, cam_y = game_world.camera.apply(self.x, self.y)
+
         if self.face_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, self.x, self.y, img.w * self.scale, img.h * self.scale)
+            img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.scale, img.h * self.scale)
         else:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.x, self.y, img.w * self.scale, img.h * self.scale)
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.scale, img.h * self.scale)
 
 
 class Knight_Bow(Enemy):
@@ -257,10 +262,14 @@ class Knight_Bow(Enemy):
             else:
                 return
 
+        cam_x, cam_y = self.x, self.y
+        if game_world.camera:
+            cam_x, cam_y = game_world.camera.apply(self.x, self.y)
+
         if self.face_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, self.x, self.y, img.w * self.scale, img.h * self.scale)
+            img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.scale, img.h * self.scale)
         else:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.x, self.y, img.w * self.scale, img.h * self.scale)
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.scale, img.h * self.scale)
 
 
 class Knight_Tackle(Enemy):
@@ -409,7 +418,11 @@ class Knight_Tackle(Enemy):
             else:
                 return
 
+        cam_x, cam_y = self.x, self.y
+        if game_world.camera:
+            cam_x, cam_y = game_world.camera.apply(self.x, self.y)
+
         if self.face_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, self.x, self.y, img.w * self.scale, img.h * self.scale)
+            img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.scale, img.h * self.scale)
         else:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.x, self.y, img.w * self.scale, img.h * self.scale)
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.scale, img.h * self.scale)

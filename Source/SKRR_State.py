@@ -1,6 +1,7 @@
 from pico2d import get_canvas_width, get_time
 from Sound_Loader import SoundManager
 import game_framework
+import game_world
 
 PIXEL_PER_METER = (10.0 / 0.3)
 RUN_SPEED_KMPH = 20.0
@@ -46,10 +47,14 @@ class Idle:
 
     def draw(self):
         img = self.skrr.images['Idle'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Idle'])]
+        cam_x, cam_y = self.skrr.x, self.skrr.y
+        if game_world.camera:
+            cam_x, cam_y = game_world.camera.apply(self.skrr.x, self.skrr.y)
+
         if self.skrr.face_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
 
 
 class Wait:
@@ -78,10 +83,14 @@ class Wait:
 
     def draw(self):
         img = self.skrr.images['Wait'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Wait'])]
+        cam_x, cam_y = self.skrr.x, self.skrr.y
+        if game_world.camera:
+            cam_x, cam_y = game_world.camera.apply(self.skrr.x, self.skrr.y)
+
         if self.skrr.face_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
 
 
 class Walk:
@@ -118,10 +127,14 @@ class Walk:
 
     def draw(self):
         img = self.skrr.images['Walk'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Walk'])]
+        cam_x, cam_y = self.skrr.x, self.skrr.y
+        if game_world.camera:
+            cam_x, cam_y = game_world.camera.apply(self.skrr.x, self.skrr.y)
+
         if self.skrr.face_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
 
 
 class Jump:
@@ -187,16 +200,23 @@ class Jump:
 
     def draw(self):
         img = self.skrr.images['Jump'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Jump'])]
+        cam_x, cam_y = self.skrr.x, self.skrr.y
+        if game_world.camera:
+            cam_x, cam_y = game_world.camera.apply(self.skrr.x, self.skrr.y)
+
         if self.skrr.face_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
 
         if self.effect_y is not None and self.effect_frame_time < 0.5:
             if self.skrr.images['JumpEffect']:
                 effect_idx = int(self.effect_frame_time * self.EFFECT_ACTION_PER_TIME) % len(self.skrr.images['JumpEffect'])
                 effect_img = self.skrr.images['JumpEffect'][effect_idx]
-                effect_img.clip_draw(0, 0, effect_img.w, effect_img.h, self.effect_x, self.effect_y,
+                effect_cam_x, effect_cam_y = self.effect_x, self.effect_y
+                if game_world.camera:
+                    effect_cam_x, effect_cam_y = game_world.camera.apply(self.effect_x, self.effect_y)
+                effect_img.clip_draw(0, 0, effect_img.w, effect_img.h, effect_cam_x, effect_cam_y,
                                      effect_img.w * self.skrr.scale, effect_img.h * self.skrr.scale)
 
 
@@ -244,10 +264,14 @@ class JumpAttack:
 
     def draw(self):
         img = self.skrr.images['JumpAttack'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['JumpAttack'])]
+        cam_x, cam_y = self.skrr.x, self.skrr.y
+        if game_world.camera:
+            cam_x, cam_y = game_world.camera.apply(self.skrr.x, self.skrr.y)
+
         if self.skrr.face_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
 
 
 class Attack:
@@ -297,10 +321,14 @@ class Attack:
         else:
             return
 
+        cam_x, cam_y = self.skrr.x, self.skrr.y
+        if game_world.camera:
+            cam_x, cam_y = game_world.camera.apply(self.skrr.x, self.skrr.y)
+
         if self.attack_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.attack_dir == -1:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
 
 
 class Dash:
@@ -378,16 +406,24 @@ class Dash:
         if self.skrr.images['DashEffect']:
             effect_idx = int(self.effect_frame_time * self.EFFECT_ACTION_PER_TIME) % len(self.skrr.images['DashEffect'])
             effect_img = self.skrr.images['DashEffect'][effect_idx]
-            if self.dash_dir == 1:
-                effect_img.clip_draw(0, 0, effect_img.w, effect_img.h, self.effect_x, self.effect_y, effect_img.w, effect_img.h)
-            elif self.dash_dir == -1:
-                effect_img.clip_composite_draw(0, 0, effect_img.w, effect_img.h, 0, 'h', self.effect_x, self.effect_y, effect_img.w, effect_img.h)
-        img = self.skrr.images['Dash'][0]
-        if self.dash_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
-        elif self.dash_dir == -1:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            effect_cam_x, effect_cam_y = self.effect_x, self.effect_y
+            if game_world.camera:
+                effect_cam_x, effect_cam_y = game_world.camera.apply(self.effect_x, self.effect_y)
 
+            if self.dash_dir == 1:
+                effect_img.clip_draw(0, 0, effect_img.w, effect_img.h, effect_cam_x, effect_cam_y, effect_img.w, effect_img.h)
+            elif self.dash_dir == -1:
+                effect_img.clip_composite_draw(0, 0, effect_img.w, effect_img.h, 0, 'h', effect_cam_x, effect_cam_y, effect_img.w, effect_img.h)
+
+        img = self.skrr.images['Dash'][0]
+        cam_x, cam_y = self.skrr.x, self.skrr.y
+        if game_world.camera:
+            cam_x, cam_y = game_world.camera.apply(self.skrr.x, self.skrr.y)
+
+        if self.dash_dir == 1:
+            img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+        elif self.dash_dir == -1:
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
 
 
 class Fall:
@@ -451,17 +487,20 @@ class Fall:
         if not self.skrr.images['Fall']:
             return
 
-        # self.skrr.frame을 직접 사용 (do에서 계산된 값)
         if self.skrr.frame < len(self.skrr.images['Fall']):
             img = self.skrr.images['Fall'][self.skrr.frame]
         else:
             img = self.skrr.images['Fall'][0]
 
+        cam_x, cam_y = self.skrr.x, self.skrr.y
+        if game_world.camera:
+            cam_x, cam_y = game_world.camera.apply(self.skrr.x, self.skrr.y)
+
         if self.skrr.face_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale,
+            img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.skrr.scale,
                           img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale,
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.skrr.scale,
                                     img.h * self.skrr.scale)
 
 
@@ -491,10 +530,14 @@ class Dead:
 
     def draw(self):
         img = self.skrr.images['Dead'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Dead'])]
+        cam_x, cam_y = self.skrr.x, self.skrr.y
+        if game_world.camera:
+            cam_x, cam_y = game_world.camera.apply(self.skrr.x, self.skrr.y)
+
         if self.skrr.face_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
 
 
 class Reborn:
@@ -523,7 +566,11 @@ class Reborn:
 
     def draw(self):
         img = self.skrr.images['Reborn'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Reborn'])]
-        img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+        cam_x, cam_y = self.skrr.x, self.skrr.y
+        if game_world.camera:
+            cam_x, cam_y = game_world.camera.apply(self.skrr.x, self.skrr.y)
+
+        img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
 
 
 
@@ -574,11 +621,14 @@ class Skill1:
 
     def draw(self):
         img = self.skrr.images['Skill1'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Skill1'])]
+        cam_x, cam_y = self.skrr.x, self.skrr.y
+        if game_world.camera:
+            cam_x, cam_y = game_world.camera.apply(self.skrr.x, self.skrr.y)
 
         if self.skrr.face_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
 
 
 class Skill2:
@@ -620,11 +670,14 @@ class Skill2:
 
     def draw(self):
         img = self.skrr.images['Skill2'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Skill2'])]
+        cam_x, cam_y = self.skrr.x, self.skrr.y
+        if game_world.camera:
+            cam_x, cam_y = game_world.camera.apply(self.skrr.x, self.skrr.y)
 
         if self.skrr.face_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
 
 
 class Skill3:
@@ -689,7 +742,11 @@ class Skill3:
         elif not self.is_air_skill and 'Skill3_ground' in self.skrr.images and len(self.skrr.images['Skill3_ground']) > 0:
             img = self.skrr.images['Skill3_ground'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Skill3_ground'])]
 
+        cam_x, cam_y = self.skrr.x, self.skrr.y
+        if game_world.camera:
+            cam_x, cam_y = game_world.camera.apply(self.skrr.x, self.skrr.y)
+
         if self.skrr.face_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', self.skrr.x, self.skrr.y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)

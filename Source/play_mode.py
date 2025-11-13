@@ -3,6 +3,7 @@ from ResourceManager import ResourceManager
 from SKRR import SKRR
 from Enemy import Knight_Sword, Knight_Bow, Knight_Tackle
 from Sound_Loader import SoundManager
+from Camera import Camera
 import game_framework
 import game_world
 import Events
@@ -18,6 +19,12 @@ def init():
     SoundManager.play_bgm('chapter1', repeat=True)
 
     Skrr = SKRR()
+
+    # 카메라 설정
+    camera = Camera.get_instance()
+    camera.set_target(Skrr)
+    camera.set_bounds(0, 3000, 0, game_framework.height)  # 맵 크기에 맞게 조정
+    game_world.set_camera(camera)
 
     # Layer 2: 플레이어
     game_world.add_object(Skrr, 2)

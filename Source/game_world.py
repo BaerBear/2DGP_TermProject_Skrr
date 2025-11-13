@@ -5,6 +5,11 @@
 # 4: UI
 
 world = [[], [], [], [], []]
+camera = None
+
+def set_camera(cam):
+    global camera
+    camera = cam
 
 def add_object(o, depth):
     world[depth].append(o)
@@ -20,6 +25,10 @@ def remove_object(o):
     print("존재하지 않는 오브젝트 제거 시도")
 
 def update():
+    # 카메라 업데이트
+    if camera:
+        camera.update()
+
     for layer in world:
         for o in layer:
             o.update()
@@ -32,4 +41,3 @@ def render():
 def clear():
     for layer in world:
         layer.clear()
-
