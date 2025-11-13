@@ -12,8 +12,8 @@ class TileMap:
         self.map_width = 0
         self.map_height = 0
         self.tileset_images = {}
-        self.collision_tiles = []
-        self.camera = None
+        self.collision_tiles = []  # 충돌 타일 바운딩 박스 저장
+        self.camera = None  # 카메라 참조
 
         self.load_tmx()
         self.build_collision_boxes()
@@ -189,6 +189,12 @@ class TileMap:
                 colliding_tiles.append(tile)
 
         return colliding_tiles
+
+    def get_bb(self):
+        return 0, 0, 0, 0
+
+    def handle_collision(self, group, other):
+        pass
 
     def draw(self):
         for layer in self.layers:
