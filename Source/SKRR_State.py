@@ -469,7 +469,7 @@ class Fall:
             self.skrr.x = new_x
 
     def exit(self, e):
-        pass
+        print(f"SKRR is_grounded: {self.skrr.is_grounded}, jump_count: {self.skrr.jump_count}")
 
     def draw(self):
         if not self.skrr.images['Fall']:
