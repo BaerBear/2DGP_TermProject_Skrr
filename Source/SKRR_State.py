@@ -652,8 +652,6 @@ class Skill3:
         if self.is_air_skill:
             self.skrr.x += self.skrr.face_dir * 50
         self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 10
-        print(f'start_x: {self.start_x}, current_x: {self.skrr.x}, face_dir: {self.skrr.face_dir}')
-
         # SoundManager.play_player_sound('Skill3')
 
     def do(self):
@@ -671,6 +669,10 @@ class Skill3:
                 else:
                     self.skrr.state_machine.handle_event(('ANIMATION_END', 'IDLE'))
             else:
+                if self.skrr.key_pressed['left']:
+                    self.skrr.face_dir = -1
+                elif self.skrr.key_pressed['right']:
+                    self.skrr.face_dir = 1
                 self.skrr.state_machine.handle_event(('ANIMATION_END', 'FALL'))
 
     def exit(self, e):
