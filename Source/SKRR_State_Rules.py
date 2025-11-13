@@ -49,12 +49,15 @@ def Get_State_Rules(skrr):
     def skill_to_walk(e):
         return animation_end(e) and e[1] == 'WALK'
 
+    def can_jump(e):
+        return jump_down(e) and (skrr.is_grounded or skrr.jump_count < 2)
+
     return {
         skrr.IDLE: {
             right_down: skrr.WALK,
             left_down: skrr.WALK,
             attack_down: skrr.ATTACK,
-            jump_down: skrr.JUMP,
+            can_jump: skrr.JUMP,
             dash_down: skrr.DASH,
             can_use_skill1: skrr.SKILL1,
             can_use_skill2: skrr.SKILL2,
@@ -66,7 +69,7 @@ def Get_State_Rules(skrr):
             right_down: skrr.WALK,
             left_down: skrr.WALK,
             attack_down: skrr.ATTACK,
-            jump_down: skrr.JUMP,
+            can_jump: skrr.JUMP,  # 수정
             dash_down: skrr.DASH,
             can_use_skill1: skrr.SKILL1,
             can_use_skill2: skrr.SKILL2,
@@ -76,7 +79,7 @@ def Get_State_Rules(skrr):
 
         skrr.WALK: {
             attack_down: skrr.ATTACK,
-            jump_down: skrr.JUMP,
+            can_jump: skrr.JUMP,  # 수정
             dash_down: skrr.DASH,
             can_use_skill1: skrr.SKILL1,
             can_use_skill2: skrr.SKILL2,
@@ -85,7 +88,7 @@ def Get_State_Rules(skrr):
         },
 
         skrr.JUMP: {
-            jump_down: skrr.JUMP,
+            can_jump: skrr.JUMP,  # 2단 점프용, 수정
             dash_down: skrr.DASH,
             attack_down: skrr.JUMPATTACK,
             can_use_skill3: skrr.SKILL3,

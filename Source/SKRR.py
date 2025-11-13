@@ -95,6 +95,8 @@ class SKRR:
         self.tile_map = tile_map
 
     def update(self):
+        self.state_machine.update()
+
         if not self.is_grounded:
             import game_framework
             self.velocity_y += self.gravity * game_framework.frame_time
@@ -102,8 +104,6 @@ class SKRR:
 
         if self.tile_map:
             self.check_tile_collision()
-
-        self.state_machine.update()
 
     def check_tile_collision(self):
         left, bottom, right, top = self.get_bb()
@@ -155,7 +155,7 @@ class SKRR:
             self.is_grounded = True
 
     def get_bb(self):
-        return (self.x - self.width, self.y - self.height / 2,
+        return (self.x - self.width / 2, self.y - self.height / 2,
                 self.x + self.width / 2, self.y + self.height / 2)
 
     def handle_collision(self, group, other):
