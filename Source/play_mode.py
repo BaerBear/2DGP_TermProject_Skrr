@@ -4,27 +4,38 @@ from SKRR import SKRR
 from Enemy import Knight_Sword, Knight_Bow, Knight_Tackle
 from Sound_Loader import SoundManager
 from Camera import Camera
+from TileMap import TileMap
 import game_framework
 import game_world
 import Events
+import os
 
 Skrr = None
+tile_map = None
+show_collision_boxes = True  # 충돌 박스 표시 여부
 
 def init():
-    global Skrr
+    global Skrr, tile_map
 
     ResourceManager.preload_resources()
 
     SoundManager.initialize()
     SoundManager.play_bgm('chapter1', repeat=True)
 
+    # 타일맵 로드
+    tmx_path = os.path.join(os.path.dirname(__file__), '..', 'Tilemap_work', 'Stage1.tmx')
+    tile_map = TileMap(tmx_path)
+
     Skrr = SKRR()
 
-    # 카메라 설정
+    # 카메라 설정 - 타일맵 크기에 맞게 조정
     camera = Camera.get_instance()
     camera.set_target(Skrr)
-    camera.set_bounds(0, 3000, 0, game_framework.height)  # 맵 크기에 맞게 조정
+    camera.set_bounds(0, tile_map.map_width * tile_map.tile_width, 0, game_framework.height)
     game_world.set_camera(camera)
+
+    # 타일맵에도 카메라 설정
+    tile_map.set_camera(camera)
 
     # Layer 2: 플레이어
     game_world.add_object(Skrr, 2)
@@ -47,10 +58,22 @@ def finish():
 
 def update():
     game_world.update()
+    if tile_map:
+        tile_map.update()
 
 def draw():
     clear_canvas()
+
+    # 타일맵 먼저 그리기 (배경)
+    if tile_map:
+        tile_map.draw()
+
     game_world.render()
+
+    # 충돌 박스 그리기 (디버그용)
+    if tile_map and show_collision_boxes:
+        tile_map.draw_collision_boxes()
+
     update_canvas()
 
 def handle_events():
@@ -60,6 +83,10 @@ def handle_events():
             game_framework.quit()
         elif e.type == SDL_KEYDOWN and e.key == SDLK_ESCAPE:
             game_framework.quit()
+        elif e.type == SDL_KEYDOWN and e.key == SDLK_F1:
+            # F1 키로 충돌 박스 표시 토글
+            global show_collision_boxes
+            show_collision_boxes = not show_collision_boxes
         elif e.type == SDL_KEYDOWN:
             Events.handle_key_down(e, Skrr)
         elif e.type == SDL_KEYUP:
