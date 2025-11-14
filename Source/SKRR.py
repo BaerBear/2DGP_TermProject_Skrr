@@ -167,7 +167,8 @@ class SKRR:
         left, bottom, right, top = self.get_bb()
 
         if self.velocity_y <= 0 and bottom <= tile['top'] and bottom >= tile['top'] - 10:
-            if self.state_machine.current_state != self.IDLE or self.state_machine.current_state != self.WALK:
+            if ((self.state_machine.current_state != self.IDLE or self.state_machine.current_state != self.WALK)
+                    and not self.was_grounded and self.is_grounded):
                 if self.is_moving:
                     self.state_machine.handle_event(('LAND_ON_GROUND', 'WALK'))
                 else:
