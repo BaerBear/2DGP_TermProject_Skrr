@@ -167,11 +167,11 @@ class SKRR:
         left, bottom, right, top = self.get_bb()
 
         if self.velocity_y <= 0 and bottom <= tile['top'] and bottom >= tile['top'] - 10:
-            if ((self.state_machine.current_state != self.WALK
-                or self.state_machine.current_state != self.IDLE)
-                    and (right <= tile['left'] or left >= tile['right'])):
-                if self.key_pressed['left'] or self.key_pressed['right']:
-                    self.state_machine.handle_event(('', None))
+            if self.state_machine.current_state != self.IDLE or self.state_machine.current_state != self.WALK:
+                if self.is_moving:
+                    self.state_machine.handle_event(('LAND_ON_GROUND', 'WALK'))
+                else:
+                    self.state_machine.handle_event(('LAND_ON_GROUND', 'IDLE'))
             self.y = tile['top'] + self.height / 2
             self.velocity_y = 0
             return True

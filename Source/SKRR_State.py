@@ -741,6 +741,7 @@ class Skill3:
     TIME_PER_ACTION = 0.1
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
     FRAMES_PER_ACTION = 6
+    SKILL3_SPEED_PPS = 3000  # 매우 빠른 이동 속도
 
     def __init__(self, skrr):
         self.skrr = skrr
@@ -748,32 +749,18 @@ class Skill3:
         self.total_frames = 6 * 6
         self.is_air_skill = False
         self.minX = 0
-        self.start_x = None
-        self.distance = 150
+        self.target_distance = 150
+        self.traveled_distance = 0
 
     def enter(self, e):
         self.skrr.frame = 0
         self.frame_time = 0
         self.skrr.use_skill('skill3')
         self.skrr.is_invincible = True
-        self.is_air_skill = not self.skrr.is_grounded # 수정하기
+        self.is_air_skill = not self.skrr.is_grounded and self.skrr.jump_count > 0
+        self.traveled_distance = 0
         self.start_x = self.skrr.x
-
-        # 이동 거리 계산 (범위 제한 적용)
-        distance = self.distance
-        if self.is_air_skill:
-            distance += 50
-
-        new_x = self.skrr.x + self.skrr.face_dir * distance
-
-        # 타일맵 범위 체크
-        if self.skrr.tile_map:
-            max_x = self.skrr.tile_map.map_width * self.skrr.tile_map.tile_width
-            min_x = 0
-            self.skrr.x = max(min_x, min(new_x, max_x))
-        else:
-            min_x = 0
-            self.skrr.x = max(min_x, min(new_x, get_canvas_width()))
+        self.target_distance = 150
 
         self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 20
         # SoundManager.play_player_sound('Skill3')
@@ -781,6 +768,32 @@ class Skill3:
     def do(self):
         self.frame_time += game_framework.frame_time
         self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
+
+        if self.traveled_distance < self.target_distance:
+            move_speed = self.SKILL3_SPEED_PPS * game_framework.frame_time
+            actual_move = min(move_speed, self.target_distance - self.traveled_distance)
+
+            new_x = self.skrr.x + self.skrr.face_dir * actual_move
+
+            if self.skrr.tile_map:
+                max_x = self.skrr.tile_map.map_width * self.skrr.tile_map.tile_width
+                min_x = max(0, self.minX)
+
+                if min_x <= new_x <= max_x - self.minX:
+                    self.skrr.x = new_x
+                    self.traveled_distance += actual_move
+                else:
+                    # 경계에 도달하면 더 이상 이동하지 않음
+                    self.skrr.x = max(min_x, min(new_x, max_x - self.minX))
+                    self.traveled_distance = self.target_distance  # 강제로 이동 종료
+            else:
+                min_x = max(0, self.minX)
+                if min_x <= new_x <= get_canvas_width() - self.minX:
+                    self.skrr.x = new_x
+                    self.traveled_distance += actual_move
+                else:
+                    self.skrr.x = max(min_x, min(new_x, get_canvas_width() - self.minX))
+                    self.traveled_distance = self.target_distance
 
         if self.skrr.frame >= self.total_frames:
             if self.skrr.is_grounded:
@@ -802,10 +815,10 @@ class Skill3:
     def exit(self, e):
         self.skrr.is_invincible = False
         if self.is_air_skill:
-            self.skrr.velocity_y = 0
             self.skrr.x = self.start_x
-            self.is_air_skill = False
-        self.start_x = None
+            self.skrr.velocity_y = 0
+        self.is_air_skill = False
+        self.traveled_distance = 0
 
     def draw(self):
         img = None
