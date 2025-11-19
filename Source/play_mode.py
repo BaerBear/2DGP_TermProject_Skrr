@@ -1,7 +1,7 @@
 from pico2d import *
 from ResourceManager import ResourceManager
-from SKRR import SKRR, stage_start_positions
-from Enemy import Knight_Sword, Knight_Bow, Knight_Tackle
+import SKRR
+from StageManager import StageManager
 from Sound_Loader import SoundManager
 from Camera import Camera
 from TileMap import TileMap
@@ -13,7 +13,7 @@ import os
 Skrr = None
 tile_map = None
 show_collision_boxes = True  # 충돌 박스 표시 여부
-current_stage = 1  # 현재 스테이지 (0: Stage0, 1: Stage1, 2: BossStage)
+current_stage = 0  # 현재 스테이지 (0: Stage0, 1: Stage1, 2: BossStage)
 
 def init():
     global Skrr, tile_map, current_stage
@@ -28,7 +28,7 @@ def init():
     tmx_path = os.path.join(os.path.dirname(__file__), '..', 'Tilemap_work', 'Stage0.tmx')
     tile_map = TileMap(tmx_path)
 
-    Skrr = SKRR()
+    Skrr = SKRR.SKRR()
     Skrr.set_tile_map(tile_map)
 
     camera = Camera.get_instance()
@@ -48,21 +48,11 @@ def init():
 
     game_world.add_collision_pair('player:tilemap', Skrr, tile_map)
 
-    # Layer 1: 적(Enemy)
-    sword_knight = Knight_Sword(900, get_canvas_height() // 2)
-    sword_knight.target = Skrr
-    game_world.add_object(sword_knight, 1)
-
-    bow_knight = Knight_Bow(1100, get_canvas_height() // 2)
-    bow_knight.target = Skrr
-    game_world.add_object(bow_knight, 1)
-
-    tackle_knight = Knight_Tackle(700, get_canvas_height() // 2)
-    tackle_knight.target = Skrr
-    game_world.add_object(tackle_knight, 1)
+    # 스테이지별 적 로드 (StageManager 사용)
+    StageManager.load_stage_enemies(current_stage, Skrr)
 
 
-def load_stage(stage_num): # 타일맵 로드
+def load_stage(stage_num):
     global tile_map, current_stage
 
     stage_files = {
@@ -75,6 +65,8 @@ def load_stage(stage_num): # 타일맵 로드
         return
 
     current_stage = stage_num
+
+    StageManager.clear_all_enemies()
 
     # 기존 타일맵 제거
     if tile_map:
@@ -104,6 +96,8 @@ def load_stage(stage_num): # 타일맵 로드
     start_x, start_y = SKRR.stage_start_positions[stage_num]
     Skrr.x = start_x
     Skrr.y = start_y
+
+    StageManager.load_stage_enemies(stage_num, Skrr)
 
     print(f"Stage {stage_num} loaded: {stage_files[stage_num]} at position ({start_x}, {start_y})")
 
