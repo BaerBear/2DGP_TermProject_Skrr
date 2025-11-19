@@ -3,7 +3,6 @@ from ResourceManager import ResourceManager
 from State_Machine import StateMachine
 from SKRR_State import Idle, Wait, Walk, Jump, JumpAttack, Attack, Dash, Fall, Dead, Reborn, Skill1, Skill2, Skill3
 from SKRR_State_Rules import Get_State_Rules
-import game_world
 
 stage_start_positions = {
         0: (100, 256),      # Stage0 시작 위치

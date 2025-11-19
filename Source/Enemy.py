@@ -52,9 +52,112 @@ class Enemy:
         self.state = 'IDLE'
         self.prev_state = 'IDLE'
 
+        # 물리 속성 추가
+        self.velocity_y = 0
+        self.gravity = -1000
+        self.is_grounded = False
+        self.tile_map = None
+
+        # 충돌 박스 크기 (적마다 다를 수 있으므로 상속 클래스에서 오버라이드 가능)
+        self.width = 30 * self.scale
+        self.height = 40 * self.scale
+
+    def set_tile_map(self, tile_map):
+        """타일맵 설정"""
+        self.tile_map = tile_map
+
+    def get_bb(self):
+        """충돌 박스 반환"""
+        return (self.x - self.width / 2, self.y - self.height / 2,
+                self.x + self.width / 2, self.y + self.height / 2)
+
+    def apply_gravity(self):
+        """중력 적용"""
+        if not self.is_grounded:
+            self.velocity_y += self.gravity * game_framework.frame_time
+            self.y += self.velocity_y * game_framework.frame_time
+
+    def check_tile_collision(self):
+        """타일맵과의 충돌 체크"""
+        if not self.tile_map:
+            return
+
+        left, bottom, right, top = self.get_bb()
+        colliding_tiles = self.tile_map.check_collision(left, bottom, right, top)
+
+        has_ground_collision = False
+
+        for tile in colliding_tiles:
+            if tile['layer'] == 'tile':
+                if self.handle_tile_collision(tile):
+                    has_ground_collision = True
+            elif tile['layer'] == 'flatform':
+                if self.handle_platform_collision(tile):
+                    has_ground_collision = True
+
+        was_grounded = self.is_grounded
+        self.is_grounded = has_ground_collision
+
+        if self.is_grounded and not was_grounded:
+            self.velocity_y = 0
+
+    def handle_tile_collision(self, tile):
+        """타일과의 충돌 처리"""
+        left, bottom, right, top = self.get_bb()
+
+        overlap_left = right - tile['left']
+        overlap_right = tile['right'] - left
+        overlap_top = tile['top'] - bottom
+        overlap_bottom = top - tile['bottom']
+
+        min_overlap = min(overlap_left, overlap_right, overlap_top, overlap_bottom)
+
+        # 천장 충돌 (위로 올라갈 때)
+        if min_overlap == overlap_bottom and self.velocity_y > 0:
+            horizontal_overlap = min(overlap_left, overlap_right)
+            if horizontal_overlap > self.width * 0.5:
+                self.y = tile['bottom'] - self.height / 2
+                self.velocity_y = 0
+                return False
+        # 바닥 충돌 (아래로 떨어질 때)
+        elif min_overlap == overlap_top and self.velocity_y <= 0:
+            self.y = tile['top'] + self.height / 2
+            self.velocity_y = 0
+            return True
+        # 왼쪽 벽 충돌
+        elif min_overlap == overlap_left:
+            self.x = tile['left'] - self.width / 2
+            # 벽에 부딪히면 방향 전환
+            if self.state == 'WALK':
+                self.face_dir *= -1
+            return False
+        # 오른쪽 벽 충돌
+        elif min_overlap == overlap_right:
+            self.x = tile['right'] + self.width / 2
+            # 벽에 부딪히면 방향 전환
+            if self.state == 'WALK':
+                self.face_dir *= -1
+            return False
+
+        return False
+
+    def handle_platform_collision(self, tile):
+        """플랫폼과의 충돌 처리"""
+        left, bottom, right, top = self.get_bb()
+
+        # 위에서 아래로 떨어질 때만 플랫폼 충돌
+        if self.velocity_y <= 0 and bottom <= tile['top'] and bottom >= tile['top'] - 10:
+            self.y = tile['top'] + self.height / 2
+            self.velocity_y = 0
+            return True
+
+        return False
+
     def update(self):
         if not self.is_alive:
             return
+
+        self.apply_gravity()
 
         player = SKRR.get_player()
         if player:
@@ -96,8 +199,21 @@ class Enemy:
         elif self.state == 'ATTACK':
             self.frame = int(self.frame_time * self.ATTACK_ACTION_PER_TIME * self.ATTACK_FRAMES_PER_ACTION)
 
+        self.check_tile_collision()
+
     def draw(self):
         pass
+
+    def draw_collision_box(self):
+        """충돌 박스 그리기 (디버그용)"""
+        if SKRR.SKRR.show_collision_box:
+            from pico2d import draw_rectangle
+            if game_world.camera:
+                camera_x, camera_y = game_world.camera.get_position()
+                left, bottom, right, top = self.get_bb()
+                draw_rectangle(left - camera_x, bottom - camera_y,
+                             right - camera_x, top - camera_y)
+
 
 class Knight_Sword(Enemy):
     images = None
@@ -107,6 +223,11 @@ class Knight_Sword(Enemy):
         self.hp = 150
         self.velocity = ENEMY_WALK_SPEED_PPS
         self.attack_cooldown_time = 1.5
+
+        # Knight_Sword 전용 충돌 박스 크기
+        self.width = 25 * self.scale
+        self.height = 35 * self.scale
+
         if not Knight_Sword.images:
             Knight_Sword.images = ResourceManager.get_enemy_images('Knight_Sword')
 
@@ -149,6 +270,9 @@ class Knight_Sword(Enemy):
         else:
             img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.scale, img.h * self.scale)
 
+        # 충돌 박스 그리기
+        self.draw_collision_box()
+
 
 class Knight_Bow(Enemy):
     images = None
@@ -163,12 +287,21 @@ class Knight_Bow(Enemy):
         self.aim_duration = 1.0
         self.aim_timer = 0
         self.aim_frames = 4
+
+        # Knight_Bow 전용 충돌 박스 크기 (좀 더 작음)
+        self.width = 22 * self.scale
+        self.height = 32 * self.scale
+
         if not Knight_Bow.images:
             Knight_Bow.images = ResourceManager.get_enemy_images('Knight_Bow')
 
     def update(self):
         if not self.is_alive:
             return
+
+        # 중력 및 충돌 처리 추가
+        self.apply_gravity()
+        self.check_tile_collision()
 
         player = SKRR.get_player()
         if player:
@@ -271,6 +404,9 @@ class Knight_Bow(Enemy):
         else:
             img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.scale, img.h * self.scale)
 
+        # 충돌 박스 그리기
+        self.draw_collision_box()
+
 
 class Knight_Tackle(Enemy):
     images = None
@@ -292,12 +428,21 @@ class Knight_Tackle(Enemy):
         self.tackle_speed = ENEMY_WALK_SPEED_PPS * 3.0
         self.tackle_distance = 400
         self.tackle_traveled = 0
+
+        # Knight_Tackle 전용 충돌 박스 크기 (가장 큼)
+        self.width = 30 * self.scale
+        self.height = 40 * self.scale
+
         if not Knight_Tackle.images:
             Knight_Tackle.images = ResourceManager.get_enemy_images('Knight_Tackle')
 
     def update(self):
         if not self.is_alive:
             return
+
+        # 중력 및 충돌 처리 추가
+        self.apply_gravity()
+        self.check_tile_collision()
 
         player = SKRR.get_player()
         if player:
@@ -426,3 +571,6 @@ class Knight_Tackle(Enemy):
             img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.scale, img.h * self.scale)
         else:
             img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.scale, img.h * self.scale)
+
+        # 충돌 박스 그리기
+        self.draw_collision_box()

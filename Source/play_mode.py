@@ -47,8 +47,8 @@ def init():
 
     game_world.add_collision_pair('player:tilemap', Skrr, tile_map)
 
-    # 스테이지별 적 로드 (StageManager 사용)
-    StageManager.load_stage_enemies(current_stage, Skrr)
+    # 스테이지별 적 로드
+    StageManager.load_stage_enemies(current_stage, Skrr, tile_map)
 
 
 def load_stage(stage_num):
@@ -67,15 +67,12 @@ def load_stage(stage_num):
 
     StageManager.clear_all_enemies()
 
-    # 기존 타일맵 제거
     if tile_map:
         game_world.remove_collision_object(tile_map)
 
-    # 새 타일맵 로드
     tmx_path = os.path.join(os.path.dirname(__file__), '..', 'Tilemap_work', stage_files[stage_num])
     tile_map = TileMap(tmx_path)
 
-    # 플레이어에 타일맵 설정
     Skrr.set_tile_map(tile_map)
 
     # 카메라 범위 업데이트
@@ -96,7 +93,7 @@ def load_stage(stage_num):
     Skrr.x = start_x
     Skrr.y = start_y
 
-    StageManager.load_stage_enemies(stage_num, Skrr)
+    StageManager.load_stage_enemies(stage_num, Skrr, tile_map)
 
     print(f"Stage {stage_num} loaded: {stage_files[stage_num]} at position ({start_x}, {start_y})")
 
