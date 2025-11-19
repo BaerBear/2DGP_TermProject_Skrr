@@ -3,7 +3,7 @@ ResourceManager - 중앙 리소스 관리 시스템
 모든 이미지와 사운드를 한 곳에서 관리하여 중복 로딩 방지 및 메모리 최적화
 """
 
-from Image_Loader import SKRR_Image_Loader, Enemy_Image_Loader
+from Image_Loader import SKRR_Image_Loader, Enemy_Image_Loader, Boss_Image_Loader
 from pico2d import load_image
 import os
 
@@ -16,6 +16,7 @@ class ResourceManager:
     _image_cache = {}
     _player_images = None
     _enemy_images = {}
+    _boss_images = {}
     _effect_images = {}
 
     def __new__(cls):
@@ -35,6 +36,9 @@ class ResourceManager:
 
         # 적 이미지 로드
         cls._load_enemy_images()
+
+        # 보스 이미지 로드
+        cls._load_boss_images()
 
         # 공통 이펙트 이미지 로드
         cls._load_effect_images()
@@ -101,6 +105,21 @@ class ResourceManager:
             }
 
     @classmethod
+    def _load_boss_images(cls):
+        print("  - 보스 이미지 로딩...")
+
+        # GrimReaper
+        if 'GrimReaper' not in cls._boss_images:
+            cls._boss_images['GrimReaper'] = {
+                'idle': Boss_Image_Loader('GrimReaper', 'Idle').images,
+                'walk': Boss_Image_Loader('GrimReaper', 'Walk').images,
+                'attack': Boss_Image_Loader('GrimReaper', 'Attack').images,
+                'skill1_effect': Boss_Image_Loader('GrimReaper', 'Skill1_Effect').images,
+                'skill1_motion': Boss_Image_Loader('GrimReaper', 'Skill1_Motion').images,
+                'skill2': Boss_Image_Loader('GrimReaper', 'Skill2').images,
+            }
+
+    @classmethod
     def _load_effect_images(cls):
         if 'enemy_dead' not in cls._effect_images:
             try:
@@ -139,6 +158,13 @@ class ResourceManager:
         return cls._enemy_images.get(enemy_type, {})
 
     @classmethod
+    def get_boss_images(cls, boss_type):
+        """보스 이미지 가져오기"""
+        if not cls._initialized:
+            cls.initialize()
+        return cls._boss_images.get(boss_type, {})
+
+    @classmethod
     def get_effect_images(cls, effect_name):
         if not cls._initialized:
             cls.initialize()
@@ -159,6 +185,7 @@ class ResourceManager:
         cls._image_cache.clear()
         cls._player_images = None
         cls._enemy_images.clear()
+        cls._boss_images.clear()
         cls._effect_images.clear()
         cls._initialized = False
 

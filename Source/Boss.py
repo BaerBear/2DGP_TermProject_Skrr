@@ -4,7 +4,6 @@ from ResourceManager import ResourceManager
 import SKRR
 import game_framework
 import game_world
-import random
 
 BOSS_WALK_SPEED_PPS = 80.0
 
@@ -38,9 +37,19 @@ class GrimReaper(Enemy):
         self.is_using_skill = False
         self.current_skill = None
 
+        # Skill1 전용 변수 (고속 돌진)
+        self.skill1_phase = 'READY'  # READY, DASHING, LANDING
+        self.skill1_start_x = 0
+        self.skill1_start_y = 0
+        self.skill1_target_x = 0
+        self.skill1_target_y = 0
+        self.skill1_dash_speed = 1200.0  # 매우 빠른 속도
+        self.skill1_landing_timer = 0
+        self.skill1_landing_duration = 0.7  # 착지 모션 시간 (7프레임 * 0.1)
+
         # 이미지 로드
         if not GrimReaper.images:
-            GrimReaper.images = self.load_images()
+            GrimReaper.images = ResourceManager.get_boss_images('GrimReaper')
 
         # 크기 조정
         if GrimReaper.images and 'idle' in GrimReaper.images and GrimReaper.images['idle']:
@@ -50,49 +59,6 @@ class GrimReaper(Enemy):
         else:
             self.width = 80 * self.scale
             self.height = 100 * self.scale
-
-    @staticmethod
-    def load_images():
-        """보스 이미지 로드"""
-        base_path = '..\\Resources\\Image\\Object\\GrimReaper\\'
-        images = {}
-
-        try:
-            # Idle
-            images['idle'] = []
-            for i in range(6):
-                img = load_image(base_path + f'Idle\\Idle_{i} #*.png')
-                images['idle'].append(img)
-
-            # Walk
-            images['walk'] = []
-            for i in range(6):
-                img = load_image(base_path + f'Walk\\Walk_{i} #*.png')
-                images['walk'].append(img)
-
-            # AttackA (기본 공격)
-            images['attack'] = []
-            for i in range(9):
-                img = load_image(base_path + f'AttackA\\AttackA_{i} #*.png')
-                images['attack'].append(img)
-
-            # Skill1 (스킬1)
-            images['skill1'] = []
-            for i in range(32):
-                img = load_image(base_path + f'Skill1\\GrimReaper_Sentence_3_Hit_{i}.png')
-                images['skill1'].append(img)
-
-            # Skill2 (스킬2)
-            images['skill2'] = []
-            for i in range(80):
-                img = load_image(base_path + f'Skill2\\GrimReaper_TheStake_Land_{i}.png')
-                images['skill2'].append(img)
-
-            print("Boss images loaded successfully")
-        except Exception as e:
-            print(f"Boss image loading error: {e}")
-
-        return images
 
     def get_bb(self):
         """물리/타일 충돌용 박스"""
@@ -152,11 +118,8 @@ class GrimReaper(Enemy):
         # 스킬 사용 중 처리
         elif self.is_using_skill:
             if self.current_skill == 'SKILL1':
-                # Skill1 지속 시간 체크
-                skill_duration = len(GrimReaper.images.get('skill1', [])) * 0.1
-                if self.frame_time >= skill_duration:
-                    self.is_using_skill = False
-                    self.current_skill = None
+                # Skill1 전용 업데이트 호출
+                self.update_skill1()
             elif self.current_skill == 'SKILL2':
                 # Skill2 지속 시간 체크
                 skill_duration = len(GrimReaper.images.get('skill2', [])) * 0.1
@@ -238,14 +201,71 @@ class GrimReaper(Enemy):
                 self.frame = int(self.frame_time * 10.0) % frame_count
 
         elif self.state == 'SKILL1':
-            frame_count = len(GrimReaper.images.get('skill1', []))
-            if frame_count > 0:
-                self.frame = int(self.frame_time * 10.0) % frame_count
+            # Skill1은 별도로 처리 (단계별로 다름)
+            pass
 
         elif self.state == 'SKILL2':
             frame_count = len(GrimReaper.images.get('skill2', []))
             if frame_count > 0:
                 self.frame = int(self.frame_time * 10.0) % frame_count
+
+    def update_skill1(self):
+        """Skill1 (고속 돌진) 업데이트"""
+        if self.skill1_phase == 'READY':
+            # 준비 단계: 0번 모션 유지
+            self.frame = 0
+            # 바로 돌진 시작
+            self.skill1_phase = 'DASHING'
+
+        elif self.skill1_phase == 'DASHING':
+            # 돌진 중: 목표 지점까지 고속 이동
+            dx = self.skill1_target_x - self.x
+            dy = self.skill1_target_y - self.y
+            distance = (dx ** 2 + dy ** 2) ** 0.5
+
+            if distance > 10:  # 아직 도착 안함
+                move_distance = self.skill1_dash_speed * game_framework.frame_time
+                if move_distance >= distance:
+                    # 도착
+                    self.x = self.skill1_target_x
+                    self.y = self.skill1_target_y
+                    self.skill1_phase = 'LANDING'
+                    self.skill1_landing_timer = 0
+                else:
+                    # 계속 이동
+                    ratio = move_distance / distance
+                    self.x += dx * ratio
+                    self.y += dy * ratio
+            else:
+                # 도착
+                self.skill1_phase = 'LANDING'
+                self.skill1_landing_timer = 0
+
+        elif self.skill1_phase == 'LANDING':
+            # 착지 모션: 1-6번 프레임 재생
+            self.skill1_landing_timer += game_framework.frame_time
+            motion_progress = self.skill1_landing_timer / self.skill1_landing_duration
+            self.frame = min(int(motion_progress * 6) + 1, 6)  # 1-6 프레임
+
+            if self.skill1_landing_timer >= self.skill1_landing_duration:
+                # 스킬 종료
+                self.is_using_skill = False
+                self.current_skill = None
+                self.skill1_phase = 'READY'
+                self.state = 'IDLE'
+
+    def get_skill1_effect_bb(self):
+        """Skill1 돌진 궤적의 타격 범위 반환"""
+        if self.current_skill != 'SKILL1' or self.skill1_phase != 'DASHING':
+            return None
+
+        # 시작점에서 현재 위치까지의 직사각형 범위
+        min_x = min(self.skill1_start_x, self.x)
+        max_x = max(self.skill1_start_x, self.x)
+        min_y = min(self.skill1_start_y, self.y) - self.height / 2
+        max_y = max(self.skill1_start_y, self.y) + self.height / 2
+
+        return (min_x, min_y, max_x, max_y)
 
     def start_dash(self):
         """대쉬 시작"""
@@ -260,6 +280,23 @@ class GrimReaper(Enemy):
         self.current_skill = 'SKILL1'
         self.state = 'SKILL1'
         self.skill1_last_use = get_time()
+        self.skill1_phase = 'READY'  # 초기 단계로 설정
+        self.frame_time = 0  # 프레임 타이머 초기화
+
+        # 시작 위치 및 목표 위치 설정
+        player = SKRR.get_player()
+        if player:
+            self.skill1_start_x = self.x
+            self.skill1_start_y = self.y
+            self.skill1_target_x = player.x
+            self.skill1_target_y = player.y
+        else:
+            self.skill1_target_x = self.x
+            self.skill1_target_y = self.y
+
+        # 대쉬 속도 및 착지 시간 설정
+        self.skill1_dash_speed = 500  # 대쉬 속도 (픽셀/초)
+        self.skill1_landing_duration = 0.6  # 착지 모션 지속 시간 (초)
 
     def use_skill2(self):
         """스킬2 사용"""
@@ -289,13 +326,15 @@ class GrimReaper(Enemy):
                 img = GrimReaper.images['attack'][self.frame % len(GrimReaper.images['attack'])]
 
         elif self.state == 'SKILL1':
-            if 'skill1' in GrimReaper.images and GrimReaper.images['skill1']:
-                img = GrimReaper.images['skill1'][self.frame % len(GrimReaper.images['skill1'])]
+            if 'skill1_motion' in GrimReaper.images and GrimReaper.images['skill1_motion']:
+                if self.frame < len(GrimReaper.images['skill1_motion']):
+                    img = GrimReaper.images['skill1_motion'][self.frame]
 
         elif self.state == 'SKILL2':
             if 'skill2' in GrimReaper.images and GrimReaper.images['skill2']:
                 img = GrimReaper.images['skill2'][self.frame % len(GrimReaper.images['skill2'])]
 
+        # 보스 이미지 그리기
         if img:
             cam_x, cam_y = self.x, self.y
             if game_world.camera:
@@ -306,11 +345,53 @@ class GrimReaper(Enemy):
             else:
                 img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.scale, img.h * self.scale)
 
+        # Skill1 돌진 이펙트 그리기
+        if self.state == 'SKILL1' and self.skill1_phase == 'DASHING':
+            self.draw_skill1_effect()
+
         # 체력바 그리기
         self.draw_hp_bar()
 
         # 충돌박스 그리기
         self.draw_collision_box()
+
+    def draw_skill1_effect(self):
+        """Skill1 돌진 궤적 이펙트 그리기"""
+        if 'skill1_effect' not in GrimReaper.images or not GrimReaper.images['skill1_effect']:
+            return
+
+        # 시작점부터 현재 위치까지 이펙트 그리기
+        dx = self.x - self.skill1_start_x
+        dy = self.y - self.skill1_start_y
+        distance = (dx ** 2 + dy ** 2) ** 0.5
+
+        if distance < 10:
+            return
+
+        # 이펙트 애니메이션 프레임
+        effect_frame = int(self.frame_time * 30.0) % len(GrimReaper.images['skill1_effect'])
+        effect_img = GrimReaper.images['skill1_effect'][effect_frame]
+
+        # 시작점과 현재점 사이에 이펙트 그리기
+        segments = max(1, int(distance / 50))  # 50픽셀마다 이펙트
+
+        for i in range(segments + 1):
+            ratio = i / max(segments, 1)
+            effect_x = self.skill1_start_x + dx * ratio
+            effect_y = self.skill1_start_y + dy * ratio
+
+            if game_world.camera:
+                cam_x, cam_y = game_world.camera.apply(effect_x, effect_y)
+
+                # 이펙트 그리기 (방향에 따라 회전)
+                if self.face_dir == 1:
+                    effect_img.clip_draw(0, 0, effect_img.w, effect_img.h,
+                                       cam_x, cam_y,
+                                       effect_img.w * 2, effect_img.h * 2)
+                else:
+                    effect_img.clip_composite_draw(0, 0, effect_img.w, effect_img.h,
+                                                  0, 'h', cam_x, cam_y,
+                                                  effect_img.w * 2, effect_img.h * 2)
 
     def draw_hp_bar(self):
         """보스 체력바 그리기"""
@@ -349,4 +430,3 @@ class GrimReaper(Enemy):
                 hit_left, hit_bottom, hit_right, hit_top = self.get_hit_bb()
                 draw_rectangle(hit_left - camera_x, hit_bottom - camera_y,
                              hit_right - camera_x, hit_top - camera_y)
-

@@ -40,7 +40,8 @@ class SoundManager:
         cls.enemy_sounds = {}
         cls.enemy_sounds['enemy_dead'] = load_wav(os.path.join(Enemy_path, 'Enemy_Dead.wav'))
         cls.enemy_sounds['enemy_big_dead'] = load_wav(os.path.join(Enemy_path, 'Enemy_Big_Dead.wav'))
-        cls.enemy_sounds['arrow_hit'] = load_wav(os.path.join(Enemy_path, 'arrow_hit.wav'))
+        cls.enemy_sounds['arrow_ready'] = load_wav(os.path.join(Enemy_path, 'Crossbow_Ready.wav'))
+        cls.enemy_sounds['arrow_fire'] = load_wav(os.path.join(Enemy_path, 'Crossbow_Fire.wav'))
         cls.enemy_sounds['blast_hit'] = load_wav(os.path.join(Enemy_path, 'Attack_Sword.wav'))
 
         for sound in cls.enemy_sounds.values():

@@ -55,9 +55,10 @@ class SKRR_Image_Loader:
                 self.images.append(load_image(os.path.join(self.resource_path, r'Skill1', f'Skill1_{i}.png')))
         elif state == 'Skill2':
             for i in range(3):
-                self.images.append(load_image(os.path.join(self.resource_path, r'Skill2', f'HeavenEarthSlam_Ready_{i}.png')))
-            for i in range(5):
-                self.images.append(load_image(os.path.join(self.resource_path, r'Skill2', f'HeavenEarthSlam_Attack_{i}.png')))
+                self.images.append(load_image(os.path.join(self.resource_path, r'Skill2', f'BuddhaCyclone_{i}.png')))
+        elif state == 'Skill2_effect':
+            for i in range(18):
+                self.images.append(load_image(os.path.join(self.resource_path, r'Skill2', f'StoneMonkey_2_BuddhaCyclone_Start_{i}.png')))
         elif state == 'Skill3_ground':
             for i in range(2):
                 self.images.append(load_image(os.path.join(self.resource_path, r'Skill3', f'FlashBladeDance_Ready_{i}.png')))
@@ -115,3 +116,34 @@ class Enemy_Image_Loader:
             elif state == 'Idle':
                 for i in range(5):
                     self.images.append(load_image(os.path.join(self.resource_path, f'Idle_{i}.png')))
+
+
+class Boss_Image_Loader:
+    def __init__(self, boss_type, state):
+        self.images = []
+        self.resource_path = os.path.join(os.path.dirname(__file__), r'..\Resources\Image\Object', boss_type)
+
+        if boss_type == 'GrimReaper':
+            if state == 'Idle':
+                for i in range(6):
+                    self.images.append(load_image(os.path.join(self.resource_path, r'Idle', f'Idle_{i}.png')))
+
+            elif state == 'Walk':
+                for i in range(6):
+                    self.images.append(load_image(os.path.join(self.resource_path, r'Walk', f'Walk_{i}.png')))
+
+            elif state == 'Attack':
+                for i in range(9):
+                    self.images.append(load_image(os.path.join(self.resource_path, r'AttackA', f'AttackA_{i}.png')))
+
+            elif state == 'Skill1_Effect':
+                for i in range(32):
+                    self.images.append(load_image(os.path.join(self.resource_path, r'Skill1', f'GrimReaper_Sentence_3_Hit_{i}.png')))
+
+            elif state == 'Skill1_Motion':
+                for i in range(7):
+                    self.images.append(load_image(os.path.join(self.resource_path, r'Skill1', f'Skill2_1_{i}.png')))
+
+            elif state == 'Skill2':
+                for i in range(80):
+                    self.images.append(load_image(os.path.join(self.resource_path, r'Skill2', f'GrimReaper_TheStake_Land_{i}.png')))

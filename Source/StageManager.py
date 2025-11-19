@@ -1,4 +1,5 @@
 from Enemy import Knight_Sword, Knight_Bow, Knight_Tackle
+from Boss import GrimReaper
 import game_world
 
 class StageManager:
@@ -25,11 +26,7 @@ class StageManager:
             (Knight_Sword, 1500),
         ],
         2: [  # BossStage
-            (Knight_Sword, 600),
-            (Knight_Bow, 800),
-            (Knight_Tackle, 1000),
-            (Knight_Bow, 1200),
-            (Knight_Sword, 1400),
+            (GrimReaper, 600),
         ]
     }
 
