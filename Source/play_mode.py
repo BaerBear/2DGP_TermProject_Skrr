@@ -16,6 +16,7 @@ show_collision_boxes = True  # 충돌 박스 표시 여부
 
 def init():
     global Skrr, tile_map
+    hide_lattice()
 
     ResourceManager.preload_resources()
 
