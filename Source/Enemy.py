@@ -130,14 +130,10 @@ class Enemy:
         # 왼쪽 벽 충돌
         elif min_overlap == overlap_left:
             self.x = tile['left'] - self.width / 2
-            if self.state == 'WALK':
-                self.face_dir *= -1
             return False
         # 오른쪽 벽 충돌
         elif min_overlap == overlap_right:
             self.x = tile['right'] + self.width / 2
-            if self.state == 'WALK':
-                self.face_dir *= -1
             return False
 
         return False
@@ -163,10 +159,12 @@ class Enemy:
         if player:
             self.dis_to_player = abs(self.x - player.x)
 
-            if player.x > self.x:
-                self.face_dir = 1
-            else:
-                self.face_dir = -1
+            # 공격 중이 아닐 때만 방향 전환
+            if not self.is_attacking:
+                if player.x > self.x:
+                    self.face_dir = 1
+                else:
+                    self.face_dir = -1
 
             attack_range = 100
             detect_range = 400
@@ -213,7 +211,6 @@ class Enemy:
                 left, bottom, right, top = self.get_bb()
                 draw_rectangle(left - camera_x, bottom - camera_y,
                              right - camera_x, top - camera_y)
-
 
 class Knight_Sword(Enemy):
     images = None
@@ -453,9 +450,8 @@ class Knight_Tackle(Enemy):
             self.height = 40 * self.scale
 
     def get_bb(self):
-        """물리/타일 충돌용 히트박스 - 몸체 중심, 방향 무관"""
         if self.is_tackling:
-            width_modifier = 1.1
+            width_modifier = 0.9
         else:
             width_modifier = 1.0
 
@@ -465,16 +461,33 @@ class Knight_Tackle(Enemy):
 
     def get_hit_bb(self):
         if self.is_tackling:
-            width_modifier = 1.1
+            width_modifier = 0.9
+            adjusted_width = self.width * width_modifier
+            body_offset = -10 * self.face_dir
+
+            return (self.x + body_offset - adjusted_width / 2, self.y - self.height / 2,
+                    self.x + body_offset + adjusted_width / 2, self.y + self.height / 4 - 10)
         else:
-            width_modifier = 1.0
+            if (self.face_dir == 1):
+                return (self.x - self.width / 2, self.y - self.height / 2,
+                        self.x + self.width / 4, self.y + self.height / 4 - 10)
+            else:
+                return (self.x - self.width / 4, self.y - self.height / 2,
+                        self.x + self.width / 2, self.y + self.height / 4 - 10)
 
-        adjusted_width = self.width * width_modifier
+    def draw_collision_box(self):
+        """충돌 박스 그리기 (디버그용)"""
+        if SKRR.SKRR.show_collision_box:
+            from pico2d import draw_rectangle
+            if game_world.camera:
+                camera_x, camera_y = game_world.camera.get_position()
+                left, bottom, right, top = self.get_bb()
+                draw_rectangle(left - camera_x, bottom - camera_y,
+                             right - camera_x, top - camera_y)
 
-        body_offset = -10 * self.face_dir
-
-        return (self.x + body_offset - adjusted_width / 2, self.y - self.height / 2,
-                self.x + body_offset + adjusted_width / 2, self.y + self.height / 4)
+                hit_left, hit_bottom, hit_right, hit_top = self.get_hit_bb()
+                draw_rectangle(hit_left - camera_x, hit_bottom - camera_y,
+                             hit_right - camera_x, hit_top - camera_y)
 
     def update(self):
         if not self.is_alive:
@@ -487,7 +500,8 @@ class Knight_Tackle(Enemy):
         if player:
             self.dis_to_player = abs(self.x - player.x)
 
-            if not self.is_tackling:
+            # 태클 중, 공격 중이 아닐 때만 방향 전환
+            if not self.is_tackling and not self.is_attacking:
                 if player.x > self.x:
                     self.face_dir = 1
                 else:
