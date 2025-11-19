@@ -16,6 +16,7 @@ def get_player():
 
 class SKRR:
     images = None
+    show_collision_box = True  # 충돌 박스 표시 여부 (클래스 변수)
 
     @classmethod
     def load_images(cls):
@@ -206,14 +207,15 @@ class SKRR:
 
     def draw(self):
         self.state_machine.draw()
-        from pico2d import draw_rectangle
-        from Camera import Camera
-        camera = Camera.get_instance()
-        if camera:
-            camera_x, camera_y = camera.get_position()
-            left, bottom, right, top = self.get_bb()
-            draw_rectangle(left - camera_x, bottom - camera_y,
-                          right - camera_x, top - camera_y)
+        if SKRR.show_collision_box:
+            from pico2d import draw_rectangle
+            from Camera import Camera
+            camera = Camera.get_instance()
+            if camera:
+                camera_x, camera_y = camera.get_position()
+                left, bottom, right, top = self.get_bb()
+                draw_rectangle(left - camera_x, bottom - camera_y,
+                              right - camera_x, top - camera_y)
 
     def handle_event(self, event):
         self.state_machine.handle_event(event)
