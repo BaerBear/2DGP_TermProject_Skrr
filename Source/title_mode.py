@@ -1,4 +1,5 @@
 from pico2d import *
+from Sound_Loader import SoundManager
 import game_framework
 import play_mode
 
@@ -9,6 +10,8 @@ def init():
     image = []
     image.append(load_image('../Resources/Image/Title_Art.png'))
     image.append(load_image('../Resources/Image/Title_Logo.png'))
+
+    SoundManager.play_bgm('main_title', repeat=True)
 
 def update():
     pass
@@ -38,4 +41,3 @@ def pause():
 
 def resume():
     pass
-

@@ -21,7 +21,6 @@ def init():
 
     ResourceManager.preload_resources()
 
-    SoundManager.initialize()
     SoundManager.play_bgm('chapter1', repeat=True)
 
     current_stage = 0
