@@ -5,28 +5,27 @@ import game_world
 class StageManager:
     """스테이지별 적 배치 정보를 관리하는 클래스"""
 
-    # 각 적 클래스별 y 오프셋 (플레이어 시작 위치 기준)
-    # 각 적의 충돌 박스 크기 차이를 보정하기 위한 오프셋
     ENEMY_Y_OFFSETS = {
-        Knight_Sword: 0,     # 기준 (width=20*2=40, height=32*2=64)
-        Knight_Bow: 1,       # 가장 작음 (width=18*2=36, height=30*2=60) - 1픽셀 높게
-        Knight_Tackle: -3    # 가장 큼 (width=28*2=56, height=38*2=76) - 3픽셀 낮게
+        Knight_Sword: 0,
+        Knight_Bow: 1,
+        Knight_Tackle: -3,
+        GrimReaper: 0
     }
 
-    # (적 클래스, x좌표, y좌표)
+    # (적 클래스, x좌표, y좌표) - y좌표가 None이면 player_start_y 사용
     STAGE_ENEMIES = {
         0: [  # Stage0
-            (Knight_Sword, 800),
-            (Knight_Bow, 1200),
+            (Knight_Sword, 800, 256),
+            (Knight_Bow, 1200, 256),
         ],
         1: [  # Stage1
-            (Knight_Sword, 700),
-            (Knight_Bow, 1100),
-            (Knight_Tackle, 900),
-            (Knight_Sword, 1500),
+            (Knight_Sword, 700, 608),
+            (Knight_Bow, 600, 608),
+            (Knight_Tackle, 1300, 672),
+            (Knight_Sword, 1500, 608),
         ],
         2: [  # BossStage
-            (GrimReaper, 600),
+            (GrimReaper, 900, 320),  # 보스는 특정 y좌표에 배치
         ]
     }
 
@@ -43,9 +42,16 @@ class StageManager:
 
         enemy_configs = StageManager.STAGE_ENEMIES[stage_num]
 
-        for enemy_class, x in enemy_configs:
-            y_offset = StageManager.ENEMY_Y_OFFSETS.get(enemy_class, 0)
-            y = player_start_y + y_offset
+        for config in enemy_configs:
+            if len(config) == 2:
+                enemy_class, x = config
+                y = None
+            else:
+                enemy_class, x, y = config
+
+            if y is None:
+                y_offset = StageManager.ENEMY_Y_OFFSETS.get(enemy_class, 0)
+                y = player_start_y + y_offset
 
             enemy = enemy_class(x, y)
             enemy.target = player
@@ -55,9 +61,9 @@ class StageManager:
 
             game_world.add_object(enemy, 1)  # Layer 1에 추가
             enemies.append(enemy)
-            print(f"  - Spawned {enemy_class.__name__} at ({x}, {y}) [offset: {y_offset}]")
+            print(f"  - Spawned {enemy_class.__name__} at ({x}, {y})")
 
-        print(f"Stage {stage_num}: Loaded {len(enemies)} enemies at base y={player_start_y}")
+        print(f"Stage {stage_num}: Loaded {len(enemies)} enemies")
         return enemies
 
     @staticmethod
