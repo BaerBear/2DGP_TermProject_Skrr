@@ -7,9 +7,9 @@ class StageManager:
     # 각 적 클래스별 y 오프셋 (플레이어 시작 위치 기준)
     # 각 적의 충돌 박스 크기 차이를 보정하기 위한 오프셋
     ENEMY_Y_OFFSETS = {
-        Knight_Sword: 0,     # 기준 (height = 70)
-        Knight_Bow: 3,       # 약간 작음 (height = 64) - 3픽셀 높게
-        Knight_Tackle: -5    # 가장 큼 (height = 80) - 5픽셀 낮게
+        Knight_Sword: 0,     # 기준 (width=20*2=40, height=32*2=64)
+        Knight_Bow: 1,       # 가장 작음 (width=18*2=36, height=30*2=60) - 1픽셀 높게
+        Knight_Tackle: -3    # 가장 큼 (width=28*2=56, height=38*2=76) - 3픽셀 낮게
     }
 
     # (적 클래스, x좌표, y좌표)
@@ -70,4 +70,3 @@ class StageManager:
         for obj in objects_to_remove:
             game_world.remove_object(obj)
         print("All enemies cleared")
-

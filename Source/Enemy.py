@@ -58,7 +58,6 @@ class Enemy:
         self.is_grounded = False
         self.tile_map = None
 
-        # 충돌 박스 크기 (적마다 다를 수 있으므로 상속 클래스에서 오버라이드 가능)
         self.width = 30 * self.scale
         self.height = 40 * self.scale
 
@@ -67,9 +66,13 @@ class Enemy:
         self.tile_map = tile_map
 
     def get_bb(self):
-        """충돌 박스 반환"""
+        """충돌 박스 반환 (타일 충돌, 물리 처리용)"""
         return (self.x - self.width / 2, self.y - self.height / 2,
                 self.x + self.width / 2, self.y + self.height / 2)
+
+    def get_hit_bb(self):
+        """피격 박스 반환 (플레이어 공격 받을 때 사용)"""
+        return self.get_bb()
 
     def apply_gravity(self):
         """중력 적용"""
@@ -112,14 +115,14 @@ class Enemy:
 
         min_overlap = min(overlap_left, overlap_right, overlap_top, overlap_bottom)
 
-        # 천장 충돌 (위로 올라갈 때)
+        # 천장 충돌
         if min_overlap == overlap_bottom and self.velocity_y > 0:
             horizontal_overlap = min(overlap_left, overlap_right)
             if horizontal_overlap > self.width * 0.5:
                 self.y = tile['bottom'] - self.height / 2
                 self.velocity_y = 0
                 return False
-        # 바닥 충돌 (아래로 떨어질 때)
+        # 바닥 충돌
         elif min_overlap == overlap_top and self.velocity_y <= 0:
             self.y = tile['top'] + self.height / 2
             self.velocity_y = 0
@@ -127,14 +130,12 @@ class Enemy:
         # 왼쪽 벽 충돌
         elif min_overlap == overlap_left:
             self.x = tile['left'] - self.width / 2
-            # 벽에 부딪히면 방향 전환
             if self.state == 'WALK':
                 self.face_dir *= -1
             return False
         # 오른쪽 벽 충돌
         elif min_overlap == overlap_right:
             self.x = tile['right'] + self.width / 2
-            # 벽에 부딪히면 방향 전환
             if self.state == 'WALK':
                 self.face_dir *= -1
             return False
@@ -145,7 +146,6 @@ class Enemy:
         """플랫폼과의 충돌 처리"""
         left, bottom, right, top = self.get_bb()
 
-        # 위에서 아래로 떨어질 때만 플랫폼 충돌
         if self.velocity_y <= 0 and bottom <= tile['top'] and bottom >= tile['top'] - 10:
             self.y = tile['top'] + self.height / 2
             self.velocity_y = 0
@@ -224,12 +224,20 @@ class Knight_Sword(Enemy):
         self.velocity = ENEMY_WALK_SPEED_PPS
         self.attack_cooldown_time = 1.5
 
-        # Knight_Sword 전용 충돌 박스 크기
-        self.width = 25 * self.scale
-        self.height = 35 * self.scale
-
         if not Knight_Sword.images:
             Knight_Sword.images = ResourceManager.get_enemy_images('Knight_Sword')
+
+        if Knight_Sword.images and 'idle' in Knight_Sword.images and Knight_Sword.images['idle']:
+            sample_img = Knight_Sword.images['idle'][0]
+            self.width = sample_img.w * self.scale * 0.8
+            self.height = sample_img.h * self.scale
+        else:
+            self.width = 25 * self.scale
+            self.height = 35 * self.scale
+
+    def get_bb(self):
+        return (self.x - self.width / 2, self.y - self.height / 2,
+                self.x + self.width / 2, self.y + self.height / 3)
 
     def update(self):
         super().update()
@@ -270,7 +278,6 @@ class Knight_Sword(Enemy):
         else:
             img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.scale, img.h * self.scale)
 
-        # 충돌 박스 그리기
         self.draw_collision_box()
 
 
@@ -288,18 +295,25 @@ class Knight_Bow(Enemy):
         self.aim_timer = 0
         self.aim_frames = 4
 
-        # Knight_Bow 전용 충돌 박스 크기 (좀 더 작음)
-        self.width = 22 * self.scale
-        self.height = 32 * self.scale
-
         if not Knight_Bow.images:
             Knight_Bow.images = ResourceManager.get_enemy_images('Knight_Bow')
+
+        if Knight_Bow.images and 'idle' in Knight_Bow.images and Knight_Bow.images['idle']:
+            sample_img = Knight_Bow.images['idle'][0]
+            self.width = sample_img.w * self.scale * 0.6
+            self.height = sample_img.h * self.scale
+        else:
+            self.width = 22 * self.scale
+            self.height = 32 * self.scale
+
+    def get_bb(self):
+        return (self.x - self.width / 2, self.y - self.height / 2,
+                self.x + self.width / 2, self.y + self.height / 3)
 
     def update(self):
         if not self.is_alive:
             return
 
-        # 중력 및 충돌 처리 추가
         self.apply_gravity()
         self.check_tile_collision()
 
@@ -335,7 +349,7 @@ class Knight_Bow(Enemy):
             elif not self.is_attacking and not self.is_aiming:
                 if self.dis_to_player < attack_range_min:
                     self.state = 'WALK'
-                    self.x -= self.velocity * self.face_dir * game_framework.frame_time  # 반대로 이동
+                    self.x -= self.velocity * self.face_dir * game_framework.frame_time
                 elif self.dis_to_player > attack_range_max and self.dis_to_player <= detect_range:
                     self.state = 'WALK'
                     self.x += self.velocity * self.face_dir * game_framework.frame_time
@@ -356,7 +370,6 @@ class Knight_Bow(Enemy):
             aim_progress = self.aim_timer / self.aim_duration
             self.frame = min(int(aim_progress * self.aim_frames), self.aim_frames - 1)
         elif self.state == 'ATTACK':
-            # 공격 중에는 3번 프레임 고정
             self.frame = 3
             attack_duration = len(Knight_Bow.images.get('attack', [])) * self.ATTACK_TIME_PER_ACTION
             if self.frame_time >= attack_duration:
@@ -404,7 +417,6 @@ class Knight_Bow(Enemy):
         else:
             img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.scale, img.h * self.scale)
 
-        # 충돌 박스 그리기
         self.draw_collision_box()
 
 
@@ -429,18 +441,45 @@ class Knight_Tackle(Enemy):
         self.tackle_distance = 400
         self.tackle_traveled = 0
 
-        # Knight_Tackle 전용 충돌 박스 크기 (가장 큼)
-        self.width = 30 * self.scale
-        self.height = 40 * self.scale
-
         if not Knight_Tackle.images:
             Knight_Tackle.images = ResourceManager.get_enemy_images('Knight_Tackle')
+
+        if Knight_Tackle.images and 'idle' in Knight_Tackle.images and Knight_Tackle.images['idle']:
+            sample_img = Knight_Tackle.images['idle'][0]
+            self.width = sample_img.w * self.scale * 0.7
+            self.height = sample_img.h * self.scale
+        else:
+            self.width = 30 * self.scale
+            self.height = 40 * self.scale
+
+    def get_bb(self):
+        """물리/타일 충돌용 히트박스 - 몸체 중심, 방향 무관"""
+        if self.is_tackling:
+            width_modifier = 1.1
+        else:
+            width_modifier = 1.0
+
+        adjusted_width = self.width * width_modifier
+        return (self.x - adjusted_width / 2, self.y - self.height / 2,
+                self.x + adjusted_width / 2, self.y + self.height / 4)
+
+    def get_hit_bb(self):
+        if self.is_tackling:
+            width_modifier = 1.1
+        else:
+            width_modifier = 1.0
+
+        adjusted_width = self.width * width_modifier
+
+        body_offset = -10 * self.face_dir
+
+        return (self.x + body_offset - adjusted_width / 2, self.y - self.height / 2,
+                self.x + body_offset + adjusted_width / 2, self.y + self.height / 4)
 
     def update(self):
         if not self.is_alive:
             return
 
-        # 중력 및 충돌 처리 추가
         self.apply_gravity()
         self.check_tile_collision()
 
@@ -572,5 +611,4 @@ class Knight_Tackle(Enemy):
         else:
             img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.scale, img.h * self.scale)
 
-        # 충돌 박스 그리기
         self.draw_collision_box()
