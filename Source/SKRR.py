@@ -5,6 +5,12 @@ from SKRR_State import Idle, Wait, Walk, Jump, JumpAttack, Attack, Dash, Fall, D
 from SKRR_State_Rules import Get_State_Rules
 import game_world
 
+stage_start_positions = {
+        0: (100, 256),      # Stage0 시작 위치
+        1: (100, 608),      # Stage1 시작 위치
+        2: (100, 512)       # BossStage 시작 위치
+    }
+
 _player_instance = None
 
 def set_player(player):
@@ -26,7 +32,7 @@ class SKRR:
     def __init__(self):
         SKRR.load_images()
 
-        self.x, self.y = 300, 650
+        self.x, self.y = stage_start_positions[0]
         self.frame = 0
         self.face_dir = 1
         self.scale = 2

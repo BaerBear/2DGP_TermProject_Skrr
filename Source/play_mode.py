@@ -1,6 +1,6 @@
 from pico2d import *
 from ResourceManager import ResourceManager
-from SKRR import SKRR
+from SKRR import SKRR, stage_start_positions
 from Enemy import Knight_Sword, Knight_Bow, Knight_Tackle
 from Sound_Loader import SoundManager
 from Camera import Camera
@@ -24,8 +24,8 @@ def init():
     SoundManager.initialize()
     SoundManager.play_bgm('chapter1', repeat=True)
 
-    current_stage = 1
-    tmx_path = os.path.join(os.path.dirname(__file__), '..', 'Tilemap_work', 'Stage1.tmx')
+    current_stage = 0
+    tmx_path = os.path.join(os.path.dirname(__file__), '..', 'Tilemap_work', 'Stage0.tmx')
     tile_map = TileMap(tmx_path)
 
     Skrr = SKRR()
@@ -71,13 +71,6 @@ def load_stage(stage_num): # 타일맵 로드
         2: 'BossStage.tmx'
     }
 
-    # 각 스테이지별 시작 위치
-    stage_start_positions = {
-        0: (100, 256),      # Stage0 시작 위치
-        1: (100, 608),      # Stage1 시작 위치
-        2: (100, 512)       # BossStage 시작 위치
-    }
-
     if stage_num not in stage_files:
         return
 
@@ -108,7 +101,7 @@ def load_stage(stage_num): # 타일맵 로드
     # 충돌 페어 재설정
     game_world.add_collision_pair('player:tilemap', Skrr, tile_map)
 
-    start_x, start_y = stage_start_positions[stage_num]
+    start_x, start_y = SKRR.stage_start_positions[stage_num]
     Skrr.x = start_x
     Skrr.y = start_y
 
