@@ -4,7 +4,7 @@ import game_framework
 import game_world
 
 PIXEL_PER_METER = (10.0 / 0.3)
-RUN_SPEED_KMPH = 25.0
+RUN_SPEED_KMPH = 30.0
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
@@ -751,6 +751,7 @@ class Skill3:
         self.minX = 0
         self.target_distance = 150
         self.traveled_distance = 0
+        self.movement_stopped = False
 
     def enter(self, e):
         self.skrr.frame = 0
@@ -761,6 +762,7 @@ class Skill3:
         self.traveled_distance = 0
         self.start_x = self.skrr.x
         self.target_distance = 150
+        self.movement_stopped = False
 
         self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 20
         # SoundManager.play_player_sound('Skill3')
@@ -769,7 +771,7 @@ class Skill3:
         self.frame_time += game_framework.frame_time
         self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
 
-        if self.traveled_distance < self.target_distance:
+        if not self.movement_stopped and self.traveled_distance < self.target_distance:
             move_speed = self.SKILL3_SPEED_PPS * game_framework.frame_time
             actual_move = min(move_speed, self.target_distance - self.traveled_distance)
 
@@ -779,21 +781,27 @@ class Skill3:
                 max_x = self.skrr.tile_map.map_width * self.skrr.tile_map.tile_width
                 min_x = max(0, self.minX)
 
-                if min_x <= new_x <= max_x - self.minX:
+                if new_x < min_x:
+                    self.skrr.x = min_x
+                    self.movement_stopped = True
+                elif new_x > max_x - self.minX:
+                    self.skrr.x = max_x - self.minX
+                    self.movement_stopped = True
+                else:
                     self.skrr.x = new_x
                     self.traveled_distance += actual_move
-                else:
-                    # 경계에 도달하면 더 이상 이동하지 않음
-                    self.skrr.x = max(min_x, min(new_x, max_x - self.minX))
-                    self.traveled_distance = self.target_distance  # 강제로 이동 종료
             else:
                 min_x = max(0, self.minX)
-                if min_x <= new_x <= get_canvas_width() - self.minX:
+
+                if new_x < min_x:
+                    self.skrr.x = min_x
+                    self.movement_stopped = True
+                elif new_x > get_canvas_width() - self.minX:
+                    self.skrr.x = get_canvas_width() - self.minX
+                    self.movement_stopped = True
+                else:
                     self.skrr.x = new_x
                     self.traveled_distance += actual_move
-                else:
-                    self.skrr.x = max(min_x, min(new_x, get_canvas_width() - self.minX))
-                    self.traveled_distance = self.target_distance
 
         if self.skrr.frame >= self.total_frames:
             if self.skrr.is_grounded:
@@ -819,6 +827,7 @@ class Skill3:
             self.skrr.velocity_y = 0
         self.is_air_skill = False
         self.traveled_distance = 0
+        self.movement_stopped = False
 
     def draw(self):
         img = None

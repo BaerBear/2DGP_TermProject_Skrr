@@ -61,6 +61,12 @@ def handle_attack(skrr, event):
     if skrr.attack_type == 'B':
         return
 
+    # 스킬 사용 중에는 공격 불가
+    if (skrr.state_machine.current_state == skrr.SKILL1
+        or skrr.state_machine.current_state == skrr.SKILL2
+        or skrr.state_machine.current_state == skrr.SKILL3):
+        return
+
     if skrr.state_machine.current_state == skrr.ATTACK and skrr.attack_type == 'A' and 18 <= skrr.frame < 30:
         skrr.attack_type = 'B'
         skrr.state_machine.handle_event(('COMBO_AVAILABLE', None))
@@ -73,7 +79,11 @@ def handle_attack(skrr, event):
 
 
 def handle_jump(skrr, event):
-    if skrr.state_machine.current_state == skrr.ATTACK or skrr.state_machine.current_state == skrr.JUMPATTACK:
+    if (skrr.state_machine.current_state == skrr.ATTACK
+        or skrr.state_machine.current_state == skrr.JUMPATTACK
+        or skrr.state_machine.current_state == skrr.SKILL1
+        or skrr.state_machine.current_state == skrr.SKILL2
+        or skrr.state_machine.current_state == skrr.SKILL3):
         return
 
     if skrr.is_grounded or skrr.jump_count < 2:
@@ -83,7 +93,11 @@ def handle_jump(skrr, event):
 def handle_dash(skrr, event):
     if not skrr.is_dash_ready():
         return
-    if skrr.state_machine.current_state == skrr.ATTACK or skrr.state_machine.current_state == skrr.JUMPATTACK:
+    if (skrr.state_machine.current_state == skrr.ATTACK
+        or skrr.state_machine.current_state == skrr.JUMPATTACK
+        or skrr.state_machine.current_state == skrr.SKILL1
+        or skrr.state_machine.current_state == skrr.SKILL2
+        or skrr.state_machine.current_state == skrr.SKILL3):
         return
 
     if skrr.dash_type is None:
