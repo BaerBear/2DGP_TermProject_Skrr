@@ -25,7 +25,7 @@ class StageManager:
             (Knight_Sword, 1500, 608),
         ],
         2: [  # BossStage
-            (GrimReaper, 900, 320),  # 보스는 특정 y좌표에 배치
+            (GrimReaper, 900, 320),
         ]
     }
 
