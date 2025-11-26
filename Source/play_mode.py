@@ -140,6 +140,8 @@ def handle_events():
         elif e.type == SDL_KEYDOWN and e.key == SDLK_F4:
             # F4 - BossStage 로드
             load_stage(2)
+        elif e.type == SDL_MOUSEBUTTONDOWN and e.button == SDL_BUTTON_LEFT:
+            print(f"Mouse Left Click: ({e.x}, {get_canvas_height() - e.y})")
         elif e.type == SDL_KEYDOWN:
             Events.handle_key_down(e, Skrr)
         elif e.type == SDL_KEYUP:

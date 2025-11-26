@@ -35,6 +35,8 @@ def handle_events():
             game_framework.quit()
         elif e.type == SDL_KEYDOWN and e.key == SDLK_ESCAPE:
             game_framework.quit()
+        elif e.type == SDL_MOUSEBUTTONDOWN and e.button == SDL_BUTTON_LEFT:
+            print(f"Mouse Left Click: ({e.x}, {get_canvas_height() - e.y})")
 
 def pause():
     pass

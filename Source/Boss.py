@@ -350,7 +350,7 @@ class GrimReaper(Enemy):
             self.draw_skill1_effect()
 
         # 체력바 그리기
-        self.draw_hp_bar()
+        # self.draw_hp_bar()
 
         # 충돌박스 그리기
         self.draw_collision_box()
