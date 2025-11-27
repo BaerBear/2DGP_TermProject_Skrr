@@ -296,6 +296,11 @@ class Knight_Bow(Enemy):
         self.aim_duration = 1.0
         self.aim_timer = 0
         self.aim_frames = 4
+        
+        self.sign_frame = 0
+        self.SIGN_TIME_PER_ACTION = 1.5
+        self.SIGN_ACTION_PER_TIME = 1.0 / self.SIGN_TIME_PER_ACTION
+        self.SIGN_FRAMES_PER_ACTION = 17
 
         if not Knight_Bow.images:
             Knight_Bow.images = ResourceManager.get_enemy_images('Knight_Bow')
@@ -323,10 +328,11 @@ class Knight_Bow(Enemy):
         if player:
             self.dis_to_player = abs(self.x - player.x)
 
-            if player.x > self.x:
-                self.face_dir = 1
-            else:
-                self.face_dir = -1
+            if not self.is_attacking and self.state != 'AIM':
+                if player.x > self.x:
+                    self.face_dir = 1
+                else:
+                    self.face_dir = -1
 
             attack_range_min = 150
             attack_range_max = 350
@@ -348,6 +354,7 @@ class Knight_Bow(Enemy):
                     self.is_aiming = True
                     self.aim_timer = 0
                     self.state = 'AIM'
+                    self.sign_frame = 0
             elif not self.is_attacking and not self.is_aiming:
                 if self.dis_to_player < attack_range_min:
                     self.state = 'WALK'
@@ -371,9 +378,11 @@ class Knight_Bow(Enemy):
         elif self.state == 'AIM':
             aim_progress = self.aim_timer / self.aim_duration
             self.frame = min(int(aim_progress * self.aim_frames), self.aim_frames - 1)
+            self.sign_frame = int(self.frame_time * self.SIGN_ACTION_PER_TIME * self.SIGN_FRAMES_PER_ACTION)
         elif self.state == 'ATTACK':
             self.frame = 3
             attack_duration = len(Knight_Bow.images.get('attack', [])) * self.ATTACK_TIME_PER_ACTION
+            self.sign_frame = int(self.frame_time * self.SIGN_ACTION_PER_TIME * self.SIGN_FRAMES_PER_ACTION)
             if self.frame_time >= attack_duration:
                 self.is_attacking = False
 
@@ -410,6 +419,8 @@ class Knight_Bow(Enemy):
             else:
                 return
 
+        sign_img = Knight_Bow.images['attack_sign'][self.sign_frame]
+
         cam_x, cam_y = self.x, self.y
         if game_world.camera:
             cam_x, cam_y = game_world.camera.apply(self.x, self.y)
@@ -421,8 +432,14 @@ class Knight_Bow(Enemy):
 
         if self.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y - offset_y, img.w * self.scale, img.h * self.scale)
+            if self.state == 'ATTACK' or self.state == 'AIM':
+                sign_img.clip_draw(0, 0, sign_img.w, sign_img.h,
+                                   cam_x + sign_img.w * self.scale / 2, cam_y, sign_img.w * self.scale, sign_img.h/ 2)
         else:
             img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y - offset_y, img.w * self.scale, img.h * self.scale)
+            if self.state == 'ATTACK' or self.state == 'AIM':
+                sign_img.clip_composite_draw(0, 0, sign_img.w, sign_img.h, 0, 'h',
+                                             cam_x - sign_img.w * self.scale / 2, cam_y, sign_img.w * self.scale, sign_img.h / 2)
 
         self.draw_collision_box()
 

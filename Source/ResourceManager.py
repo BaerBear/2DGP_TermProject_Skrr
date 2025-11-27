@@ -95,6 +95,7 @@ class ResourceManager:
                 'attack': Enemy_Image_Loader('Knight_Bow', 'Attack').images,
                 'hit': Enemy_Image_Loader('Knight_Bow', 'Hit').images,
                 'idle': Enemy_Image_Loader('Knight_Bow', 'Idle').images,
+                'attack_sign': Enemy_Image_Loader('Knight_Bow', 'Attack_Sign').images,
             }
 
         # Knight_Tackle

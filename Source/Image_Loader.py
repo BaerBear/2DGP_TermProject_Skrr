@@ -105,6 +105,9 @@ class Enemy_Image_Loader:
             elif state == 'Idle':
                 for i in range(4):
                     self.images.append(load_image(os.path.join(self.resource_path, f'Idle_{i}.png')))
+            elif state == 'Attack_Sign':
+                for i in range(17):
+                    self.images.append(load_image(os.path.join(self.resource_path, f'AttackSign_Archer_{i}.png')))
 
         elif enemy_type == 'Knight_Tackle':
             if state == 'Walk':
