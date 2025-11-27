@@ -19,7 +19,7 @@ class Enemy:
     WALK_ACTION_PER_TIME = 1.0 / WALK_TIME_PER_ACTION
     WALK_FRAMES_PER_ACTION = 6
 
-    ATTACK_TIME_PER_ACTION = 0.1
+    ATTACK_TIME_PER_ACTION = 0.15
     ATTACK_ACTION_PER_TIME = 1.0 / ATTACK_TIME_PER_ACTION
     ATTACK_FRAMES_PER_ACTION = 6
 
@@ -270,10 +270,15 @@ class Knight_Sword(Enemy):
         if game_world.camera:
             cam_x, cam_y = game_world.camera.apply(self.x, self.y)
 
-        if self.face_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.scale, img.h * self.scale)
+        if self.state == 'WALK':
+            offset_y = 8
         else:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.scale, img.h * self.scale)
+            offset_y = 0
+
+        if self.face_dir == 1:
+            img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y - offset_y, img.w * self.scale, img.h * self.scale)
+        else:
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y- offset_y, img.w * self.scale, img.h * self.scale)
 
         self.draw_collision_box()
 
@@ -409,10 +414,15 @@ class Knight_Bow(Enemy):
         if game_world.camera:
             cam_x, cam_y = game_world.camera.apply(self.x, self.y)
 
-        if self.face_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.scale, img.h * self.scale)
+        if self.state == 'ATTACK' or self.state == 'AIM':
+            offset_y = 8
         else:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.scale, img.h * self.scale)
+            offset_y = 0
+
+        if self.face_dir == 1:
+            img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y - offset_y, img.w * self.scale, img.h * self.scale)
+        else:
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y - offset_y, img.w * self.scale, img.h * self.scale)
 
         self.draw_collision_box()
 

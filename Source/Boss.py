@@ -7,6 +7,10 @@ import game_world
 
 BOSS_WALK_SPEED_PPS = 80.0
 
+SKILL1_PER_ACTION = 0.1
+SKILL1_PER_TIME = 1.0 / SKILL1_PER_ACTION
+FRAMES_PER_SKILL1 = 7
+
 class GrimReaper(Enemy):
     images = None
 
@@ -131,17 +135,17 @@ class GrimReaper(Enemy):
         else:
             detect_range = 700
             attack_range = 150
-            skill_range = 400
+            skill_range = 500
 
             # 스킬 우선순위 체크
             if self.dis_to_player <= skill_range:
-                # Skill2 사용 가능?
-                if current_time - self.skill2_last_use >= self.skill2_cooldown:
-                    self.use_skill2()
-                    return
                 # Skill1 사용 가능?
-                elif current_time - self.skill1_last_use >= self.skill1_cooldown:
+                if current_time - self.skill1_last_use >= self.skill1_cooldown:
                     self.use_skill1()
+                    return
+                # Skill2 사용 가능?
+                elif current_time - self.skill2_last_use >= self.skill2_cooldown:
+                    self.use_skill2()
                     return
 
             # 대쉬 공격 (중거리)
@@ -289,7 +293,7 @@ class GrimReaper(Enemy):
             self.skill1_start_x = self.x
             self.skill1_start_y = self.y
             self.skill1_target_x = player.x
-            self.skill1_target_y = player.y
+            self.skill1_target_y = self.y
         else:
             self.skill1_target_x = self.x
             self.skill1_target_y = self.y
@@ -349,9 +353,6 @@ class GrimReaper(Enemy):
         if self.state == 'SKILL1' and self.skill1_phase == 'DASHING':
             self.draw_skill1_effect()
 
-        # 체력바 그리기
-        # self.draw_hp_bar()
-
         # 충돌박스 그리기
         self.draw_collision_box()
 
@@ -377,45 +378,20 @@ class GrimReaper(Enemy):
 
         for i in range(segments + 1):
             ratio = i / max(segments, 1)
-            effect_x = self.skill1_start_x + dx * ratio
-            effect_y = self.skill1_start_y + dy * ratio
+            effect_x = (self.skill1_start_x + self.skill1_target_x) / 2
+            effect_y = self.skill1_start_y
 
             if game_world.camera:
                 cam_x, cam_y = game_world.camera.apply(effect_x, effect_y)
 
                 # 이펙트 그리기 (방향에 따라 회전)
+                w = self.skill1_start_x - self.skill1_target_x
                 if self.face_dir == 1:
-                    effect_img.clip_draw(0, 0, effect_img.w, effect_img.h,
-                                       cam_x, cam_y,
-                                       effect_img.w * 2, effect_img.h * 2)
+                    effect_img.clip_draw(0, 0, effect_img.w, effect_img.h, cam_x, cam_y, w, effect_img.h * 2)
                 else:
-                    effect_img.clip_composite_draw(0, 0, effect_img.w, effect_img.h,
-                                                  0, 'h', cam_x, cam_y,
-                                                  effect_img.w * 2, effect_img.h * 2)
-
-    def draw_hp_bar(self):
-        """보스 체력바 그리기"""
-        if game_world.camera:
-            cam_x, cam_y = game_world.camera.apply(self.x, self.y)
-
-            hp_bar_width = 200
-            hp_bar_height = 15
-            hp_ratio = max(0, self.hp / self.max_hp)
-
-            # 체력바 배경 (어두운 빨간색)
-            bar_y = cam_y + self.height / 2 + 30
-
-            # 외곽선
-            draw_rectangle(cam_x - hp_bar_width/2 - 2, bar_y - 2,
-                         cam_x + hp_bar_width/2 + 2, bar_y + hp_bar_height + 2)
-
-            # 현재 체력바 (초록->노랑->빨강)
-            if hp_ratio > 0:
-                current_width = hp_bar_width * hp_ratio
-                # TODO: 색상별로 체력바 그리기 (나중에 구현)
+                    effect_img.clip_composite_draw(0, 0, effect_img.w, effect_img.h, 0, 'h', cam_x, cam_y, w, effect_img.h * 2)
 
     def draw_collision_box(self):
-        """충돌 박스 그리기 (디버그용)"""
         if SKRR.SKRR.show_collision_box:
             from pico2d import draw_rectangle
             if game_world.camera:
