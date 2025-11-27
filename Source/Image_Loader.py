@@ -32,8 +32,8 @@ class SKRR_Image_Loader:
             for i in range(2):
                 self.images.append(load_image(os.path.join(self.resource_path, r'JumpAttack', f'JumpAttack_{i}.png')))
         elif state == 'Reborn':
-            for i in range(26):
-                self.images.append(load_image(os.path.join(self.resource_path, r'Reborn', f'Reborn1(Castle)_{i + 1}.png')))
+            for i in range(9):
+                self.images.append(load_image(os.path.join(self.resource_path, r'Reborn', f'Skill_Reborn_{i}.png')))
         elif state == 'Dash':
             self.images.append(load_image(os.path.join(self.resource_path, r'Dash', 'Dash_0.png')))
         elif state == 'DashEffect':
@@ -55,8 +55,11 @@ class SKRR_Image_Loader:
                 self.images.append(load_image(os.path.join(self.resource_path, r'Skill1', f'Skill1_{i}.png')))
         elif state == 'Skill2':
             for i in range(3):
-                self.images.append(load_image(os.path.join(self.resource_path, r'Skill2', f'BuddhaCyclone_{i}.png')))
-        elif state == 'Skill2_effect':
+                self.images.append(load_image(os.path.join(self.resource_path, r'Skill2', f'BuddhaCyclone_Enhanced_{i}.png')))
+        elif state == 'Skill2_Effect':
+            for i in range(12):
+                self.images.append(load_image(os.path.join(self.resource_path, r'Skill2', f'StoneMonkey_2_BuddhaCyclone_{i}.png')))
+        elif state == 'Skill2_Start':
             for i in range(18):
                 self.images.append(load_image(os.path.join(self.resource_path, r'Skill2', f'StoneMonkey_2_BuddhaCyclone_Start_{i}.png')))
         elif state == 'Skill3_ground':
@@ -147,3 +150,4 @@ class Boss_Image_Loader:
             elif state == 'Skill2':
                 for i in range(80):
                     self.images.append(load_image(os.path.join(self.resource_path, r'Skill2', f'GrimReaper_TheStake_Land_{i}.png')))
+

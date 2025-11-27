@@ -597,7 +597,7 @@ class Reborn:
     def __init__(self, skrr):
         self.skrr = skrr
         self.frame_time = 0
-        self.total_frames = 78 * 2
+        self.total_frames = 27 * 2
 
     def enter(self, e):
         self.skrr.frame = 0
@@ -624,13 +624,13 @@ class Reborn:
 
 
 class Skill1:
-    TIME_PER_ACTION = 0.1
+    TIME_PER_ACTION = 0.7
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
     FRAMES_PER_ACTION = 7
     def __init__(self, skrr):
         self.skrr = skrr
         self.frame_time = 0
-        self.total_frames = 7 * 20
+        self.total_frames = 7 * 3
 
     def enter(self, e):
         self.skrr.frame = 0
@@ -678,7 +678,7 @@ class Skill1:
         pass
 
     def draw(self):
-        img = self.skrr.images['Skill1'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Skill1'])]
+        img = self.skrr.images['Skill1'][self.skrr.frame % len(self.skrr.images['Skill1'])]
         cam_x, cam_y = self.skrr.x, self.skrr.y
         if game_world.camera:
             cam_x, cam_y = game_world.camera.apply(self.skrr.x, self.skrr.y)
@@ -692,12 +692,16 @@ class Skill1:
 class Skill2:
     TIME_PER_ACTION = 0.1
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
-    FRAMES_PER_ACTION = 8
+    FRAMES_PER_ACTION = 3
 
     def __init__(self, skrr):
         self.skrr = skrr
         self.frame_time = 0
-        self.total_frames = 8 * 8
+        self.total_frames = 3 * 12
+        self.effect_frame = 0
+        self.effect_total_frame = len(self.skrr.images['Skill2_Effect']) * 3
+        self.start_frame = 0
+        self.start_total_frame = len(self.skrr.images['Skill2_Start'])
 
     def enter(self, e):
         self.skrr.frame = 0
@@ -709,6 +713,9 @@ class Skill2:
     def do(self):
         self.frame_time += game_framework.frame_time
         self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
+        self.effect_frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
+        self.start_frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
+
 
         if self.skrr.frame >= self.total_frames:
             if self.skrr.is_grounded:
@@ -728,15 +735,21 @@ class Skill2:
 
     def draw(self):
         img = self.skrr.images['Skill2'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Skill2'])]
+        skill2_start = self.skrr.images['Skill2_Start'][self.start_frame % len(self.skrr.images['Skill2_Start'])]
+        skill2_effet = self.skrr.images['Skill2_Effect'][self.effect_frame % len(self.skrr.images['Skill2_Effect'])]
         cam_x, cam_y = self.skrr.x, self.skrr.y
         if game_world.camera:
             cam_x, cam_y = game_world.camera.apply(self.skrr.x, self.skrr.y)
 
         if self.skrr.face_dir == 1:
-            img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_draw(0, 0, img.w, img.h, cam_x - 20 , cam_y + 25, img.w * self.skrr.scale, img.h * self.skrr.scale)
         elif self.skrr.face_dir == -1:
-            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.skrr.scale, img.h * self.skrr.scale)
+            img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x + 20, cam_y + 25, img.w * self.skrr.scale, img.h * self.skrr.scale)
 
+        if self.effect_frame < self.effect_total_frame:
+            skill2_effet.clip_draw(0, 0, skill2_effet.w, skill2_effet.h, cam_x, cam_y + 40, skill2_effet.w * self.skrr.scale, skill2_effet.h * self.skrr.scale)
+        if self.start_frame < self.start_total_frame:
+            skill2_start.clip_draw(0, 0, skill2_start.w, skill2_start.h, cam_x, cam_y + 40, skill2_start.w * self.skrr.scale, skill2_start.h * self.skrr.scale)
 
 class Skill3:
     TIME_PER_ACTION = 0.1
