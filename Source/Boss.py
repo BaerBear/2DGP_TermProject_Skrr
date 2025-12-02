@@ -1,70 +1,70 @@
 from pico2d import *
 from Enemy import Enemy
 from ResourceManager import ResourceManager
+from BossSkill import FireField
 import SKRR
 import game_framework
 import game_world
 
-# 물리 상수 정의 (SKRR와 동일한 체계)
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel = 30 cm
 GRAVITY_MULTIPLIER = 5.0
 BASE_GRAVITY = 9.8
 GRAVITY = BASE_GRAVITY * GRAVITY_MULTIPLIER
 
-# 보스 이동 속도 (KMPH -> PPS 변환)
-BOSS_WALK_SPEED_KMPH = 15.0  # 시속 15km
-BOSS_WALK_SPEED_MPM = (BOSS_WALK_SPEED_KMPH * 1000.0 / 60.0)  # 분당 미터
-BOSS_WALK_SPEED_MPS = (BOSS_WALK_SPEED_MPM / 60.0)  # 초당 미터
-BOSS_WALK_SPEED_PPS = (BOSS_WALK_SPEED_MPS * PIXEL_PER_METER)  # 초당 픽셀
+# 보스 걷기 속도
+BOSS_WALK_SPEED_KMPH = 15.0
+BOSS_WALK_SPEED_MPM = (BOSS_WALK_SPEED_KMPH * 1000.0 / 60.0)
+BOSS_WALK_SPEED_MPS = (BOSS_WALK_SPEED_MPM / 60.0)
+BOSS_WALK_SPEED_PPS = (BOSS_WALK_SPEED_MPS * PIXEL_PER_METER)
 
 # 보스 대쉬 속도
-BOSS_DASH_SPEED_KMPH = 60.0  # 시속 60km
+BOSS_DASH_SPEED_KMPH = 60.0
 BOSS_DASH_SPEED_MPM = (BOSS_DASH_SPEED_KMPH * 1000.0 / 60.0)
 BOSS_DASH_SPEED_MPS = (BOSS_DASH_SPEED_MPM / 60.0)
 BOSS_DASH_SPEED_PPS = (BOSS_DASH_SPEED_MPS * PIXEL_PER_METER)
 
 # 스킬1 돌진 속도
-SKILL1_DASH_SPEED_KMPH = 100.0  # 시속 100km (매우 빠름)
+SKILL1_DASH_SPEED_KMPH = 100.0
 SKILL1_DASH_SPEED_MPM = (SKILL1_DASH_SPEED_KMPH * 1000.0 / 60.0)
 SKILL1_DASH_SPEED_MPS = (SKILL1_DASH_SPEED_MPM / 60.0)
 SKILL1_DASH_SPEED_PPS = (SKILL1_DASH_SPEED_MPS * PIXEL_PER_METER)
 
-# 거리 상수 (미터 단위로 정의)
-DETECT_RANGE_METER = 21.0  # 21미터
+# 거리 상수
+DETECT_RANGE_METER = 21.0
 DETECT_RANGE_PPS = DETECT_RANGE_METER * PIXEL_PER_METER
 
-SKILL_RANGE_METER = 15.0  # 15미터
+SKILL_RANGE_METER = 15.0
 SKILL_RANGE_PPS = SKILL_RANGE_METER * PIXEL_PER_METER
 
-DASH_RANGE_MIN_METER = 6.0  # 6미터
+DASH_RANGE_MIN_METER = 6.0
 DASH_RANGE_MIN_PPS = DASH_RANGE_MIN_METER * PIXEL_PER_METER
-DASH_RANGE_MAX_METER = 15.0  # 15미터
+DASH_RANGE_MAX_METER = 15.0
 DASH_RANGE_MAX_PPS = DASH_RANGE_MAX_METER * PIXEL_PER_METER
 
-ATTACK_RANGE_METER = 4.5  # 4.5미터
+ATTACK_RANGE_METER = 4.5
 ATTACK_RANGE_PPS = ATTACK_RANGE_METER * PIXEL_PER_METER
 
-DASH_DISTANCE_METER = 15.0  # 대쉬 거리 15미터
+DASH_DISTANCE_METER = 15.0
 DASH_DISTANCE_PPS = DASH_DISTANCE_METER * PIXEL_PER_METER
 
-# 프레임 애니메이션 상수
-IDLE_TIME_PER_ACTION = 0.167  # 약 6 FPS
+# 프레임 애니메이션
+IDLE_TIME_PER_ACTION = 0.167
 IDLE_ACTION_PER_TIME = 1.0 / IDLE_TIME_PER_ACTION
 IDLE_FRAMES_PER_ACTION = 10
 
-WALK_TIME_PER_ACTION = 0.125  # 약 8 FPS
+WALK_TIME_PER_ACTION = 0.125
 WALK_ACTION_PER_TIME = 1.0 / WALK_TIME_PER_ACTION
 WALK_FRAMES_PER_ACTION = 8
 
-ATTACK_TIME_PER_ACTION = 0.1  # 10 FPS
+ATTACK_TIME_PER_ACTION = 0.1
 ATTACK_ACTION_PER_TIME = 1.0 / ATTACK_TIME_PER_ACTION
 ATTACK_FRAMES_PER_ACTION = 10
 
-SKILL1_READY_TIME = 0.1  # 준비 시간
-SKILL1_LANDING_TIME = 0.7  # 착지 모션 시간
-SKILL1_LANDING_FRAMES = 7  # 착지 프레임 수
+SKILL1_READY_TIME = 0.1
+SKILL1_LANDING_TIME = 0.7
+SKILL1_LANDING_FRAMES = 7
 
-SKILL2_TIME_PER_ACTION = 0.1  # 10 FPS
+SKILL2_TIME_PER_ACTION = 0.1
 SKILL2_ACTION_PER_TIME = 1.0 / SKILL2_TIME_PER_ACTION
 
 class GrimReaper(Enemy):
@@ -74,50 +74,46 @@ class GrimReaper(Enemy):
     def __init__(self, x, y):
         super().__init__(x, y)
 
-        # 보스 기본 스탯
         self.hp = 2000
         self.max_hp = 2000
         self.scale = 3
 
-        # 이동 속도 (물리 기반)
         self.walk_speed = BOSS_WALK_SPEED_PPS
         self.dash_speed = BOSS_DASH_SPEED_PPS
         self.skill1_dash_speed = SKILL1_DASH_SPEED_PPS
 
-        # 대쉬 상태
         self.is_dashing = False
         self.dash_distance = DASH_DISTANCE_PPS
         self.dash_traveled = 0
 
-        # 스킬 쿨다운 (초 단위)
-        self.skill1_cooldown = 8.0
-        self.skill1_last_use = -8.0
+        self.skill1_cooldown = 15.0
+        self.skill1_last_use = -15.0
         self.skill2_cooldown = 12.0
         self.skill2_last_use = -12.0
         self.dash_cooldown = 6.0
         self.dash_last_use = -6.0
 
-        # 스킬 상태
         self.is_using_skill = False
         self.current_skill = None
 
-        # Skill1 전용 변수 (고속 돌진)
-        self.skill1_phase = 'READY'  # READY, DASHING, LANDING
+        # 행동 간격 관련 (공격 후 1.5초 대기)
+        self.action_delay = 1.0  # 행동 간격
+        self.last_action_time = -1.0
+
+        self.skill1_phase = 'READY'
         self.skill1_start_x = 0
         self.skill1_start_y = 0
         self.skill1_target_x = 0
         self.skill1_target_y = 0
         self.skill1_landing_timer = 0
         self.skill1_ready_timer = 0
-        self.skill1_effect_timer = 0  # 이펙트 애니메이션용 타이머
+        self.skill1_effect_timer = 0
 
-        # 이미지 로드
         if not GrimReaper.images:
             GrimReaper.images = ResourceManager.get_boss_images('GrimReaper')
             GrimReaper.skill1_effect = GrimReaper.images.get('skill1_effect', [])
 
 
-        # 크기 조정
         if GrimReaper.images and 'idle' in GrimReaper.images and GrimReaper.images['idle']:
             sample_img = GrimReaper.images['idle'][0]
             self.width = sample_img.w * self.scale * 0.5
@@ -162,14 +158,12 @@ class GrimReaper(Enemy):
         self.dis_to_player = abs(self.x - player.x)
         current_time = get_time()
 
-        # 스킬 사용 중이거나 대쉬 중이 아닐 때만 방향 전환
         if not self.is_using_skill and not self.is_dashing and not self.is_attacking:
             if player.x > self.x:
                 self.face_dir = 1
             else:
                 self.face_dir = -1
 
-        # 대쉬 처리
         if self.is_dashing:
             self.state = 'DASH'
             move_distance = self.dash_speed * game_framework.frame_time
@@ -181,64 +175,83 @@ class GrimReaper(Enemy):
                 self.dash_traveled = 0
                 self.state = 'IDLE'
 
-        # 스킬 사용 중 처리
         elif self.is_using_skill:
             if self.current_skill == 'SKILL1':
                 self.update_skill1()
             elif self.current_skill == 'SKILL2':
                 self.update_skill2()
 
-        # 일반 행동 패턴
-        else:
-            # 스킬 우선순위 체크
-            if self.dis_to_player <= SKILL_RANGE_PPS:
-                # Skill1 사용 가능?
-                if current_time - self.skill1_last_use >= self.skill1_cooldown:
-                    self.use_skill1()
-                    return
-                # Skill2 사용 가능?
-                elif current_time - self.skill2_last_use >= self.skill2_cooldown:
-                    self.use_skill2()
-                    return
+        elif self.is_attacking:
+            self.state = 'ATTACK'
 
-            # 대쉬 공격 (중거리)
-            if DASH_RANGE_MIN_PPS <= self.dis_to_player <= DASH_RANGE_MAX_PPS:
-                if current_time - self.dash_last_use >= self.dash_cooldown:
-                    self.start_dash()
-                    return
-
-            # 기본 공격 (근거리)
-            if self.dis_to_player <= ATTACK_RANGE_PPS:
-                if current_time - self.attack_last_use_time >= self.attack_cooldown_time:
-                    self.state = 'ATTACK'
-                    self.is_attacking = True
-                    self.attack_last_use_time = current_time
-                elif not self.is_attacking:
-                    self.state = 'IDLE'
-
-            # 이동
-            elif self.dis_to_player <= DETECT_RANGE_PPS:
-                self.state = 'WALK'
-                self.x += self.walk_speed * self.face_dir * game_framework.frame_time
-
-            else:
+        elif self.dis_to_player <= DETECT_RANGE_PPS:
+            if current_time - self.last_action_time < self.action_delay:
                 self.state = 'IDLE'
+            else:
+                if self.dis_to_player <= SKILL_RANGE_PPS:
+                    if current_time - self.skill1_last_use >= self.skill1_cooldown:
+                        self.use_skill1()
+                        return
+                    elif current_time - self.skill2_last_use >= self.skill2_cooldown:
+                        self.use_skill2()
+                        return
 
-        # 상태 변경 체크
+                if DASH_RANGE_MIN_PPS <= self.dis_to_player <= DASH_RANGE_MAX_PPS:
+                    if current_time - self.dash_last_use >= self.dash_cooldown:
+                        self.start_dash()
+                        return
+
+                if self.dis_to_player <= ATTACK_RANGE_PPS:
+                    if current_time - self.attack_last_use_time >= self.attack_cooldown_time:
+                        self.state = 'ATTACK'
+                        self.is_attacking = True
+                        self.attack_last_use_time = current_time
+                    else:
+                        self.state = 'IDLE'
+                else:
+                    self.state = 'WALK'
+                    self.x += self.walk_speed * self.face_dir * game_framework.frame_time
+        else:
+            # 감지 범위 밖이면 IDLE
+            self.state = 'IDLE'
+
+        # 맵 경계 체크
+        if self.tile_map:
+            map_width_pixels = self.tile_map.map_width * self.tile_map.tile_width
+            hit_boundary = False
+
+            if self.x < self.width / 2:
+                self.x = self.width / 2
+                hit_boundary = True
+            elif self.x > map_width_pixels - self.width / 2:
+                self.x = map_width_pixels - self.width / 2
+                hit_boundary = True
+
+            # 경계에 닿았을 때 행동 중단
+            if hit_boundary:
+                if self.is_dashing:
+                    self.is_dashing = False
+                    self.dash_traveled = 0
+                    self.state = 'IDLE'
+                    self.last_action_time = get_time()
+                elif self.is_using_skill and self.current_skill == 'SKILL1':
+                    if self.skill1_phase == 'DASHING':
+                        self.skill1_phase = 'LANDING'
+                        self.skill1_landing_timer = 0
+
         if self.state != self.prev_state:
             self.frame_time = 0
             self.prev_state = self.state
 
         self.frame_time += game_framework.frame_time
 
-        # 프레임 업데이트
         self.update_frame()
 
-        # 공격 종료 체크
         if self.state == 'ATTACK' and self.is_attacking:
             attack_duration = len(GrimReaper.images.get('attack', [])) * ATTACK_TIME_PER_ACTION
             if self.frame_time >= attack_duration:
                 self.is_attacking = False
+                self.last_action_time = current_time
 
     def update_frame(self):
         """프레임 업데이트 (물리 기반 시간 계산)"""
@@ -258,11 +271,10 @@ class GrimReaper(Enemy):
                 self.frame = int(self.frame_time * ATTACK_ACTION_PER_TIME) % frame_count
 
         elif self.state == 'SKILL1':
-            # Skill1은 별도로 처리 (단계별로 다름)
             pass
 
         elif self.state == 'SKILL2':
-            frame_count = len(GrimReaper.images.get('skill2', []))
+            frame_count = len(GrimReaper.images.get('skill2_motion', []))
             if frame_count > 0:
                 self.frame = int(self.frame_time * SKILL2_ACTION_PER_TIME) % frame_count
 
@@ -318,14 +330,16 @@ class GrimReaper(Enemy):
                 self.current_skill = None
                 self.skill1_phase = 'READY'
                 self.state = 'IDLE'
+                self.last_action_time = get_time()  # 스킬 후 행동 간격 시작
 
     def update_skill2(self):
         """Skill2 업데이트 - 물리 기반"""
-        skill_duration = len(GrimReaper.images.get('skill2', [])) * SKILL2_TIME_PER_ACTION
+        skill_duration = len(GrimReaper.images.get('skill2_motion', [])) * SKILL2_TIME_PER_ACTION
         if self.frame_time >= skill_duration:
             self.is_using_skill = False
             self.current_skill = None
             self.state = 'IDLE'
+            self.last_action_time = get_time()  # 스킬 후 행동 간격 시작
 
     def get_skill1_effect_bb(self):
         """Skill1 돌진 궤적의 타격 범위 반환"""
@@ -357,7 +371,6 @@ class GrimReaper(Enemy):
         self.skill1_ready_timer = 0
         self.frame_time = 0
 
-        # 시작 위치 및 목표 위치 설정
         player = SKRR.get_player()
         if player:
             self.skill1_start_x = self.x
@@ -376,6 +389,9 @@ class GrimReaper(Enemy):
         self.skill2_last_use = get_time()
         self.frame_time = 0
 
+        fire_field = FireField(self.x, self.y, GrimReaper.images)
+        game_world.add_object(fire_field, 2)
+
     def draw(self):
         if not self.is_alive:
             return
@@ -383,7 +399,6 @@ class GrimReaper(Enemy):
         if not GrimReaper.images:
             return
 
-        # 현재 상태에 맞는 이미지 가져오기
         current_images = None
         if self.state == 'IDLE':
             current_images = GrimReaper.images.get('idle', [])
@@ -396,7 +411,7 @@ class GrimReaper(Enemy):
         elif self.state == 'SKILL1':
             current_images = GrimReaper.images.get('skill1_motion', [])
         elif self.state == 'SKILL2':
-            current_images = GrimReaper.images.get('skill2', [])
+            current_images = GrimReaper.images.get('skill2_motion', [])
 
         if current_images and len(current_images) > 0:
             frame_index = min(self.frame, len(current_images) - 1)
@@ -428,7 +443,6 @@ class GrimReaper(Enemy):
 
                 effect_img.draw(cam_x, cam_y, effect_img.w * 2, effect_img.h* 2)
 
-        # 디버그용 충돌 박스 그리기
         if SKRR.SKRR.show_collision_box:
             from pico2d import draw_rectangle
             if game_world.camera:

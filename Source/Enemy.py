@@ -171,18 +171,32 @@ class Enemy:
 
             current_time = get_time()
 
-            if self.dis_to_player <= attack_range:
-                if current_time - self.attack_last_use_time >= self.attack_cooldown_time:
-                    self.state = 'ATTACK'
-                    self.is_attacking = True
-                    self.attack_last_use_time = current_time
-                elif not self.is_attacking:
-                    self.state = 'IDLE'
+            # 공격 중이면 범위와 관계없이 공격 완료까지 진행
+            if self.is_attacking:
+                self.state = 'ATTACK'
+            # 감지 범위 내에서만 새로운 행동 시작
             elif self.dis_to_player <= detect_range:
-                self.state = 'WALK'
-                self.x += self.velocity * self.face_dir * game_framework.frame_time
+                if self.dis_to_player <= attack_range:
+                    if current_time - self.attack_last_use_time >= self.attack_cooldown_time:
+                        self.state = 'ATTACK'
+                        self.is_attacking = True
+                        self.attack_last_use_time = current_time
+                    else:
+                        self.state = 'IDLE'
+                else:
+                    self.state = 'WALK'
+                    self.x += self.velocity * self.face_dir * game_framework.frame_time
             else:
+                # 감지 범위 밖이면 IDLE
                 self.state = 'IDLE'
+
+        # 맵 경계 체크
+        if self.tile_map:
+            map_width_pixels = self.tile_map.map_width * self.tile_map.tile_width
+            if self.x < self.width / 2:
+                self.x = self.width / 2
+            elif self.x > map_width_pixels - self.width / 2:
+                self.x = map_width_pixels - self.width / 2
 
         if self.state != self.prev_state:
             self.frame_time = 0
@@ -528,14 +542,16 @@ class Knight_Tackle(Enemy):
             self.dis_to_player = abs(self.x - player.x)
 
             # 태클 중, 공격 중이 아닐 때만 방향 전환
-            if not self.is_tackling and not self.is_attacking:
+            if not self.is_tackling and not self.is_attacking and not self.is_tackle_ready and not self.is_tackle_end:
                 if player.x > self.x:
                     self.face_dir = 1
                 else:
                     self.face_dir = -1
 
             current_time = get_time()
+            detect_range = 500
 
+            # 태클 준비 중 - 범위와 관계없이 완료
             if self.is_tackle_ready:
                 self.state = 'TACKLE_READY'
                 self.tackle_ready_timer += game_framework.frame_time
@@ -546,6 +562,8 @@ class Knight_Tackle(Enemy):
                     self.tackle_ready_timer = 0
                     self.tackle_traveled = 0
                     self.state = 'TACKLE'
+
+            # 태클 실행 중 - 범위와 관계없이 완료
             elif self.is_tackling:
                 self.state = 'TACKLE'
                 move_distance = self.tackle_speed * game_framework.frame_time
@@ -558,6 +576,8 @@ class Knight_Tackle(Enemy):
                     self.tackle_traveled = 0
                     self.tackle_end_timer = 0
                     self.state = 'TACKLE_END'
+
+            # 태클 종료 중 - 범위와 관계없이 완료
             elif self.is_tackle_end:
                 self.state = 'TACKLE_END'
                 self.tackle_end_timer += game_framework.frame_time
@@ -567,29 +587,45 @@ class Knight_Tackle(Enemy):
                     self.tackle_end_timer = 0
                     self.tackle_last_use_time = current_time
                     self.state = 'IDLE'
-            else:
-                detect_range = 500
-                if current_time - self.tackle_last_use_time >= self.tackle_cooldown_time:
-                    if self.dis_to_player <= detect_range:
-                        self.is_tackle_ready = True
-                        self.tackle_ready_timer = 0
-                        self.state = 'TACKLE_READY'
-                        return
-                attack_range = 80
-                detect_range_normal = 400
 
-                if self.dis_to_player <= attack_range:
-                    if current_time - self.attack_last_use_time >= self.attack_cooldown_time:
-                        self.state = 'ATTACK'
-                        self.is_attacking = True
-                        self.attack_last_use_time = current_time
-                    elif not self.is_attacking:
-                        self.state = 'IDLE'
-                elif self.dis_to_player <= detect_range_normal:
-                    self.state = 'WALK'
-                    self.x += self.velocity * self.face_dir * game_framework.frame_time
+            # 공격 중 - 범위와 관계없이 완료
+            elif self.is_attacking:
+                self.state = 'ATTACK'
+
+            # 감지 범위 내에서만 새로운 행동 시작
+            elif self.dis_to_player <= detect_range:
+                # 새로운 태클 시작
+                if current_time - self.tackle_last_use_time >= self.tackle_cooldown_time:
+                    self.is_tackle_ready = True
+                    self.tackle_ready_timer = 0
+                    self.state = 'TACKLE_READY'
                 else:
-                    self.state = 'IDLE'
+                    attack_range = 80
+                    detect_range_normal = 400
+
+                    if self.dis_to_player <= attack_range:
+                        if current_time - self.attack_last_use_time >= self.attack_cooldown_time:
+                            self.state = 'ATTACK'
+                            self.is_attacking = True
+                            self.attack_last_use_time = current_time
+                        else:
+                            self.state = 'IDLE'
+                    elif self.dis_to_player <= detect_range_normal:
+                        self.state = 'WALK'
+                        self.x += self.velocity * self.face_dir * game_framework.frame_time
+                    else:
+                        self.state = 'IDLE'
+            else:
+                # 감지 범위 밖이면 IDLE
+                self.state = 'IDLE'
+
+        # 맵 경계 체크
+        if self.tile_map:
+            map_width_pixels = self.tile_map.map_width * self.tile_map.tile_width
+            if self.x < self.width / 2:
+                self.x = self.width / 2
+            elif self.x > map_width_pixels - self.width / 2:
+                self.x = map_width_pixels - self.width / 2
 
         if self.state != self.prev_state:
             self.frame_time = 0
@@ -646,6 +682,7 @@ class Knight_Tackle(Enemy):
         cam_x, cam_y = self.x, self.y
         if game_world.camera:
             cam_x, cam_y = game_world.camera.apply(self.x, self.y)
+
 
         if self.face_dir == 1:
             img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.scale, img.h * self.scale)
