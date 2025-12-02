@@ -150,7 +150,11 @@ class Boss_Image_Loader:
                 for i in range(7):
                     self.images.append(load_image(os.path.join(self.resource_path, r'Skill1', f'Skill2_1_{i}.png')))
 
-            elif state == 'Skill2':
+            elif state == 'Skill2_Motion':
+                for i in range(9):
+                    self.images.append(load_image(os.path.join(self.resource_path, r'Skill2', f'Skill2_{i}.png')))
+
+            elif state == 'Skill2_Fire':
                 for i in range(80):
                     self.images.append(load_image(os.path.join(self.resource_path, r'Skill2', f'GrimReaper_TheStake_Land_{i}.png')))
 

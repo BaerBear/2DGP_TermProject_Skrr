@@ -31,6 +31,8 @@ class SoundManager:
         cls.player_sounds['Attack2'] = load_wav(os.path.join(skul_path, 'Skul_Atk_2.wav'))
         cls.player_sounds['Jump_attack'] = load_wav(os.path.join(skul_path, 'Skul_Jump_Atk.wav'))
         cls.player_sounds['Dead'] = load_wav(os.path.join(skul_path, 'Default_Dead.wav'))
+        cls.player_sounds['Skill3_air'] = load_wav(os.path.join(skul_path, 'Ninja_Shuriken_Large.wav'))
+        cls.player_sounds['Skill3_ground'] = load_wav(os.path.join(skul_path, 'Ninja_Shuriken_Small.wav'))
 
         for sound in cls.player_sounds.values():
             sound.set_volume(cls.Effect_Volume)

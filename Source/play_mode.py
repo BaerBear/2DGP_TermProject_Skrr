@@ -20,7 +20,7 @@ def init():
     hide_lattice()
 
     ResourceManager.preload_resources()
-
+    SoundManager.stop_bgm()
     SoundManager.play_bgm('chapter1', repeat=True)
 
     current_stage = 0
@@ -59,10 +59,11 @@ def load_stage(stage_num):
         1: 'Stage1.tmx',
         2: 'BossStage.tmx'
     }
-
+    Skrr.face_dir = 1
     if stage_num not in stage_files:
         return
 
+    before_stage = current_stage
     current_stage = stage_num
 
     StageManager.clear_all_enemies()
@@ -94,6 +95,13 @@ def load_stage(stage_num):
     Skrr.y = start_y
 
     StageManager.load_stage_enemies(stage_num, Skrr, tile_map)
+
+    if before_stage == 2 and stage_num != 2:
+        SoundManager.stop_bgm()
+        SoundManager.play_bgm('chapter1', repeat=True)
+    elif current_stage == 2:
+        SoundManager.stop_bgm()
+        SoundManager.play_bgm('chapter1_boss', repeat=True)
 
     print(f"Stage {stage_num} loaded: {stage_files[stage_num]} at position ({start_x}, {start_y})")
 

@@ -25,7 +25,7 @@ class StageManager:
             (Knight_Sword, 1500, 608),
         ],
         2: [  # BossStage
-            (GrimReaper, 900, 320),
+            (GrimReaper, 1400, 320),
         ]
     }
 

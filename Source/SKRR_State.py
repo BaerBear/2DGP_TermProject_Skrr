@@ -779,7 +779,13 @@ class Skill3:
         self.movement_stopped = False
 
         self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 20
-        # SoundManager.play_player_sound('Skill3')
+        if self.is_air_skill:
+            SoundManager.play_player_sound('Skill3_air')
+            self.total_frames = 6 * 18
+        else:
+            SoundManager.play_player_sound('Skill3_ground')
+            self.total_frames = 6 * 6
+            self.target_distance = 300
 
     def do(self):
         self.frame_time += game_framework.frame_time

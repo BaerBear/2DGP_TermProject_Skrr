@@ -119,7 +119,8 @@ class ResourceManager:
                 'attack': Boss_Image_Loader('GrimReaper', 'Attack').images,
                 'skill1_effect': Boss_Image_Loader('GrimReaper', 'Skill1_Effect').images,
                 'skill1_motion': Boss_Image_Loader('GrimReaper', 'Skill1_Motion').images,
-                'skill2': Boss_Image_Loader('GrimReaper', 'Skill2').images,
+                'skill2_fire': Boss_Image_Loader('GrimReaper', 'Skill2_Fire').images,
+                'skill2_motion': Boss_Image_Loader('GrimReaper', 'Skill2_Motion').images,
             }
 
     @classmethod
