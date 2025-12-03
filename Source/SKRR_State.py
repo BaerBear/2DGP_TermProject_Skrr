@@ -118,7 +118,7 @@ class Walk:
         # 타일맵 경계 체크
         if self.skrr.tile_map:
             max_x = self.skrr.tile_map.map_width * self.skrr.tile_map.tile_width
-            min_x = max(0, minX)  # 0 미만으로 못 가게
+            min_x = max(0, minX)
 
             if self.skrr.x <= min_x and self.skrr.face_dir == -1:
                 self.skrr.x = min_x
@@ -126,7 +126,7 @@ class Walk:
                 self.skrr.x = max_x - minX
             else:
                 new_x = self.skrr.x + self.skrr.face_dir * RUN_SPEED_PPS * game_framework.frame_time
-                self.skrr.x = max(min_x, min(new_x, max_x - minX))  # 범위 제한
+                self.skrr.x = max(min_x, min(new_x, max_x - minX))
         else:
             min_x = max(0, minX)
             if self.skrr.x <= min_x and self.skrr.face_dir == -1:

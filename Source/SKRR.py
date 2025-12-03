@@ -61,7 +61,16 @@ class SKRR:
         self.was_grounded = False  # 이전 프레임의 바닥 상태 추적
         self.is_moving = False
         self.ground_y = 300  # 더미 값
+
+        # 피격관련
         self.is_invincible = False
+        self.invincibility_duration = 1.0  # 무적 시간 우선 1초
+        self.invincibility_start_time = 0.0
+        self.is_hit = False
+
+        # 공격 관련
+        self.active_hitbox = None
+        self.hit_targets = set()
 
         # 스킬 시스템
         self.skill_cooldowns = {
@@ -114,6 +123,11 @@ class SKRR:
 
         if self.tile_map:
             self.check_tile_collision()
+
+        if self.is_invincible:
+            if get_time() - self.invincible_start_time >= self.invincible_duration:
+                self.is_invincible = False
+    
 
     def check_tile_collision(self):
         left, bottom, right, top = self.get_bb()
