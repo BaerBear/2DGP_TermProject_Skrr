@@ -41,7 +41,15 @@ class Enemy:
         self.is_alive = True
 
         # 임의 스탯
-        self.hp = 150
+        self.max_hp = 50
+        self.current_hp = 50
+        self.attack_power = 15
+        self.defense = 3
+
+        # 공격 판정
+        self.active_hitbox = None
+        self.hit_targets = set()
+
         self.velocity = ENEMY_WALK_SPEED_PPS
         self.dis_to_player = 0
 
@@ -215,6 +223,29 @@ class Enemy:
 
     def draw(self):
         pass
+
+    def take_damage(self, damage, attacker_x):
+        if self.current_hp <= 0:
+            return False
+
+        actual_damage = int(damage * (100 / (100 + self.defense)))
+        self.current_hp -= random.randint(actual_damage - int(actual_damage * 0.1),
+                                          actual_damage + int(actual_damage * 0.1))
+
+        if self.current_hp <= 0:
+            self.on_death()
+            return True
+
+        return True
+
+    def on_death(self):
+        self.is_alive = False
+        game_world.remove_object(self)
+        pass
+
+    def get_bb(self):
+        return (self.x - self.width / 2, self.y - self.height / 2,
+                self.x + self.width / 2, self.y + self.height / 2)
 
     def draw_collision_box(self):
         """충돌 박스 그리기 (디버그용)"""
