@@ -62,10 +62,16 @@ class SKRR:
         self.is_moving = False
         self.ground_y = 300  # 더미 값
 
+        # 스탯
+        self.max_hp = 150
+        self.current_hp = 150
+        self.attack_power = 10
+        self.defense = 10
+
         # 피격관련
         self.is_invincible = False
-        self.invincibility_duration = 1.0  # 무적 시간 우선 1초
-        self.invincibility_start_time = 0.0
+        self.invincible_duration = 1.0  # 무적 시간 우선 1초
+        self.invincible_start_time = 0.0
         self.is_hit = False
 
         # 공격 관련
@@ -127,7 +133,20 @@ class SKRR:
         if self.is_invincible:
             if get_time() - self.invincible_start_time >= self.invincible_duration:
                 self.is_invincible = False
-    
+
+    def get_damage(self, damage):
+        if self.is_invincible or self.state_machine.current_state == self.DEAD:
+            return
+
+        actual_damage = int(damage * (100 / (100 + self.defense)))
+        self.current_hp -= actual_damage
+
+        if self.current_hp <= 0:
+            self.current_hp = 0
+            self.state_machine.handle_event(('DEATH', None))
+
+        self.is_invincible = True
+        self.invincible_start_time = get_time()
 
     def check_tile_collision(self):
         left, bottom, right, top = self.get_bb()

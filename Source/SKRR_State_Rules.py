@@ -3,7 +3,7 @@ from Event_Checker import (
     attack_down, jump_down, dash_down,
     skill1_down, skill2_down, skill3_down,
     time_out, animation_end, land_on_ground, start_falling,
-    combo_available, dash_complete, stop_moving
+    combo_available, dash_complete, stop_moving, death
 )
 
 
@@ -52,6 +52,9 @@ def Get_State_Rules(skrr):
     def can_jump(e):
         return jump_down(e) and (skrr.is_grounded or skrr.jump_count < 2)
 
+    def skrr_death(e):
+        return death(e) and e[1] == 'DEAD'
+
     return {
         skrr.IDLE: {
             right_down: skrr.WALK,
@@ -64,6 +67,7 @@ def Get_State_Rules(skrr):
             can_use_skill3: skrr.SKILL3,
             time_out: skrr.WAIT,
             start_falling: skrr.FALL,  # 낙하 전환 추가
+            skrr_death: skrr.DEATH,
         },
 
         skrr.WAIT: {
@@ -76,6 +80,7 @@ def Get_State_Rules(skrr):
             can_use_skill2: skrr.SKILL2,
             can_use_skill3: skrr.SKILL3,
             animation_end: skrr.IDLE,
+            skrr_death: skrr.DEATH,
         },
 
         skrr.WALK: {
@@ -87,6 +92,7 @@ def Get_State_Rules(skrr):
             can_use_skill3: skrr.SKILL3,
             stop_moving: skrr.IDLE,
             start_falling: skrr.FALL,
+            skrr_death: skrr.DEATH,
         },
 
         skrr.JUMP: {
@@ -97,6 +103,7 @@ def Get_State_Rules(skrr):
             start_falling: skrr.FALL,
             land_to_walk: skrr.WALK,
             land_to_idle: skrr.IDLE,
+            skrr_death: skrr.DEATH,
         },
 
         skrr.FALL: {
@@ -106,18 +113,21 @@ def Get_State_Rules(skrr):
             can_use_skill3: skrr.SKILL3,
             land_to_walk: skrr.WALK,
             land_to_idle: skrr.IDLE,
+            skrr_death: skrr.DEATH,
         },
 
         skrr.ATTACK: {
             attack_to_walk: skrr.WALK,
             attack_to_idle: skrr.IDLE,
             combo_available: skrr.ATTACK,
+            skrr_death: skrr.DEATH,
         },
 
         skrr.JUMPATTACK: {
             animation_end: skrr.FALL,
             land_to_walk: skrr.WALK,
             land_to_idle: skrr.IDLE,
+            skrr_death: skrr.DEATH,
         },
 
         skrr.DASH: {
@@ -125,6 +135,7 @@ def Get_State_Rules(skrr):
             dash_to_walk: skrr.WALK,
             dash_to_idle: skrr.IDLE,
             dash_to_fall: skrr.FALL,
+            skrr_death: skrr.DEATH,
         },
 
         skrr.DEAD: {
@@ -140,17 +151,20 @@ def Get_State_Rules(skrr):
             skill_to_idle: skrr.IDLE,
             skill_to_fall: skrr.FALL,
             skill_to_walk: skrr.WALK,
+            skrr_death: skrr.DEATH,
         },
 
         skrr.SKILL2: {
             skill_to_idle: skrr.IDLE,
             skill_to_fall: skrr.FALL,
             skill_to_walk: skrr.WALK,
+            skrr_death: skrr.DEATH,
         },
 
         skrr.SKILL3: {
             skill_to_idle: skrr.IDLE,
             skill_to_fall: skrr.FALL,
             skill_to_walk: skrr.WALK,
+            skrr_death: skrr.DEATH,
         },
     }
