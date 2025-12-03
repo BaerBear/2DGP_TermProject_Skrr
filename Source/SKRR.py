@@ -3,6 +3,7 @@ from ResourceManager import ResourceManager
 from State_Machine import StateMachine
 from SKRR_State import Idle, Wait, Walk, Jump, JumpAttack, Attack, Dash, Fall, Dead, Reborn, Skill1, Skill2, Skill3
 from SKRR_State_Rules import Get_State_Rules
+import random
 
 stage_start_positions = {
         0: (100, 256),      # Stage0 시작 위치
@@ -134,12 +135,14 @@ class SKRR:
             if get_time() - self.invincible_start_time >= self.invincible_duration:
                 self.is_invincible = False
 
+    # 피격
     def get_damage(self, damage):
         if self.is_invincible or self.state_machine.current_state == self.DEAD:
             return
 
         actual_damage = int(damage * (100 / (100 + self.defense)))
-        self.current_hp -= actual_damage
+        self.current_hp -= random.randint(actual_damage - int(actual_damage * 0.1),
+                                          actual_damage + int(actual_damage * 0.1))
 
         if self.current_hp <= 0:
             self.current_hp = 0
@@ -147,6 +150,37 @@ class SKRR:
 
         self.is_invincible = True
         self.invincible_start_time = get_time()
+
+    # 공격 히트박스 설정
+    def set_attack_hitbox(self, width, height, offset_x, offset_y, damage=None):
+        self.active_hitbox = {
+            'width': width,
+            'height': height,
+            'offset_x': offset_x,
+            'offset_y': offset_y,
+            'damage': damage if damage else self.attack_power
+        }
+        self.hit_targets.clear()
+
+    # 공격 히트박스 반환
+    def get_attack_hitbox(self):
+        if self.active_hitbox is None:
+            return None
+
+        hitbox = self.active_hitbox.copy()
+        if self.face_dir < 0:
+            hitbox['x'] = self.x - hitbox['offset_x'] - hitbox['width']
+        else:
+            hitbox['x'] = self.x + hitbox['offset_x']
+
+        hitbox['y'] = self.y + hitbox['offset_y']
+        return hitbox
+
+    # 공격 히트박스 초기화
+    def clear_attack_hitbox(self):
+        self.active_hitbox = None
+        self.hit_targets.clear()
+
 
     def check_tile_collision(self):
         left, bottom, right, top = self.get_bb()
