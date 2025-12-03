@@ -181,6 +181,18 @@ class SKRR:
         self.active_hitbox = None
         self.hit_targets.clear()
 
+    # 중복 타격 방지
+    def can_hit_target(self, target):
+        return target not in self.hit_targets
+
+    def add_hit_target(self, target):
+        self.hit_targets.add(target)
+
+    def heal(self, amount):
+        self.current_hp = min(self.max_hp, self.current_hp + amount)
+
+    def is_alive(self):
+        return self.current_hp > 0
 
     def check_tile_collision(self):
         left, bottom, right, top = self.get_bb()
