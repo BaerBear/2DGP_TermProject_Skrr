@@ -3,7 +3,7 @@ from Event_Checker import (
     attack_down, jump_down, dash_down,
     skill1_down, skill2_down, skill3_down,
     time_out, animation_end, land_on_ground, start_falling,
-    combo_available, dash_complete, stop_moving, death
+    combo_available, dash_complete, stop_moving, dead, respawn
 )
 
 
@@ -53,7 +53,7 @@ def Get_State_Rules(skrr):
         return jump_down(e) and (skrr.is_grounded or skrr.jump_count < 2)
 
     def skrr_death(e):
-        return death(e) and e[1] == 'DEAD'
+        return dead(e) and e[1] == 'DEAD'
 
     return {
         skrr.IDLE: {
@@ -139,7 +139,7 @@ def Get_State_Rules(skrr):
         },
 
         skrr.DEAD: {
-            animation_end: skrr.REBORN,
+            respawn: skrr.REBORN,
         },
 
         skrr.REBORN: {

@@ -578,25 +578,32 @@ class Fall:
 
 
 class Dead:
-    TIME_PER_ACTION = 0.25
+    TIME_PER_ACTION = 0.7
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
-    FRAMES_PER_ACTION = 15
+    FRAMES_PER_ACTION = 6
 
     def __init__(self, skrr):
         self.skrr = skrr
         self.frame_time = 0
-        self.total_frames = 30 * 5
+        self.death_timer = 0
+        self.respawn_delay = 2.0  # 2초 후 리스폰
 
     def enter(self, e):
         self.skrr.frame = 0
         self.frame_time = 0
+        self.death_timer = 0
+        # 사망 시 물리 상태 초기화
+        self.skrr.velocity_y = 0
+        self.skrr.clear_attack_hitbox()
 
     def do(self):
         self.frame_time += game_framework.frame_time
+        self.death_timer += game_framework.frame_time
         self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
 
-        if self.skrr.frame >= self.total_frames:
-            self.skrr.state_machine.handle_event(('ANIMATION_END', None))
+        # 2초 후 자동으로 리스폰
+        if self.death_timer >= self.respawn_delay:
+            self.skrr.state_machine.handle_event(('RESPAWN', None))
 
     def exit(self, e):
         pass
@@ -627,6 +634,59 @@ class Reborn:
         self.skrr.frame = 0
         self.frame_time = 0
 
+        # 스테이지 0으로 돌아가기
+        import play_mode
+        play_mode.load_stage(0)
+
+        # HP 회복
+        self.skrr.current_hp = self.skrr.max_hp
+
+        # Stage0 시작 위치로 이동
+        import SKRR
+        start_x, start_y = SKRR.stage_start_positions[0]
+        self.skrr.x = start_x
+        self.skrr.y = start_y
+
+        # 물리 상태 초기화
+        self.skrr.velocity_y = 0
+        self.skrr.is_grounded = False
+        self.skrr.was_grounded = False
+        self.skrr.jumping = False
+        self.skrr.jump_count = 0
+
+        # 방향 초기화
+        self.skrr.face_dir = 1
+
+        # 이동 상태 초기화
+        self.skrr.is_moving = False
+        self.skrr.key_pressed = {'left': False, 'right': False}
+
+        # 대쉬 상태 초기화
+        self.skrr.dash_type = None
+        self.skrr.dash_last_use_time = 0
+
+        # 공격 상태 초기화
+        self.skrr.attack_type = None
+        self.skrr.jumpattack_last_use_time = 0
+        self.skrr.clear_attack_hitbox()
+
+        self.skrr.active_hitbox = None
+        self.skrr.attack_bounding_box = None
+        self.skrr.hit_targets = set()
+        self.skrr.hit_timestamps = {}  # 각 적을 마지막으로 타격한 시간 기록
+
+        # 스킬 쿨타임 초기화
+        self.skrr.skill_last_use_time = {
+            'skill1': -5.0,
+            'skill2': -8.0,
+            'skill3': -12.0
+        }
+
+        # 무적 상태 설정 (리스폰 직후 보호)
+        self.skrr.is_invincible = True
+        self.skrr.invincible_start_time = get_time()
+        self.skrr.invincible_duration = 2.0  # 리스폰 후 2초 무적
+
     def do(self):
         self.frame_time += game_framework.frame_time
         self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
@@ -635,7 +695,7 @@ class Reborn:
             self.skrr.state_machine.handle_event(('ANIMATION_END', None))
 
     def exit(self, e):
-        self.face_dir = 1
+        pass
 
     def draw(self):
         img = self.skrr.images['Reborn'][int(self.frame_time * self.ACTION_PER_TIME) % len(self.skrr.images['Reborn'])]

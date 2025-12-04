@@ -152,7 +152,7 @@ class SKRR:
 
         if self.current_hp <= 0:
             self.current_hp = 0
-            self.state_machine.handle_event(('DEATH', None))
+            self.state_machine.handle_event(('DEAD', 'DEAD'))
 
         self.is_invincible = True
         self.invincible_start_time = get_time()

@@ -53,5 +53,8 @@ def dash_complete(e):
 def stop_moving(e):
     return e[0] == 'STOP_MOVING'
 
-def death(e):
-    return e[0] == 'DEATH'
+def dead(e):
+    return e[0] == 'DEAD'
+
+def respawn(e):
+    return e[0] == 'RESPAWN'

@@ -155,6 +155,25 @@ class Enemy:
 
         player = SKRR.get_player()
         if player:
+            # 플레이어가 죽었으면 새로운 공격을 시작하지 않음
+            if not player.is_alive():
+                # 공격 중이면 완료될 때까지 계속 진행
+                if self.is_attacking:
+                    self.state = 'ATTACK'
+                else:
+                    # 공격 중이 아니면 IDLE 상태 유지
+                    self.state = 'IDLE'
+                    self.clear_attack_hitbox()
+
+                    if self.state != self.prev_state:
+                        self.frame_time = 0
+                        self.prev_state = self.state
+
+                    self.frame_time += game_framework.frame_time
+                    self.frame = int(self.frame_time * self.IDLE_ACTION_PER_TIME * self.IDLE_FRAMES_PER_ACTION)
+                    self.check_tile_collision()
+                    return
+
             self.dis_to_player = abs(self.x - player.x)
 
             # 공격 중이 아닐 때만 방향 전환
@@ -350,8 +369,29 @@ class Knight_Sword(Enemy):
     def update(self):
         super().update()
 
+        player = SKRR.get_player()
+        if player and not player.is_alive():
+            if self.is_attacking and self.state == 'ATTACK':
+                if not self.active_hitbox and self.frame >= 6:
+                    self.set_attack_hitbox(
+                        width=80,
+                        height=self.height * 0.8,
+                        center_offset_x=40,
+                        center_offset_y=0,
+                        damage=self.attack_power,
+                        multi_hit=False
+                    )
+                if 6 <= self.frame < 10:
+                    self.get_attack_hitbox()
+
+                attack_duration = len(Knight_Sword.images.get('attack', [])) * self.ATTACK_TIME_PER_ACTION
+                if self.frame_time >= attack_duration:
+                    self.is_attacking = False
+                    self.clear_attack_hitbox()
+            return
+
         if self.state == 'ATTACK':
-            if not self.active_hitbox:
+            if not self.active_hitbox and self.frame >= 6:
                 self.set_attack_hitbox(
                     width=80,
                     height=self.height * 0.8,
@@ -360,8 +400,7 @@ class Knight_Sword(Enemy):
                     damage=self.attack_power,
                     multi_hit=False
                 )
-
-            if 2 <= self.frame < 5:
+            if 6 <= self.frame < 10:
                 self.get_attack_hitbox()
 
             attack_duration = len(Knight_Sword.images.get('attack', [])) * self.ATTACK_TIME_PER_ACTION
@@ -452,6 +491,73 @@ class Knight_Bow(Enemy):
 
         player = SKRR.get_player()
         if player:
+            # 플레이어가 죽었을 때는 새로운 공격을 시작하지 않음
+            if not player.is_alive():
+                # 조준 중이거나 공격 중이면 완료될 때까지 계속 진행
+                if self.is_aiming or self.is_attacking:
+                    # 조준 중일 때
+                    if self.is_aiming:
+                        self.state = 'AIM'
+                        self.aim_timer += game_framework.frame_time
+                        if self.aim_timer >= self.aim_duration:
+                            self.state = 'ATTACK'
+                            self.is_aiming = False
+                            self.is_attacking = True
+                            self.aim_timer = 0
+                            self.attack_last_use_time = get_time()
+
+                    # 공격 중일 때
+                    if self.is_attacking and self.state == 'ATTACK':
+                        if not self.active_hitbox:
+                            sign_img = Knight_Bow.images['attack_sign'][0]
+                            w = sign_img.w * self.scale
+                            h = sign_img.h / 4
+                            self.set_attack_hitbox(
+                                width=w,
+                                height=h,
+                                center_offset_x=w / 2,
+                                damage=self.attack_power,
+                                multi_hit=False
+                            )
+
+                        self.frame = 3
+                        attack_duration = len(Knight_Bow.images.get('attack', [])) * self.ATTACK_TIME_PER_ACTION
+                        self.sign_frame = int(self.frame_time * self.SIGN_ACTION_PER_TIME * self.SIGN_FRAMES_PER_ACTION)
+
+                        if self.frame_time < 0.2:
+                            self.get_attack_hitbox()
+                        else:
+                            self.attack_bounding_box = None
+
+                        if self.frame_time >= attack_duration:
+                            self.is_attacking = False
+                            self.clear_attack_hitbox()
+
+                    if self.state != self.prev_state:
+                        self.frame_time = 0
+                        self.prev_state = self.state
+
+                    self.frame_time += game_framework.frame_time
+
+                    if self.state == 'AIM':
+                        aim_progress = self.aim_timer / self.aim_duration
+                        self.frame = min(int(aim_progress * self.aim_frames), self.aim_frames - 1)
+                        self.sign_frame = int(self.frame_time * self.SIGN_ACTION_PER_TIME * self.SIGN_FRAMES_PER_ACTION)
+
+                    return
+                else:
+                    # 공격 중이 아니면 IDLE 상태 유지
+                    self.state = 'IDLE'
+                    self.clear_attack_hitbox()
+
+                    if self.state != self.prev_state:
+                        self.frame_time = 0
+                        self.prev_state = self.state
+
+                    self.frame_time += game_framework.frame_time
+                    self.frame = int(self.frame_time * self.IDLE_ACTION_PER_TIME * self.IDLE_FRAMES_PER_ACTION)
+                    return
+
             self.dis_to_player = abs(self.x - player.x)
 
             if not self.is_attacking and self.state != 'AIM':
@@ -642,6 +748,102 @@ class Knight_Tackle(Enemy):
 
         player = SKRR.get_player()
         if player:
+            # 플레이어가 죽었을 때는 새로운 공격/태클을 시작하지 않음
+            if not player.is_alive():
+                # 태클 중이거나 공격 중이면 완료될 때까지 계속 진행
+                if self.is_tackle_ready or self.is_tackling or self.is_tackle_end or self.is_attacking:
+                    # 태클 준비 중
+                    if self.is_tackle_ready:
+                        self.state = 'TACKLE_READY'
+                        self.tackle_ready_timer += game_framework.frame_time
+
+                        if self.tackle_ready_timer >= self.tackle_ready_duration:
+                            self.is_tackle_ready = False
+                            self.is_tackling = True
+                            self.tackle_ready_timer = 0
+                            self.tackle_traveled = 0
+                            self.state = 'TACKLE'
+
+                    # 태클 실행 중
+                    elif self.is_tackling:
+                        self.state = 'TACKLE'
+                        move_distance = self.tackle_speed * game_framework.frame_time
+                        self.x += move_distance * self.face_dir
+                        self.tackle_traveled += move_distance
+
+                        if self.tackle_traveled >= self.tackle_distance:
+                            self.is_tackling = False
+                            self.is_tackle_end = True
+                            self.tackle_traveled = 0
+                            self.tackle_end_timer = 0
+                            self.state = 'TACKLE_END'
+
+                    # 태클 종료 중
+                    elif self.is_tackle_end:
+                        self.state = 'TACKLE_END'
+                        self.tackle_end_timer += game_framework.frame_time
+
+                        if self.tackle_end_timer >= self.tackle_end_duration:
+                            self.is_tackle_end = False
+                            self.tackle_end_timer = 0
+                            self.tackle_last_use_time = get_time()
+                            self.state = 'IDLE'
+
+                    # 일반 공격 중
+                    elif self.is_attacking:
+                        self.state = 'ATTACK'
+                        if not self.active_hitbox:
+                            self.set_attack_hitbox(
+                                width=100,
+                                height=self.height * 0.8,
+                                center_offset_x=self.width * 0.4,
+                                center_offset_y=-20,
+                                damage=self.attack_power,
+                                multi_hit=False
+                            )
+
+                        self.frame = int(self.frame_time * self.ATTACK_ACTION_PER_TIME * self.ATTACK_FRAMES_PER_ACTION)
+
+                        if 2 <= self.frame < 6:
+                            self.get_attack_hitbox()
+
+                        attack_duration = len(Knight_Tackle.images.get('attack', [])) * self.ATTACK_TIME_PER_ACTION
+                        if self.frame_time >= attack_duration:
+                            self.is_attacking = False
+                            self.clear_attack_hitbox()
+
+                    # 프레임 업데이트
+                    if self.state != self.prev_state:
+                        self.frame_time = 0
+                        self.prev_state = self.state
+
+                    self.frame_time += game_framework.frame_time
+
+                    # 상태별 프레임 계산
+                    if self.state == 'TACKLE_READY':
+                        self.frame = 0
+                    elif self.state == 'TACKLE':
+                        self.get_attack_hitbox()
+                        self.frame = 1
+                    elif self.state == 'TACKLE_END':
+                        if self.tackle_end_timer < game_framework.frame_time:
+                            self.clear_attack_hitbox()
+                        self.frame = 2
+
+                    return
+                else:
+                    # 공격/태클 중이 아니면 IDLE 상태 유지
+                    self.state = 'IDLE'
+                    self.clear_attack_hitbox()
+
+                    if self.state != self.prev_state:
+                        self.frame_time = 0
+                        self.prev_state = self.state
+
+                    self.frame_time += game_framework.frame_time
+                    self.frame = int(self.frame_time * self.IDLE_ACTION_PER_TIME * self.IDLE_FRAMES_PER_ACTION)
+                    return
+
             self.dis_to_player = abs(self.x - player.x)
 
             # 태클 중, 공격 중이 아닐 때만 방향 전환
