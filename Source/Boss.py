@@ -132,17 +132,6 @@ class GrimReaper(Enemy):
         return (self.x - adjusted_width / 2, self.y - self.height / 2,
                 self.x + adjusted_width / 2, self.y + self.height / 2)
 
-    def get_hit_bb(self):
-        """피격 박스"""
-        if self.is_dashing:
-            # 대쉬 중에는 히트박스 작게
-            return (self.x - self.width / 3, self.y - self.height / 3,
-                    self.x + self.width / 3, self.y + self.height / 3)
-        else:
-            # 일반 상태
-            return (self.x - self.width / 2.5, self.y - self.height / 2.5,
-                    self.x + self.width / 2.5, self.y + self.height / 2.5)
-
     def update(self):
         if not self.is_alive:
             return
@@ -445,7 +434,3 @@ class GrimReaper(Enemy):
                 left, bottom, right, top = self.get_bb()
                 draw_rectangle(left - camera_x, bottom - camera_y,
                                right - camera_x, top - camera_y)
-
-                hit_left, hit_bottom, hit_right, hit_top = self.get_hit_bb()
-                draw_rectangle(hit_left - camera_x, hit_bottom - camera_y,
-                               hit_right - camera_x, hit_top - camera_y)

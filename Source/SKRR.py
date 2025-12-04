@@ -69,7 +69,7 @@ class SKRR:
 
         # 스탯
         self.max_hp = 150
-        self.current_hp = 150
+        self.current_hp = self.max_hp
         self.attack_power = 10
         self.defense = 10
 
@@ -340,7 +340,7 @@ class SKRR:
                 left, bottom, right, top = self.get_bb()
                 draw_rectangle(left - camera_x, bottom - camera_y,
                               right - camera_x, top - camera_y)
-                # 공격 히트박스 (있다면)
+
                 hitbox = self.attack_bounding_box
                 if hitbox:
                     draw_rectangle(hitbox[0] - camera_x, hitbox[1] - camera_y,

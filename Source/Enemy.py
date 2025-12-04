@@ -33,14 +33,16 @@ class Enemy:
         self.is_alive = True
 
         # 임의 스탯
-        self.max_hp = 50
-        self.current_hp = 50
+        self.max_hp = 100
+        self.current_hp = self.max_hp
         self.attack_power = 15
         self.defense = 3
 
         # 공격 판정
         self.active_hitbox = None
+        self.attack_bounding_box = None
         self.hit_targets = set()
+        self.hit_timestamps = {}  # 각 타겟을 마지막으로 타격한 시간 기록
 
         self.velocity = ENEMY_WALK_SPEED_PPS
         self.dis_to_player = 0
@@ -69,10 +71,6 @@ class Enemy:
         """충돌 박스 반환 (타일 충돌, 물리 처리용)"""
         return (self.x - self.width / 2, self.y - self.height / 2,
                 self.x + self.width / 2, self.y + self.height / 2)
-
-    def get_hit_bb(self):
-        """피격 박스 반환 (플레이어 공격 받을 때 사용)"""
-        return self.get_bb()
 
     def apply_gravity(self):
         """중력 적용"""
@@ -249,14 +247,82 @@ class Enemy:
                 camera_x, camera_y = game_world.camera.get_position()
                 left, bottom, right, top = self.get_bb()
                 draw_rectangle(left - camera_x, bottom - camera_y,
-                             right - camera_x, top - camera_y)
+                               right - camera_x, top - camera_y)
+
+    def set_attack_hitbox(self, width, height, center_offset_x=0, center_offset_y=0, damage=None, multi_hit=False, hit_interval=0.0):
+        self.active_hitbox = {
+            'width': width,
+            'height': height,
+            'center_offset_x': center_offset_x,
+            'center_offset_y': center_offset_y,
+            'damage': damage if damage else self.attack_power,
+            'multi_hit': multi_hit,
+            'hit_interval': hit_interval
+        }
+        if not multi_hit:
+            self.hit_targets.clear()
+            self.hit_timestamps.clear()
+        else:
+            self.hit_timestamps.clear()
+
+    def update_attack_hitbox_position(self, center_offset_x, center_offset_y, width=None):
+        if self.active_hitbox:
+            self.active_hitbox['center_offset_x'] = center_offset_x
+            self.active_hitbox['center_offset_y'] = center_offset_y
+            if width is not None:
+                self.active_hitbox['width'] = width
+
+    def get_attack_hitbox(self):
+        if self.active_hitbox is None:
+            return None
+
+        hitbox_center_x = self.x + (self.active_hitbox['center_offset_x'] * self.face_dir)
+        hitbox_center_y = self.y + self.active_hitbox['center_offset_y']
+
+        half_width = self.active_hitbox['width'] / 2
+        half_height = self.active_hitbox['height'] / 2
+        self.attack_bounding_box = (hitbox_center_x - half_width, hitbox_center_y - half_height,
+                                    hitbox_center_x + half_width, hitbox_center_y + half_height)
+
+        return (hitbox_center_x - half_width, hitbox_center_y - half_height,
+                hitbox_center_x + half_width, hitbox_center_y + half_height)
+
+    def clear_attack_hitbox(self):
+        self.active_hitbox = None
+        self.attack_bounding_box = None
+        self.hit_targets.clear()
+        self.hit_timestamps.clear()
+
+    def can_hit_target(self, target):
+        if not self.active_hitbox:
+            return False
+
+        is_multi_hit = self.active_hitbox.get('multi_hit', False)
+        hit_interval = self.active_hitbox.get('hit_interval', 0.0)
+
+        if not is_multi_hit:
+            return target not in self.hit_targets
+
+        if hit_interval == 0.0:
+            return True
+
+        if target not in self.hit_timestamps:
+            return True
+
+        current_time = get_time()
+        last_hit_time = self.hit_timestamps[target]
+        return (current_time - last_hit_time) >= hit_interval
+
+    def add_hit_target(self, target):
+        self.hit_targets.add(target)
+        if self.active_hitbox and self.active_hitbox.get('multi_hit', False):
+            self.hit_timestamps[target] = get_time()
 
 class Knight_Sword(Enemy):
     images = None
 
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.hp = 150
         self.velocity = ENEMY_WALK_SPEED_PPS
         self.attack_cooldown_time = 1.5
 
@@ -279,9 +345,23 @@ class Knight_Sword(Enemy):
         super().update()
 
         if self.state == 'ATTACK':
+            if self.frame_time < game_framework.frame_time:
+                self.set_attack_hitbox(
+                    width=80,
+                    height=self.height * 0.8,
+                    center_offset_x=40,
+                    center_offset_y=0,
+                    damage=self.attack_power,
+                    multi_hit=False
+                )
+
+            if 2 <= self.frame < 5:
+                self.get_attack_hitbox()
+
             attack_duration = len(Knight_Sword.images.get('attack', [])) * self.ATTACK_TIME_PER_ACTION
             if self.frame_time >= attack_duration:
                 self.is_attacking = False
+                self.clear_attack_hitbox()
 
     def draw(self):
         if not self.is_alive:
@@ -327,7 +407,8 @@ class Knight_Bow(Enemy):
 
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.hp = 100
+        self.max_hp = 80
+        self.current_hp = self.max_hp
         self.velocity = ENEMY_WALK_SPEED_PPS * 0.8
         self.attack_cooldown_time = 2.0
         self.preferred_distance = 250
@@ -419,11 +500,26 @@ class Knight_Bow(Enemy):
             self.frame = min(int(aim_progress * self.aim_frames), self.aim_frames - 1)
             self.sign_frame = int(self.frame_time * self.SIGN_ACTION_PER_TIME * self.SIGN_FRAMES_PER_ACTION)
         elif self.state == 'ATTACK':
+            if self.frame_time < game_framework.frame_time:
+                self.set_attack_hitbox(
+                    width=400,
+                    height=20,
+                    center_offset_x=self.width,
+                    center_offset_y=10,
+                    damage=self.attack_power,
+                    multi_hit=False
+                )
+
             self.frame = 3
             attack_duration = len(Knight_Bow.images.get('attack', [])) * self.ATTACK_TIME_PER_ACTION
             self.sign_frame = int(self.frame_time * self.SIGN_ACTION_PER_TIME * self.SIGN_FRAMES_PER_ACTION)
+
+            if self.frame_time < 0.2:
+                self.get_attack_hitbox()
+
             if self.frame_time >= attack_duration:
                 self.is_attacking = False
+                self.clear_attack_hitbox()
 
     def draw(self):
         if not self.is_alive:
@@ -488,7 +584,8 @@ class Knight_Tackle(Enemy):
 
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.hp = 200
+        self.max_hp = 150
+        self.current_hp = self.max_hp
         self.velocity = ENEMY_WALK_SPEED_PPS * 1.2
         self.attack_cooldown_time = 3.0
         self.tackle_cooldown_time = 7.0
@@ -525,22 +622,6 @@ class Knight_Tackle(Enemy):
         return (self.x - adjusted_width / 2, self.y - self.height / 2,
                 self.x + adjusted_width / 2, self.y + self.height / 4)
 
-    def get_hit_bb(self):
-        if self.is_tackling:
-            width_modifier = 0.9
-            adjusted_width = self.width * width_modifier
-            body_offset = -10 * self.face_dir
-
-            return (self.x + body_offset - adjusted_width / 2, self.y - self.height / 2,
-                    self.x + body_offset + adjusted_width / 2, self.y + self.height / 4 - 10)
-        else:
-            if (self.face_dir == 1):
-                return (self.x - self.width / 2, self.y - self.height / 2,
-                        self.x + self.width / 4, self.y + self.height / 4 - 10)
-            else:
-                return (self.x - self.width / 4, self.y - self.height / 2,
-                        self.x + self.width / 2, self.y + self.height / 4 - 10)
-
     def draw_collision_box(self):
         """충돌 박스 그리기 (디버그용)"""
         if SKRR.SKRR.show_collision_box:
@@ -550,10 +631,6 @@ class Knight_Tackle(Enemy):
                 left, bottom, right, top = self.get_bb()
                 draw_rectangle(left - camera_x, bottom - camera_y,
                              right - camera_x, top - camera_y)
-
-                hit_left, hit_bottom, hit_right, hit_top = self.get_hit_bb()
-                draw_rectangle(hit_left - camera_x, hit_bottom - camera_y,
-                             hit_right - camera_x, hit_top - camera_y)
 
     def update(self):
         if not self.is_alive:
@@ -663,15 +740,44 @@ class Knight_Tackle(Enemy):
         elif self.state == 'WALK':
             self.frame = int(self.frame_time * self.WALK_ACTION_PER_TIME * self.WALK_FRAMES_PER_ACTION)
         elif self.state == 'ATTACK':
+            # 일반 공격 히트박스 설정
+            if self.frame_time < game_framework.frame_time:  # 공격 시작 프레임
+                self.set_attack_hitbox(
+                    width=90,
+                    height=self.height * 0.8,
+                    center_offset_x=self.width,
+                    center_offset_y=0,
+                    damage=self.attack_power,
+                    multi_hit=False
+                )
+
             self.frame = int(self.frame_time * self.ATTACK_ACTION_PER_TIME * self.ATTACK_FRAMES_PER_ACTION)
+
+            if 2 <= self.frame < 6:
+                self.get_attack_hitbox()
+
             attack_duration = len(Knight_Tackle.images.get('attack', [])) * self.ATTACK_TIME_PER_ACTION
             if self.frame_time >= attack_duration:
                 self.is_attacking = False
+                self.clear_attack_hitbox()
         elif self.state == 'TACKLE_READY':
             self.frame = 0
         elif self.state == 'TACKLE':
+            if self.tackle_traveled < game_framework.frame_time * self.tackle_speed:
+                self.set_attack_hitbox(
+                    width=self.width,
+                    height=self.height,
+                    center_offset_x=self.width,
+                    center_offset_y=0,
+                    damage=int(self.attack_power * 1.5),
+                    multi_hit=False
+                )
+
+            self.get_attack_hitbox()
             self.frame = 1
         elif self.state == 'TACKLE_END':
+            if self.tackle_end_timer < game_framework.frame_time:
+                self.clear_attack_hitbox()
             self.frame = 2
 
     def draw(self):
