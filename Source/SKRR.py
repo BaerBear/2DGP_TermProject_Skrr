@@ -23,11 +23,15 @@ def get_player():
 class SKRR:
     images = None
     show_collision_box = True  # 충돌 박스 표시 여부 (클래스 변수)
+    default_w = 0
+    default_h = 0
 
     @classmethod
     def load_images(cls):
         if cls.images is None:
             cls.images = ResourceManager.get_player_images()
+            cls.default_w = cls.images['Idle'][0].w
+            cls.default_h = cls.images['Idle'][0].h
 
     def __init__(self):
         SKRR.load_images()
@@ -77,6 +81,7 @@ class SKRR:
 
         # 공격 관련
         self.active_hitbox = None
+        self.attack_bounding_box = None
         self.hit_targets = set()
 
         # 스킬 시스템
@@ -152,33 +157,36 @@ class SKRR:
         self.invincible_start_time = get_time()
 
     # 공격 히트박스 설정
-    def set_attack_hitbox(self, width, height, offset_x, offset_y, damage=None):
+    def set_attack_hitbox(self, width, height, center_offset_x=0, center_offset_y=0, damage=None):
         self.active_hitbox = {
             'width': width,
             'height': height,
-            'offset_x': offset_x,
-            'offset_y': offset_y,
+            'center_offset_x': center_offset_x,
+            'center_offset_y': center_offset_y,
             'damage': damage if damage else self.attack_power
         }
         self.hit_targets.clear()
 
     # 공격 히트박스 반환
     def get_attack_hitbox(self):
+
         if self.active_hitbox is None:
             return None
+        hitbox_center_x = self.x + (self.active_hitbox['center_offset_x'] * self.face_dir)
+        hitbox_center_y = self.y + self.active_hitbox['center_offset_y']
 
-        hitbox = self.active_hitbox.copy()
-        if self.face_dir < 0:
-            hitbox['x'] = self.x - hitbox['offset_x'] - hitbox['width']
-        else:
-            hitbox['x'] = self.x + hitbox['offset_x']
+        half_width = self.active_hitbox['width'] / 2
+        half_height = self.active_hitbox['height'] / 2
+        self.attack_bounding_box = (hitbox_center_x - half_width, hitbox_center_y - half_height,
+                                    hitbox_center_x + half_width, hitbox_center_y + half_height)
 
-        hitbox['y'] = self.y + hitbox['offset_y']
-        return hitbox
+        return (hitbox_center_x - half_width, hitbox_center_y - half_height,
+                hitbox_center_x + half_width, hitbox_center_y + half_height)
 
     # 공격 히트박스 초기화
     def clear_attack_hitbox(self):
         self.active_hitbox = None
+        self.attack_bounding_box = None
         self.hit_targets.clear()
 
     # 중복 타격 방지
@@ -299,6 +307,11 @@ class SKRR:
                 left, bottom, right, top = self.get_bb()
                 draw_rectangle(left - camera_x, bottom - camera_y,
                               right - camera_x, top - camera_y)
+                # 공격 히트박스 (있다면)
+                hitbox = self.attack_bounding_box
+                if hitbox:
+                    draw_rectangle(hitbox[0] - camera_x, hitbox[1] - camera_y,
+                                   hitbox[2] - camera_x, hitbox[3] - camera_y)
 
     def handle_event(self, event):
         self.state_machine.handle_event(event)

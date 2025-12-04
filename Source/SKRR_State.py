@@ -263,6 +263,12 @@ class JumpAttack:
         self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 20
         SoundManager.play_player_sound('Jump_attack')
 
+        self.skrr.set_attack_hitbox(
+            width=70, height=self.skrr.default_h * self.skrr.scale + 40,
+            center_offset_x= self.skrr.default_w // 2,
+            damage = self.skrr.attack_power
+        )
+
     def do(self):
         self.frame_time += game_framework.frame_time
         self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
@@ -293,7 +299,10 @@ class JumpAttack:
             self.skrr.is_grounded = True
             self.skrr.state_machine.handle_event(('ANIMATION_END', None))
 
+        if 2 <= self.skrr.frame < 6 or 10 <= self.skrr.frame < 14:
+            self.skrr.get_attack_hitbox()
     def exit(self, e):
+        self.skrr.clear_attack_hitbox()
         pass
 
     def draw(self):
@@ -327,6 +336,12 @@ class Attack:
             SoundManager.play_player_sound('Attack2')
         self.attack_dir = self.skrr.face_dir
 
+        self.skrr.set_attack_hitbox(
+            width = 80, height = self.skrr.default_h * self.skrr.scale,
+            center_offset_x = self.skrr.default_w // 2,
+            damage = self.skrr.attack_power
+        )
+
     def do(self):
         self.frame_time += game_framework.frame_time
         self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
@@ -344,7 +359,15 @@ class Attack:
                 self.skrr.state_machine.handle_event(('ANIMATION_END', 'IDLE'))
             self.skrr.attack_type = None
 
+        if self.skrr.attack_type == 'A':
+            if 4 <= self.skrr.frame < 10:
+                self.skrr.get_attack_hitbox()
+        elif self.skrr.attack_type == 'B':
+            if 3 <= self.skrr.frame < 8:
+                self.skrr.get_attack_hitbox()
+
     def exit(self, e):
+        self.skrr.clear_attack_hitbox()
         pass
 
     def draw(self):
@@ -624,7 +647,7 @@ class Reborn:
 
 
 class Skill1:
-    TIME_PER_ACTION = 0.7
+    TIME_PER_ACTION = 0.6
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
     FRAMES_PER_ACTION = 7
     def __init__(self, skrr):
@@ -636,6 +659,10 @@ class Skill1:
         self.skrr.frame = 0
         self.frame_time = 0
         self.skrr.use_skill('skill1')  # 쿨타임 기록
+        self.skrr.set_attack_hitbox(
+            width=110, height=self.skrr.default_h * self.skrr.scale,
+            damage=self.skrr.attack_power * 1.5
+        )
         # 스킬 사용 사운드 재생 (필요시)
         # SoundManager.play_sound('skill1')
 
@@ -674,7 +701,10 @@ class Skill1:
             else:
                 self.skrr.state_machine.handle_event(('ANIMATION_END', 'FALL'))
 
+        self.skrr.get_attack_hitbox()
+
     def exit(self, e):
+        self.skrr.clear_attack_hitbox()
         pass
 
     def draw(self):
@@ -710,6 +740,12 @@ class Skill2:
         # 스킬 사용 사운드 재생 (필요시)
         # SoundManager.play_sound('skill2')
 
+        self.skrr.set_attack_hitbox(
+            width=500, height=100,
+            center_offset_y=self.skrr.default_h,
+            damage=self.skrr.attack_power * 1.8
+        )
+
     def do(self):
         self.frame_time += game_framework.frame_time
         self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
@@ -730,7 +766,10 @@ class Skill2:
             else:
                 self.skrr.state_machine.handle_event(('ANIMATION_END', 'FALL'))
 
+        self.skrr.get_attack_hitbox()
+
     def exit(self, e):
+        self.skrr.clear_attack_hitbox()
         pass
 
     def draw(self):
@@ -747,12 +786,12 @@ class Skill2:
             img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x + 20, cam_y + 25, img.w * self.skrr.scale, img.h * self.skrr.scale)
 
         if self.effect_frame < self.effect_total_frame:
-            skill2_effet.clip_draw(0, 0, skill2_effet.w, skill2_effet.h, cam_x, cam_y + 40, skill2_effet.w * self.skrr.scale, skill2_effet.h * self.skrr.scale)
+            skill2_effet.clip_draw(0, 0, skill2_effet.w, skill2_effet.h, cam_x, cam_y + 40, skill2_effet.w * 1.5, skill2_effet.h * 1.5)
         if self.start_frame < self.start_total_frame:
-            skill2_start.clip_draw(0, 0, skill2_start.w, skill2_start.h, cam_x, cam_y + 40, skill2_start.w * self.skrr.scale, skill2_start.h * self.skrr.scale)
+            skill2_start.clip_draw(0, 0, skill2_start.w, skill2_start.h, cam_x, cam_y + 40, skill2_start.w * 2.5, skill2_start.h * 2)
 
 class Skill3:
-    TIME_PER_ACTION = 0.1
+    TIME_PER_ACTION = 0.08
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
     FRAMES_PER_ACTION = 6
     SKILL3_SPEED_PPS = 3000  # 매우 빠른 이동 속도
@@ -782,6 +821,11 @@ class Skill3:
         if self.is_air_skill:
             SoundManager.play_player_sound('Skill3_air')
             self.total_frames = 6 * 18
+            self.skrr.set_attack_hitbox(
+                width=self.target_distance * 1.5,
+                height=self.skrr.default_h * self.skrr.scale + 20,
+                damage=self.skrr.attack_power * 2.5
+            )
         else:
             SoundManager.play_player_sound('Skill3_ground')
             self.total_frames = 6 * 6
@@ -823,6 +867,19 @@ class Skill3:
                     self.skrr.x = new_x
                     self.traveled_distance += actual_move
 
+        if not self.is_air_skill:
+            current_distance = abs(self.skrr.x - self.start_x)
+            center_offset = -(current_distance / 2)
+
+            self.skrr.set_attack_hitbox(
+                width=current_distance,
+                height=self.skrr.default_h * self.skrr.scale + 20,
+                center_offset_x=center_offset,
+                center_offset_y=0,
+                damage=self.skrr.attack_power * 2
+            )
+            self.skrr.get_attack_hitbox()
+
         if self.skrr.frame >= self.total_frames:
             if self.skrr.is_grounded:
                 if self.skrr.key_pressed['left']:
@@ -845,9 +902,11 @@ class Skill3:
         if self.is_air_skill:
             self.skrr.x = self.start_x
             self.skrr.velocity_y = 0
+            SoundManager.stop_player_sound('Skill3_air')
         self.is_air_skill = False
         self.traveled_distance = 0
         self.movement_stopped = False
+        self.skrr.clear_attack_hitbox()
 
     def draw(self):
         img = None
