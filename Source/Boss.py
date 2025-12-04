@@ -74,8 +74,8 @@ class GrimReaper(Enemy):
     def __init__(self, x, y):
         super().__init__(x, y)
 
-        self.current_hp = 2000
-        self.max_hp = 2000
+        self.max_hp = 1000
+        self.current_hp = self.max_hp
         self.scale = 3
 
         self.walk_speed = BOSS_WALK_SPEED_PPS
@@ -96,8 +96,7 @@ class GrimReaper(Enemy):
         self.is_using_skill = False
         self.current_skill = None
 
-        # 행동 간격 관련 (공격 후 1.5초 대기)
-        self.action_delay = 1.0  # 행동 간격
+        self.action_delay = 2.0  # 행동 간격
         self.last_action_time = -1.0
 
         self.skill1_phase = 'READY'

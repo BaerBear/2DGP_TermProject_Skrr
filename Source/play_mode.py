@@ -122,19 +122,15 @@ def check_attack_collision():
     if hitbox is None:
         return
 
-    # 적 레이어 확인 (StageManager에서 Layer 1에 적 추가)
     enemy_layer = 1
     if enemy_layer >= len(game_world.world):
         return
 
-    # 리스트 복사본으로 순회 (순회 중 객체 제거 방지)
     enemies = list(game_world.world[enemy_layer])
 
-    # hitbox는 (left, bottom, right, top) 튜플
     hitbox_left, hitbox_bottom, hitbox_right, hitbox_top = hitbox
 
     for enemy in enemies:
-        # 이미 맞은 적은 스킵
         if not player.can_hit_target(enemy):
             continue
 
@@ -157,7 +153,13 @@ def check_attack_collision():
             if hasattr(enemy, 'take_damage'):
                 damage = player.active_hitbox.get('damage', player.attack_power)
                 enemy.take_damage(damage, player.x)
+
+                # 타격 기록 추가 (multi_hit일 때는 타임스탬프도 기록)
                 player.add_hit_target(enemy)
+
+                is_multi_hit = player.active_hitbox.get('multi_hit', False)
+                hit_interval = player.active_hitbox.get('hit_interval', 0.0)
+                print(f"플레이어 공격 적중! 데미지: {damage} (다중 히트: {is_multi_hit}, 간격: {hit_interval}초)")
 
 
 def check_player_damage():

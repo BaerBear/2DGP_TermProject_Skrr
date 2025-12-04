@@ -266,7 +266,8 @@ class JumpAttack:
         self.skrr.set_attack_hitbox(
             width=70, height=self.skrr.default_h * self.skrr.scale + 40,
             center_offset_x= self.skrr.default_w // 2,
-            damage = self.skrr.attack_power
+            damage = self.skrr.attack_power,
+            multi_hit=False
         )
 
     def do(self):
@@ -659,12 +660,13 @@ class Skill1:
         self.skrr.frame = 0
         self.frame_time = 0
         self.skrr.use_skill('skill1')  # 쿨타임 기록
+
         self.skrr.set_attack_hitbox(
             width=110, height=self.skrr.default_h * self.skrr.scale,
-            damage=self.skrr.attack_power * 1.5
+            damage=int(self.skrr.attack_power * 0.8),
+            multi_hit=True,
+            hit_interval=0.2
         )
-        # 스킬 사용 사운드 재생 (필요시)
-        # SoundManager.play_sound('skill1')
 
     def do(self):
         minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 20
@@ -737,13 +739,13 @@ class Skill2:
         self.skrr.frame = 0
         self.frame_time = 0
         self.skrr.use_skill('skill2')  # 쿨타임 기록
-        # 스킬 사용 사운드 재생 (필요시)
-        # SoundManager.play_sound('skill2')
 
         self.skrr.set_attack_hitbox(
             width=500, height=100,
             center_offset_y=self.skrr.default_h,
-            damage=self.skrr.attack_power * 1.8
+            damage=int(self.skrr.attack_power),
+            multi_hit=True,
+            hit_interval=0.08
         )
 
     def do(self):
@@ -814,6 +816,7 @@ class Skill3:
         self.start_x = self.skrr.x
         self.target_distance = 150
         self.movement_stopped = False
+        self.hitbox_initialized = False
 
         self.minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 20
         if self.is_air_skill:
@@ -822,8 +825,11 @@ class Skill3:
             self.skrr.set_attack_hitbox(
                 width=self.target_distance * 1.5,
                 height=self.skrr.default_h * self.skrr.scale + 20,
-                damage=self.skrr.attack_power * 2.5
+                damage=int(self.skrr.attack_power),
+                multi_hit=True,
+                hit_interval=0.1
             )
+            self.hitbox_initialized = True
         else:
             SoundManager.play_player_sound('Skill3_ground')
             self.total_frames = 6 * 6
@@ -869,13 +875,20 @@ class Skill3:
             current_distance = abs(self.skrr.x - self.start_x)
             center_offset = -(current_distance / 2)
 
-            self.skrr.set_attack_hitbox(
-                width=current_distance,
-                height=self.skrr.default_h * self.skrr.scale + 20,
-                center_offset_x=center_offset,
-                center_offset_y=0,
-                damage=self.skrr.attack_power * 2
-            )
+            if not self.hitbox_initialized:
+                self.skrr.set_attack_hitbox(
+                    width=current_distance,
+                    height=self.skrr.default_h * self.skrr.scale + 20,
+                    center_offset_x=center_offset,
+                    center_offset_y=0,
+                    damage=int(self.skrr.attack_power * 0.7),
+                    multi_hit=True,
+                    hit_interval=0.1
+                )
+                self.hitbox_initialized = True
+            else:
+                self.skrr.update_skill3_bb(center_offset, 0, width=current_distance)
+
             self.skrr.get_attack_hitbox()
 
         if self.skrr.frame >= self.total_frames:

@@ -83,6 +83,7 @@ class SKRR:
         self.active_hitbox = None
         self.attack_bounding_box = None
         self.hit_targets = set()
+        self.hit_timestamps = {}  # 각 적을 마지막으로 타격한 시간 기록
 
         # 스킬 시스템
         self.skill_cooldowns = {
@@ -157,17 +158,29 @@ class SKRR:
         self.invincible_start_time = get_time()
 
     # 공격 히트박스 설정
-    def set_attack_hitbox(self, width, height, center_offset_x=0, center_offset_y=0, damage=None):
+    def set_attack_hitbox(self, width, height, center_offset_x=0, center_offset_y=0, damage=None, multi_hit=False, hit_interval=0.0):
         self.active_hitbox = {
             'width': width,
             'height': height,
             'center_offset_x': center_offset_x,
             'center_offset_y': center_offset_y,
-            'damage': damage if damage else self.attack_power
+            'damage': damage if damage else self.attack_power,
+            'multi_hit': multi_hit,
+            'hit_interval': hit_interval
         }
-        self.hit_targets.clear()
+        if not multi_hit:
+            self.hit_targets.clear()
+            self.hit_timestamps.clear()
+        else:
+            self.hit_timestamps.clear()
 
-    # 공격 히트박스 반환
+    def update_skill3_bb(self, center_offset_x, center_offset_y, width=None):
+        if self.active_hitbox:
+            self.active_hitbox['center_offset_x'] = center_offset_x
+            self.active_hitbox['center_offset_y'] = center_offset_y
+            if width is not None:
+                self.active_hitbox['width'] = width
+
     def get_attack_hitbox(self):
 
         if self.active_hitbox is None:
@@ -188,13 +201,33 @@ class SKRR:
         self.active_hitbox = None
         self.attack_bounding_box = None
         self.hit_targets.clear()
+        self.hit_timestamps.clear()
 
     # 중복 타격 방지
     def can_hit_target(self, target):
-        return target not in self.hit_targets
+        if not self.active_hitbox:
+            return False
+
+        is_multi_hit = self.active_hitbox.get('multi_hit', False)
+        hit_interval = self.active_hitbox.get('hit_interval', 0.0)
+
+        if not is_multi_hit:
+            return target not in self.hit_targets
+
+        if hit_interval == 0.0:
+            return True
+
+        if target not in self.hit_timestamps:
+            return True
+
+        current_time = get_time()
+        last_hit_time = self.hit_timestamps[target]
+        return (current_time - last_hit_time) >= hit_interval
 
     def add_hit_target(self, target):
         self.hit_targets.add(target)
+        if self.active_hitbox and self.active_hitbox.get('multi_hit', False):
+            self.hit_timestamps[target] = get_time()
 
     def heal(self, amount):
         self.current_hp = min(self.max_hp, self.current_hp + amount)

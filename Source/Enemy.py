@@ -221,8 +221,8 @@ class Enemy:
             return False
 
         actual_damage = int(damage * (100 / (100 + self.defense)))
-        damage_variation = random.randint(actual_damage - int(actual_damage * 0.2),
-                                          actual_damage + int(actual_damage * 0.2))
+        damage_variation = max(1, random.randint(actual_damage - int(actual_damage * 0.2),
+                                          actual_damage + int(actual_damage * 0.2)))
         self.current_hp -= damage_variation
         print(f'Enemy took {damage_variation} damage, current HP: {self.current_hp}/{self.max_hp}')
 
