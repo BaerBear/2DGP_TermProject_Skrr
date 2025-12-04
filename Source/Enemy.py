@@ -23,15 +23,7 @@ class Enemy:
     ATTACK_ACTION_PER_TIME = 1.0 / ATTACK_TIME_PER_ACTION
     ATTACK_FRAMES_PER_ACTION = 6
 
-    @classmethod
-    def load_common_effects(cls):
-        if cls.dead_effect is None:
-            cls.dead_effect = ResourceManager.get_effect_images('enemy_dead')
-        if cls.hit_effect is None:
-            cls.hit_effect = ResourceManager.get_effect_images('hit_effect')
-
     def __init__(self, x, y):
-        Enemy.load_common_effects()
 
         self.x, self.y = x, y
         self.frame = 0

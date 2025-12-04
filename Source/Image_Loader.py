@@ -58,7 +58,7 @@ class SKRR_Image_Loader:
                 self.images.append(load_image(os.path.join(self.resource_path, r'Skill2', f'BuddhaCyclone_Enhanced_{i}.png')))
         elif state == 'Skill2_Effect':
             for i in range(12):
-                self.images.append(load_image(os.path.join(self.resource_path, r'Skill2', f'StoneMonkey_2_BuddhaCyclone_{i}.png')))
+                self.images.append(load_image(os.path.join(self.resource_path, r'Skill2', f'StoneMonkey_4_BuddhaCyclone_Enhanced_{i}.png')))
         elif state == 'Skill2_Start':
             for i in range(18):
                 self.images.append(load_image(os.path.join(self.resource_path, r'Skill2', f'StoneMonkey_2_BuddhaCyclone_Start_{i}.png')))

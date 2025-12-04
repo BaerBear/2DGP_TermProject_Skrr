@@ -92,6 +92,11 @@ class SoundManager:
             cls.player_sounds[sound_name].play()
 
     @classmethod
+    def stop_player_sound(cls, sound_name):
+        if cls.player_sounds and sound_name in cls.player_sounds:
+            cls.player_sounds[sound_name].stop()
+
+    @classmethod
     def play_enemy_sound(cls, sound_name):
         if cls.enemy_sounds and sound_name in cls.enemy_sounds:
             cls.enemy_sounds[sound_name].play()

@@ -108,11 +108,82 @@ def load_stage(stage_num):
 def finish():
     game_world.clear()
 
+
+def check_attack_collision():
+    """플레이어 공격과 적 충돌 체크"""
+    player = SKRR.get_player()
+    if not player:
+        return
+
+    hitbox = player.get_attack_hitbox()
+    if hitbox is None:
+        return
+
+    # 적 레이어 확인 (StageManager에서 사용하는 레이어)
+    enemy_layer = 3  # 실제 레이어 번호로 변경 필요
+    if enemy_layer not in game_world.world:
+        return
+
+    # 리스트 복사본으로 순회 (순회 중 객체 제거 방지)
+    enemies = list(game_world.world[enemy_layer])
+
+    for enemy in enemies:
+        # 메서드 존재 여부 확인
+        if not all(hasattr(enemy, method) for method in
+                   ['get_bb', 'get_damage', 'can_be_hit']):
+            continue
+
+        if not player.can_hit_target(enemy):
+            continue
+
+        try:
+            enemy_bb = enemy.get_bb()
+        except:
+            continue
+
+        # AABB 충돌 검사
+        if (hitbox['x'] < enemy_bb[2] and
+                hitbox['x'] + hitbox['width'] > enemy_bb[0] and
+                hitbox['y'] < enemy_bb[3] and
+                hitbox['y'] + hitbox['height'] > enemy_bb[1]):
+            enemy.get_damage(hitbox['damage'])
+            player.add_hit_target(enemy)
+
+def check_player_damage():
+    # 적이 공격
+    player = SKRR.get_player()
+    if not player or player.is_invincible:
+        return
+
+    player_bb = player.get_bb()
+
+    # 모든 적의 공격과 충돌 체크
+    if 3 not in game_world.world:
+        return
+    for enemy in game_world.world[3]:
+        if not hasattr(enemy, 'get_attack_hitbox'):
+            continue
+
+        enemy_hitbox = enemy.get_attack_hitbox()
+        if enemy_hitbox is None:
+            continue
+
+        # AABB 충돌 검사
+        if (enemy_hitbox['x'] < player_bb[2] and
+                enemy_hitbox['x'] + enemy_hitbox['width'] > player_bb[0] and
+                enemy_hitbox['y'] < player_bb[3] and
+                enemy_hitbox['y'] + enemy_hitbox['height'] > player_bb[1]):
+            # 플레이어 피격
+            player.get_damage(enemy_hitbox['damage'])
+
+
 def update():
     game_world.update()
     game_world.handle_collision()
     if tile_map:
         tile_map.update()
+    check_attack_collision()
+    check_player_damage()
 
 def draw():
     clear_canvas()
