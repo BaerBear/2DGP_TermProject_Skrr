@@ -221,8 +221,10 @@ class Enemy:
             return False
 
         actual_damage = int(damage * (100 / (100 + self.defense)))
-        self.current_hp -= random.randint(actual_damage - int(actual_damage * 0.1),
-                                          actual_damage + int(actual_damage * 0.1))
+        damage_variation = random.randint(actual_damage - int(actual_damage * 0.2),
+                                          actual_damage + int(actual_damage * 0.2))
+        self.current_hp -= damage_variation
+        print(f'Enemy took {damage_variation} damage, current HP: {self.current_hp}/{self.max_hp}')
 
         if self.current_hp <= 0:
             self.on_death()
@@ -235,9 +237,9 @@ class Enemy:
         game_world.remove_object(self)
         pass
 
-    def get_bb(self):
-        return (self.x - self.width / 2, self.y - self.height / 2,
-                self.x + self.width / 2, self.y + self.height / 2)
+    def handle_collision(self, group, other):
+        if group == 'player_attack:enemy':
+            pass
 
     def draw_collision_box(self):
         """충돌 박스 그리기 (디버그용)"""

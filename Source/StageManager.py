@@ -60,6 +60,10 @@ class StageManager:
                 enemy.set_tile_map(tile_map)
 
             game_world.add_object(enemy, 1)  # Layer 1에 추가
+
+            # 플레이어 공격과 적의 충돌 쌍에 적 추가
+            game_world.add_collision_pair('player_attack:enemy', None, enemy)
+
             enemies.append(enemy)
             print(f"  - Spawned {enemy_class.__name__} at ({x}, {y})")
 

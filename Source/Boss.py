@@ -74,7 +74,7 @@ class GrimReaper(Enemy):
     def __init__(self, x, y):
         super().__init__(x, y)
 
-        self.hp = 2000
+        self.current_hp = 2000
         self.max_hp = 2000
         self.scale = 3
 
@@ -372,14 +372,10 @@ class GrimReaper(Enemy):
         self.frame_time = 0
 
         player = SKRR.get_player()
-        if player:
-            self.skill1_start_x = self.x
-            self.skill1_start_y = self.y
-            self.skill1_target_x = player.x
-            self.skill1_target_y = self.y
-        else:
-            self.skill1_target_x = self.x
-            self.skill1_target_y = self.y
+        self.skill1_start_x = self.x
+        self.skill1_start_y = self.y
+        self.skill1_target_x = self.x + int(500 * self.face_dir)
+        self.skill1_target_y = self.y
 
     def use_skill2(self):
         """스킬2 사용"""
@@ -430,7 +426,7 @@ class GrimReaper(Enemy):
             effect_images = GrimReaper.images.get('skill1_effect', [])
             if effect_images and len(effect_images) > 0:
                 effect_count = len(effect_images)
-                effect_fps = 32
+                effect_fps = 12
                 effect_frame = int(self.skill1_effect_timer * effect_fps) % effect_count
                 effect_img = effect_images[effect_frame]
 

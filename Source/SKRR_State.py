@@ -754,17 +754,15 @@ class Skill2:
 
 
         if self.skrr.frame >= self.total_frames:
-            if self.skrr.is_grounded:
-                if self.skrr.key_pressed['left']:
-                    self.skrr.face_dir = -1
-                    self.skrr.state_machine.handle_event(('ANIMATION_END', 'WALK'))
-                elif self.skrr.key_pressed['right']:
-                    self.skrr.face_dir = 1
-                    self.skrr.state_machine.handle_event(('ANIMATION_END', 'WALK'))
-                else:
-                    self.skrr.state_machine.handle_event(('ANIMATION_END', 'IDLE'))
+            print('skill2 end')
+            if self.skrr.key_pressed['left']:
+                self.skrr.face_dir = -1
+                self.skrr.state_machine.handle_event(('ANIMATION_END', 'WALK'))
+            elif self.skrr.key_pressed['right']:
+                self.skrr.face_dir = 1
+                self.skrr.state_machine.handle_event(('ANIMATION_END', 'WALK'))
             else:
-                self.skrr.state_machine.handle_event(('ANIMATION_END', 'FALL'))
+                self.skrr.state_machine.handle_event(('ANIMATION_END', 'IDLE'))
 
         self.skrr.get_attack_hitbox()
 
@@ -902,7 +900,6 @@ class Skill3:
         if self.is_air_skill:
             self.skrr.x = self.start_x
             self.skrr.velocity_y = 0
-            SoundManager.stop_player_sound('Skill3_air')
         self.is_air_skill = False
         self.traveled_distance = 0
         self.movement_stopped = False
