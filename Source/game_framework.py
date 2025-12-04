@@ -5,6 +5,7 @@ running = None
 stack = None
 width = 1600
 height = 900
+show_collision_boxes = True
 
 def change_mode(mode):
     global stack

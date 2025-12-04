@@ -12,7 +12,6 @@ import os
 
 Skrr = None
 tile_map = None
-show_collision_boxes = True  # 충돌 박스 표시 여부
 current_stage = 0  # 현재 스테이지 (0: Stage0, 1: Stage1, 2: BossStage)
 
 def init():
@@ -163,18 +162,27 @@ def check_attack_collision():
 
 
 def check_player_damage():
-    # 적이 공격
+    """적의 공격과 플레이어 충돌 체크"""
     player = SKRR.get_player()
     if not player or player.is_invincible:
         return
 
     player_bb = player.get_bb()
+    player_left, player_bottom, player_right, player_top = player_bb
 
-    # 모든 적의 공격과 충돌 체크
-    if 3 not in game_world.world:
+    # Layer 1의 모든 적 확인
+    enemy_layer = 1
+    if enemy_layer >= len(game_world.world):
         return
-    for enemy in game_world.world[3]:
+
+    enemies = list(game_world.world[enemy_layer])
+
+    for enemy in enemies:
         if not hasattr(enemy, 'get_attack_hitbox'):
+            continue
+
+        # 적이 타격 가능한지 확인
+        if not enemy.can_hit_target(player):
             continue
 
         enemy_hitbox = enemy.get_attack_hitbox()
@@ -182,12 +190,20 @@ def check_player_damage():
             continue
 
         # AABB 충돌 검사
-        if (enemy_hitbox['x'] < player_bb[2] and
-                enemy_hitbox['x'] + enemy_hitbox['width'] > player_bb[0] and
-                enemy_hitbox['y'] < player_bb[3] and
-                enemy_hitbox['y'] + enemy_hitbox['height'] > player_bb[1]):
+        hitbox_left, hitbox_bottom, hitbox_right, hitbox_top = enemy_hitbox
+
+        if (hitbox_left < player_right and
+                hitbox_right > player_left and
+                hitbox_bottom < player_top and
+                hitbox_top > player_bottom):
             # 플레이어 피격
-            player.get_damage(enemy_hitbox['damage'])
+            damage = enemy.active_hitbox.get('damage', enemy.attack_power)
+            player.get_damage(damage)
+
+            # 적의 타격 기록에 플레이어 추가
+            enemy.add_hit_target(player)
+
+            print(f"플레이어 피격! 데미지: {damage}, 남은 HP: {player.current_hp}/{player.max_hp}")
 
 
 def update():
@@ -205,7 +221,7 @@ def draw():
 
     game_world.render()
 
-    if tile_map and show_collision_boxes:
+    if tile_map and game_framework.show_collision_boxes :
         tile_map.draw_collision_boxes()
 
     update_canvas()
@@ -219,10 +235,8 @@ def handle_events():
             game_framework.quit()
         elif e.type == SDL_KEYDOWN and e.key == SDLK_F1:
             # F1 - 충돌 박스 표시 토글
-            global show_collision_boxes
-            show_collision_boxes = not show_collision_boxes
-            SKRR.show_collision_box = show_collision_boxes
-            print(f"Collision boxes: {'ON' if show_collision_boxes else 'OFF'}")
+            game_framework.show_collision_boxes = not game_framework.show_collision_boxes
+            print(f"Collision boxes: {'ON' if game_framework.show_collision_boxes  else 'OFF'}")
         elif e.type == SDL_KEYDOWN and e.key == SDLK_F2:
             # F2 - Stage0 로드
             load_stage(0)

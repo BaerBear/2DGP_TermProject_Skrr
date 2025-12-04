@@ -4,6 +4,7 @@ from State_Machine import StateMachine
 from SKRR_State import Idle, Wait, Walk, Jump, JumpAttack, Attack, Dash, Fall, Dead, Reborn, Skill1, Skill2, Skill3
 from SKRR_State_Rules import Get_State_Rules
 import random
+import game_framework
 
 stage_start_positions = {
         0: (100, 256),      # Stage0 시작 위치
@@ -22,7 +23,6 @@ def get_player():
 
 class SKRR:
     images = None
-    show_collision_box = True  # 충돌 박스 표시 여부 (클래스 변수)
     default_w = 0
     default_h = 0
 
@@ -331,7 +331,7 @@ class SKRR:
 
     def draw(self):
         self.state_machine.draw()
-        if SKRR.show_collision_box:
+        if game_framework.show_collision_boxes :
             from pico2d import draw_rectangle
             from Camera import Camera
             camera = Camera.get_instance()

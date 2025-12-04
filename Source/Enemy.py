@@ -241,13 +241,19 @@ class Enemy:
 
     def draw_collision_box(self):
         """충돌 박스 그리기 (디버그용)"""
-        if SKRR.SKRR.show_collision_box:
+        if game_framework.show_collision_boxes:
             from pico2d import draw_rectangle
             if game_world.camera:
                 camera_x, camera_y = game_world.camera.get_position()
                 left, bottom, right, top = self.get_bb()
                 draw_rectangle(left - camera_x, bottom - camera_y,
                                right - camera_x, top - camera_y)
+
+                # 공격 히트박스도 그리기
+                hitbox = self.attack_bounding_box
+                if hitbox:
+                    draw_rectangle(hitbox[0] - camera_x, hitbox[1] - camera_y,
+                                   hitbox[2] - camera_x, hitbox[3] - camera_y)
 
     def set_attack_hitbox(self, width, height, center_offset_x=0, center_offset_y=0, damage=None, multi_hit=False, hit_interval=0.0):
         self.active_hitbox = {
@@ -624,7 +630,7 @@ class Knight_Tackle(Enemy):
 
     def draw_collision_box(self):
         """충돌 박스 그리기 (디버그용)"""
-        if SKRR.SKRR.show_collision_box:
+        if game_framework.show_collision_boxes :
             from pico2d import draw_rectangle
             if game_world.camera:
                 camera_x, camera_y = game_world.camera.get_position()
