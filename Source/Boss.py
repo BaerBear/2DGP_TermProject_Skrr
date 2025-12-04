@@ -236,9 +236,25 @@ class GrimReaper(Enemy):
         self.update_frame()
 
         if self.state == 'ATTACK' and self.is_attacking:
+            # 공격 히트박스 설정
+            if self.frame_time < game_framework.frame_time:
+                self.set_attack_hitbox(
+                    width=150,
+                    height=self.height * 0.8,
+                    center_offset_x=75,
+                    center_offset_y=0,
+                    damage=int(self.attack_power * 1.5),
+                    multi_hit=False
+                )
+
+            # 공격 프레임 중에만 히트박스 활성화
+            if 3 <= self.frame < 7:
+                self.get_attack_hitbox()
+
             attack_duration = len(GrimReaper.images.get('attack', [])) * ATTACK_TIME_PER_ACTION
             if self.frame_time >= attack_duration:
                 self.is_attacking = False
+                self.clear_attack_hitbox()
                 self.last_action_time = current_time
 
     def update_frame(self):
@@ -427,10 +443,16 @@ class GrimReaper(Enemy):
 
                 effect_img.draw(cam_x, cam_y, effect_img.w * 2, effect_img.h* 2)
 
-        if SKRR.SKRR.show_collision_box:
+        if game_framework.show_collision_boxes:
             from pico2d import draw_rectangle
             if game_world.camera:
                 camera_x, camera_y = game_world.camera.get_position()
                 left, bottom, right, top = self.get_bb()
                 draw_rectangle(left - camera_x, bottom - camera_y,
                                right - camera_x, top - camera_y)
+
+                # 공격 히트박스도 그리기
+                hitbox = self.attack_bounding_box
+                if hitbox:
+                    draw_rectangle(hitbox[0] - camera_x, hitbox[1] - camera_y,
+                                   hitbox[2] - camera_x, hitbox[3] - camera_y)

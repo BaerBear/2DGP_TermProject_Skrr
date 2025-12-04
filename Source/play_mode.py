@@ -49,8 +49,11 @@ def init():
     # 스테이지별 적 로드
     StageManager.load_stage_enemies(current_stage, Skrr, tile_map)
 
-    # 플레이어 공격과 적의 충돌 쌍 등록
+    # 플레이어 공격 / 적의 충돌
     game_world.add_collision_pair('player_attack:enemy', Skrr, None)
+
+    # 적 공격 / 플레이어 충돌
+    game_world.add_collision_pair('enemy_attack:player', None, Skrr)
 
 
 def load_stage(stage_num):

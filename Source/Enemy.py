@@ -247,7 +247,7 @@ class Enemy:
                 camera_x, camera_y = game_world.camera.get_position()
                 left, bottom, right, top = self.get_bb()
                 draw_rectangle(left - camera_x, bottom - camera_y,
-                               right - camera_x, top - camera_y)
+                             right - camera_x, top - camera_y)
 
                 # 공격 히트박스도 그리기
                 hitbox = self.attack_bounding_box
@@ -351,7 +351,7 @@ class Knight_Sword(Enemy):
         super().update()
 
         if self.state == 'ATTACK':
-            if self.frame_time < game_framework.frame_time:
+            if not self.active_hitbox:
                 self.set_attack_hitbox(
                     width=80,
                     height=self.height * 0.8,
@@ -506,12 +506,14 @@ class Knight_Bow(Enemy):
             self.frame = min(int(aim_progress * self.aim_frames), self.aim_frames - 1)
             self.sign_frame = int(self.frame_time * self.SIGN_ACTION_PER_TIME * self.SIGN_FRAMES_PER_ACTION)
         elif self.state == 'ATTACK':
-            if self.frame_time < game_framework.frame_time:
+            if not self.active_hitbox:
+                sign_img = Knight_Bow.images['attack_sign'][0]
+                w = sign_img.w * self.scale
+                h = sign_img.h  / 4
                 self.set_attack_hitbox(
-                    width=400,
-                    height=20,
-                    center_offset_x=self.width,
-                    center_offset_y=10,
+                    width=w,
+                    height=h,
+                    center_offset_x= w / 2,
                     damage=self.attack_power,
                     multi_hit=False
                 )
@@ -520,8 +522,11 @@ class Knight_Bow(Enemy):
             attack_duration = len(Knight_Bow.images.get('attack', [])) * self.ATTACK_TIME_PER_ACTION
             self.sign_frame = int(self.frame_time * self.SIGN_ACTION_PER_TIME * self.SIGN_FRAMES_PER_ACTION)
 
+            # 공격 지속 시간 동안 히트박스 활성화
             if self.frame_time < 0.2:
                 self.get_attack_hitbox()
+            else:
+                self.attack_bounding_box = None
 
             if self.frame_time >= attack_duration:
                 self.is_attacking = False
@@ -627,16 +632,6 @@ class Knight_Tackle(Enemy):
         adjusted_width = self.width * width_modifier
         return (self.x - adjusted_width / 2, self.y - self.height / 2,
                 self.x + adjusted_width / 2, self.y + self.height / 4)
-
-    def draw_collision_box(self):
-        """충돌 박스 그리기 (디버그용)"""
-        if game_framework.show_collision_boxes :
-            from pico2d import draw_rectangle
-            if game_world.camera:
-                camera_x, camera_y = game_world.camera.get_position()
-                left, bottom, right, top = self.get_bb()
-                draw_rectangle(left - camera_x, bottom - camera_y,
-                             right - camera_x, top - camera_y)
 
     def update(self):
         if not self.is_alive:
@@ -747,12 +742,12 @@ class Knight_Tackle(Enemy):
             self.frame = int(self.frame_time * self.WALK_ACTION_PER_TIME * self.WALK_FRAMES_PER_ACTION)
         elif self.state == 'ATTACK':
             # 일반 공격 히트박스 설정
-            if self.frame_time < game_framework.frame_time:  # 공격 시작 프레임
+            if not self.active_hitbox:  # 공격 시작 프레임
                 self.set_attack_hitbox(
-                    width=90,
+                    width=100,
                     height=self.height * 0.8,
-                    center_offset_x=self.width,
-                    center_offset_y=0,
+                    center_offset_x=self.width * 0.4,
+                    center_offset_y= -20,
                     damage=self.attack_power,
                     multi_hit=False
                 )
@@ -769,16 +764,17 @@ class Knight_Tackle(Enemy):
         elif self.state == 'TACKLE_READY':
             self.frame = 0
         elif self.state == 'TACKLE':
-            if self.tackle_traveled < game_framework.frame_time * self.tackle_speed:
+            # 태클 시작 시 히트박스 설정
+            if not self.active_hitbox:
                 self.set_attack_hitbox(
-                    width=self.width,
-                    height=self.height,
-                    center_offset_x=self.width,
-                    center_offset_y=0,
+                    width=self.width * 1.2,
+                    height=self.height * 0.9,
+                    center_offset_y= -40,
                     damage=int(self.attack_power * 1.5),
                     multi_hit=False
                 )
 
+            # 태클 중에는 계속 히트박스 활성화
             self.get_attack_hitbox()
             self.frame = 1
         elif self.state == 'TACKLE_END':
