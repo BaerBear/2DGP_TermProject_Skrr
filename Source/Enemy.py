@@ -1,6 +1,4 @@
 from pico2d import *
-from pygame.mixer import Sound
-
 from ResourceManager import ResourceManager
 import SKRR
 import random
@@ -422,7 +420,7 @@ class Knight_Sword(Enemy):
             self._handle_attack_frames()
 
     def _handle_attack_frames(self):
-        if not self.active_hitbox and self.frame >= 6:
+        if not self.active_hitbox and self.frame == 10:
             self.set_attack_hitbox(
                 width=80,
                 height=self.height * 0.8,
@@ -431,8 +429,8 @@ class Knight_Sword(Enemy):
                 damage=self.attack_power,
                 multi_hit=False
             )
-        if 6 <= self.frame < 10:
-            self.get_attack_hitbox()
+        elif self.frame == 15:
+            self.clear_attack_hitbox()
 
         attack_duration = len(Knight_Sword.images.get('attack', [])) * self.ATTACK_TIME_PER_ACTION
         if self.frame_time >= attack_duration:
