@@ -104,7 +104,7 @@ class FireField:
         img.draw(cam_x, cam_y, self.width, self.height)
 
         # 디버그용 충돌 박스
-        if SKRR.SKRR.show_collision_box:
+        if game_framework.show_collision_boxes:
             from pico2d import draw_rectangle
             if game_world.camera:
                 camera_x, camera_y = game_world.camera.get_position()

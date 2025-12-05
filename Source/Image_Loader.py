@@ -86,8 +86,8 @@ class Enemy_Image_Loader:
                 for i in range(5):
                     self.images.append(load_image(os.path.join(self.resource_path, f'Attack_{i}.png')))
             elif state == 'Hit':
-                for i in range(1, 3):
-                    self.images.append(load_image(os.path.join(self.resource_path, f'Hit0{i}.png')))
+                for i in range(2):
+                    self.images.append(load_image(os.path.join(self.resource_path, f'Hit_{i}.png')))
             elif state == 'Idle':
                 for i in range(6):
                     self.images.append(load_image(os.path.join(self.resource_path, f'Idle_{i}.png')))
@@ -100,8 +100,8 @@ class Enemy_Image_Loader:
                 for i in range(4):
                     self.images.append(load_image(os.path.join(self.resource_path, f'Attack_{i}.png')))
             elif state == 'Hit':
-                for i in range(1, 3):
-                    self.images.append(load_image(os.path.join(self.resource_path, f'Hit0{i}.png')))
+                for i in range(2):
+                    self.images.append(load_image(os.path.join(self.resource_path, f'Hit_{i}.png')))
             elif state == 'Idle':
                 for i in range(4):
                     self.images.append(load_image(os.path.join(self.resource_path, f'Idle_{i}.png')))

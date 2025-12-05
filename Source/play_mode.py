@@ -151,16 +151,18 @@ def check_attack_collision():
                 hitbox_right > enemy_left and
                 hitbox_bottom < enemy_top and
                 hitbox_top > enemy_bottom):
-            # 충돌 발생! 적에게 데미지 적용
             if hasattr(enemy, 'take_damage'):
                 damage = player.active_hitbox.get('damage', player.attack_power)
                 enemy.take_damage(damage, player.x)
 
-                # 타격 기록 추가 (multi_hit일 때는 타임스탬프도 기록)
                 player.add_hit_target(enemy)
 
                 is_multi_hit = player.active_hitbox.get('multi_hit', False)
                 hit_interval = player.active_hitbox.get('hit_interval', 0.0)
+                if enemy.type == 'Knight_Bow' or enemy.type == 'Knight_Sword' or enemy.type == 'Knight_Tackle':
+                    SoundManager.play_enemy_sound('enemy_hit')
+                else:
+                    pass
                 print(f"플레이어 공격 적중! 데미지: {damage} (다중 히트: {is_multi_hit}, 간격: {hit_interval}초)")
 
 

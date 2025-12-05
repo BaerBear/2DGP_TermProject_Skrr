@@ -1,9 +1,12 @@
 from pico2d import *
+from pygame.mixer import Sound
+
 from ResourceManager import ResourceManager
 import SKRR
 import random
 import game_framework
 import game_world
+from Sound_Loader import SoundManager
 
 ENEMY_WALK_SPEED_PPS = 100.0
 
@@ -19,16 +22,16 @@ class Enemy:
     WALK_ACTION_PER_TIME = 1.0 / WALK_TIME_PER_ACTION
     WALK_FRAMES_PER_ACTION = 6
 
-    ATTACK_TIME_PER_ACTION = 0.15
+    ATTACK_TIME_PER_ACTION = 0.1
     ATTACK_ACTION_PER_TIME = 1.0 / ATTACK_TIME_PER_ACTION
     ATTACK_FRAMES_PER_ACTION = 6
 
-    HIT_TIME_PER_ACTION = 0.1
+    HIT_TIME_PER_ACTION = 0.15
     HIT_ACTION_PER_TIME = 1.0 / HIT_TIME_PER_ACTION
-    HIT_FRAMES_PER_ACTION = 3
+    HIT_FRAMES_PER_ACTION = 2
 
     def __init__(self, x, y):
-
+        self.type = None
         self.x, self.y = x, y
         self.frame = 0
         self.frame_time = 0
@@ -218,6 +221,8 @@ class Enemy:
             elif self.dis_to_player <= detect_range and player.y >= self.y - 200 and player.y <= self.y + 200:
                 if self.dis_to_player <= attack_range:
                     if current_time - self.attack_last_use_time >= self.attack_cooldown_time:
+                        if self.type == 'Knight_Sword':
+                            SoundManager.play_enemy_sound('sword_attack')
                         self.state = 'ATTACK'
                         self.is_attacking = True
                         self.attack_last_use_time = current_time
@@ -282,6 +287,12 @@ class Enemy:
 
     def on_death(self):
         self.is_alive = False
+        if self.type == 'Knight_Sword' or self.type == 'Knight_Bow':
+            SoundManager.play_enemy_sound('enemy_dead')
+        elif self.type == 'Knight_Tackle':
+            SoundManager.play_enemy_sound('enemy_big_dead')
+        else:
+            pass
         game_world.remove_object(self)
         pass
 
@@ -379,6 +390,7 @@ class Knight_Sword(Enemy):
 
     def __init__(self, x, y):
         super().__init__(x, y)
+        self.type = 'Knight_Sword'
         self.velocity = ENEMY_WALK_SPEED_PPS
         self.attack_cooldown_time = 1.5
 
@@ -403,41 +415,29 @@ class Knight_Sword(Enemy):
         player = SKRR.get_player()
         if player and not player.is_alive():
             if self.is_attacking and self.state == 'ATTACK':
-                if not self.active_hitbox and self.frame >= 6:
-                    self.set_attack_hitbox(
-                        width=80,
-                        height=self.height * 0.8,
-                        center_offset_x=40,
-                        center_offset_y=0,
-                        damage=self.attack_power,
-                        multi_hit=False
-                    )
-                if 6 <= self.frame < 10:
-                    self.get_attack_hitbox()
-
-                attack_duration = len(Knight_Sword.images.get('attack', [])) * self.ATTACK_TIME_PER_ACTION
-                if self.frame_time >= attack_duration:
-                    self.is_attacking = False
-                    self.clear_attack_hitbox()
+                self._handle_attack_frames()
             return
 
         if self.state == 'ATTACK':
-            if not self.active_hitbox and self.frame >= 6:
-                self.set_attack_hitbox(
-                    width=80,
-                    height=self.height * 0.8,
-                    center_offset_x=40,
-                    center_offset_y=0,
-                    damage=self.attack_power,
-                    multi_hit=False
-                )
-            if 6 <= self.frame < 10:
-                self.get_attack_hitbox()
+            self._handle_attack_frames()
 
-            attack_duration = len(Knight_Sword.images.get('attack', [])) * self.ATTACK_TIME_PER_ACTION
-            if self.frame_time >= attack_duration:
-                self.is_attacking = False
-                self.clear_attack_hitbox()
+    def _handle_attack_frames(self):
+        if not self.active_hitbox and self.frame >= 6:
+            self.set_attack_hitbox(
+                width=80,
+                height=self.height * 0.8,
+                center_offset_x=40,
+                center_offset_y=0,
+                damage=self.attack_power,
+                multi_hit=False
+            )
+        if 6 <= self.frame < 10:
+            self.get_attack_hitbox()
+
+        attack_duration = len(Knight_Sword.images.get('attack', [])) * self.ATTACK_TIME_PER_ACTION
+        if self.frame_time >= attack_duration:
+            self.is_attacking = False
+            self.clear_attack_hitbox()
 
     def draw(self):
         if not self.is_alive:
@@ -445,6 +445,14 @@ class Knight_Sword(Enemy):
                 img = Knight_Sword.images['dead'][int(self.frame_time * self.ATTACK_ACTION_PER_TIME) % len(Knight_Sword.images['dead'])]
             else:
                 return
+        elif self.state == 'HIT':
+            if 'hit' in Knight_Sword.images and Knight_Sword.images['hit']:
+                img = Knight_Sword.images['hit'][int(self.frame_time * self.HIT_ACTION_PER_TIME) % len(Knight_Sword.images['hit'])]
+            else:
+                if 'idle' in Knight_Sword.images and Knight_Sword.images['idle']:
+                    img = Knight_Sword.images['idle'][0]
+                else:
+                    return
         elif self.state == 'ATTACK':
             if 'attack' in Knight_Sword.images and Knight_Sword.images['attack']:
                 img = Knight_Sword.images['attack'][int(self.frame_time * self.ATTACK_ACTION_PER_TIME) % len(Knight_Sword.images['attack'])]
@@ -483,6 +491,7 @@ class Knight_Bow(Enemy):
 
     def __init__(self, x, y):
         super().__init__(x, y)
+        self.type = 'Knight_Bow'
         self.max_hp = 80
         self.current_hp = self.max_hp
         self.velocity = ENEMY_WALK_SPEED_PPS * 0.8
@@ -532,6 +541,7 @@ class Knight_Bow(Enemy):
         self.attack_last_use_time = get_time()
         self.clear_attack_hitbox()
         self.is_attacking = False
+        self.state = 'HIT'
 
         # 조준 취소
         if self.is_aiming:
@@ -549,73 +559,31 @@ class Knight_Bow(Enemy):
         self.apply_gravity()
         self.check_tile_collision()
 
+        # hit 상태 처리
+        if self.is_hit:
+            self.hit_timer += game_framework.frame_time
+            if self.hit_timer >= self.hit_duration:
+                self.is_hit = False
+                self.hit_timer = 0
+                self.state = 'IDLE'
+            else:
+                self.state = 'HIT'
+                if self.state != self.prev_state:
+                    self.frame_time = 0
+                    self.prev_state = self.state
+                self.frame_time += game_framework.frame_time
+                self.frame = int(self.frame_time * self.HIT_ACTION_PER_TIME * self.HIT_FRAMES_PER_ACTION)
+                self.check_tile_collision()
+                return
+
         player = SKRR.get_player()
         if player:
-            # 플레이어가 죽었을 때는 새로운 공격을 시작하지 않음
             if not player.is_alive():
-                # 조준 중이거나 공격 중이면 완료될 때까지 계속 진행
                 if self.is_aiming or self.is_attacking:
-                    # 조준 중일 때
-                    if self.is_aiming:
-                        self.state = 'AIM'
-                        self.aim_timer += game_framework.frame_time
-                        if self.aim_timer >= self.aim_duration:
-                            self.state = 'ATTACK'
-                            self.is_aiming = False
-                            self.is_attacking = True
-                            self.aim_timer = 0
-                            self.attack_last_use_time = get_time()
-
-                    # 공격 중일 때
-                    if self.is_attacking and self.state == 'ATTACK':
-                        if not self.active_hitbox:
-                            sign_img = Knight_Bow.images['attack_sign'][0]
-                            w = sign_img.w * self.scale
-                            h = sign_img.h / 4
-                            self.set_attack_hitbox(
-                                width=w,
-                                height=h,
-                                center_offset_x=w / 2,
-                                damage=self.attack_power,
-                                multi_hit=False
-                            )
-
-                        self.frame = 3
-                        attack_duration = len(Knight_Bow.images.get('attack', [])) * self.ATTACK_TIME_PER_ACTION
-                        self.sign_frame = int(self.frame_time * self.SIGN_ACTION_PER_TIME * self.SIGN_FRAMES_PER_ACTION) % len(Knight_Bow.images['attack_sign'])
-
-                        if self.frame_time < 0.2:
-                            self.get_attack_hitbox()
-                        else:
-                            self.attack_bounding_box = None
-
-                        if self.frame_time >= attack_duration:
-                            self.is_attacking = False
-                            self.clear_attack_hitbox()
-
-                    if self.state != self.prev_state:
-                        self.frame_time = 0
-                        self.prev_state = self.state
-
-                    self.frame_time += game_framework.frame_time
-
-                    if self.state == 'AIM':
-                        aim_progress = self.aim_timer / self.aim_duration
-                        self.frame = min(int(aim_progress * self.aim_frames), self.aim_frames - 1)
-                        self.sign_frame = int(self.frame_time * self.SIGN_ACTION_PER_TIME * self.SIGN_FRAMES_PER_ACTION) % len(Knight_Bow.images['attack_sign'])
-
+                    self._handle_bow_attack()
                     return
                 else:
-                    # 공격 중이 아니면 IDLE 상태 유지
-                    self.state = 'IDLE'
-                    self.clear_attack_hitbox()
-
-                    if self.state != self.prev_state:
-                        self.frame_time = 0
-                        self.prev_state = self.state
-
-                    self.frame_time += game_framework.frame_time
-                    self.frame = int(self.frame_time * self.IDLE_ACTION_PER_TIME * self.IDLE_FRAMES_PER_ACTION)
+                    self._handle_idle()
                     return
 
             self.dis_to_player = abs(self.x - player.x)
@@ -633,30 +601,89 @@ class Knight_Bow(Enemy):
             current_time = get_time()
 
             if self.is_aiming:
-                self.state = 'AIM'
-                self.aim_timer += game_framework.frame_time
-                if self.aim_timer >= self.aim_duration:
-                    self.state = 'ATTACK'
-                    self.is_aiming = False
-                    self.is_attacking = True
-                    self.aim_timer = 0
-                    self.attack_last_use_time = current_time
+                self._handle_aiming(current_time)
             elif current_time - self.attack_last_use_time >= self.attack_cooldown_time and not self.is_attacking:
                 if self.dis_to_player <= detect_range and player.y >= self.y - 200 and player.y <= self.y + 200:
+                    SoundManager.play_enemy_sound('arrow_ready')
                     self.is_aiming = True
                     self.aim_timer = 0
                     self.state = 'AIM'
                     self.sign_frame = 0
             elif not self.is_attacking and not self.is_aiming:
-                if self.dis_to_player < attack_range_min:
-                    self.state = 'WALK'
-                    self.x -= self.velocity * self.face_dir * game_framework.frame_time
-                elif self.dis_to_player > attack_range_max and self.dis_to_player <= detect_range:
-                    self.state = 'WALK'
-                    self.x += self.velocity * self.face_dir * game_framework.frame_time
-                else:
-                    self.state = 'IDLE'
+                self._handle_movement(attack_range_min, attack_range_max, detect_range)
 
+        self._update_frame_time()
+
+    def _handle_bow_attack(self):
+        if self.is_aiming:
+            self.state = 'AIM'
+            self.aim_timer += game_framework.frame_time
+            if self.aim_timer >= self.aim_duration:
+                self.state = 'ATTACK'
+                self.is_aiming = False
+                self.is_attacking = True
+                self.aim_timer = 0
+                self.attack_last_use_time = get_time()
+
+        if self.is_attacking and self.state == 'ATTACK':
+            if not self.active_hitbox:
+                sign_img = Knight_Bow.images['attack_sign'][0]
+                w = sign_img.w * self.scale
+                h = sign_img.h / 4
+                self.set_attack_hitbox(
+                    width=w,
+                    height=h,
+                    center_offset_x=w / 2,
+                    damage=self.attack_power,
+                    multi_hit=False
+                )
+                SoundManager.play_enemy_sound('arrow_fire')
+
+            self.frame = 3
+            attack_duration = len(Knight_Bow.images.get('attack', [])) * self.ATTACK_TIME_PER_ACTION
+            self.sign_frame = int(self.frame_time * self.SIGN_ACTION_PER_TIME * self.SIGN_FRAMES_PER_ACTION) % len(Knight_Bow.images['attack_sign'])
+
+            if self.frame_time < 0.2:
+                self.get_attack_hitbox()
+            else:
+                self.attack_bounding_box = None
+
+            if self.frame_time >= attack_duration:
+                self.is_attacking = False
+                self.clear_attack_hitbox()
+
+    def _handle_idle(self):
+        self.state = 'IDLE'
+        self.clear_attack_hitbox()
+
+        if self.state != self.prev_state:
+            self.frame_time = 0
+            self.prev_state = self.state
+
+        self.frame_time += game_framework.frame_time
+        self.frame = int(self.frame_time * self.IDLE_ACTION_PER_TIME * self.IDLE_FRAMES_PER_ACTION)
+
+    def _handle_aiming(self, current_time):
+        self.state = 'AIM'
+        self.aim_timer += game_framework.frame_time
+        if self.aim_timer >= self.aim_duration:
+            self.state = 'ATTACK'
+            self.is_aiming = False
+            self.is_attacking = True
+            self.aim_timer = 0
+            self.attack_last_use_time = current_time
+
+    def _handle_movement(self, attack_range_min, attack_range_max, detect_range):
+        if self.dis_to_player < attack_range_min:
+            self.state = 'WALK'
+            self.x -= self.velocity * self.face_dir * game_framework.frame_time
+        elif self.dis_to_player > attack_range_max and self.dis_to_player <= detect_range:
+            self.state = 'WALK'
+            self.x += self.velocity * self.face_dir * game_framework.frame_time
+        else:
+            self.state = 'IDLE'
+
+    def _update_frame_time(self):
         if self.state != self.prev_state:
             self.frame_time = 0
             self.prev_state = self.state
@@ -675,20 +702,20 @@ class Knight_Bow(Enemy):
             if not self.active_hitbox:
                 sign_img = Knight_Bow.images['attack_sign'][0]
                 w = sign_img.w * self.scale
-                h = sign_img.h  / 4
+                h = sign_img.h / 4
                 self.set_attack_hitbox(
                     width=w,
                     height=h,
-                    center_offset_x= w / 2,
+                    center_offset_x=w / 2,
                     damage=self.attack_power,
                     multi_hit=False
                 )
+                SoundManager.play_enemy_sound('arrow_fire')
 
             self.frame = 3
             attack_duration = len(Knight_Bow.images.get('attack', [])) * self.ATTACK_TIME_PER_ACTION
             self.sign_frame = int(self.frame_time * self.SIGN_ACTION_PER_TIME * self.SIGN_FRAMES_PER_ACTION)
 
-            # 공격 지속 시간 동안 히트박스 활성화
             if self.frame_time < 0.2:
                 self.get_attack_hitbox()
             else:
@@ -704,6 +731,14 @@ class Knight_Bow(Enemy):
                 img = Knight_Bow.images['dead'][int(self.frame_time * self.ATTACK_ACTION_PER_TIME) % len(Knight_Bow.images['dead'])]
             else:
                 return
+        elif self.state == 'HIT':
+            if 'hit' in Knight_Bow.images and Knight_Bow.images['hit']:
+                img = Knight_Bow.images['hit'][int(self.frame_time * self.HIT_ACTION_PER_TIME) % len(Knight_Bow.images['hit'])]
+            else:
+                if 'idle' in Knight_Bow.images and Knight_Bow.images['idle']:
+                    img = Knight_Bow.images['idle'][0]
+                else:
+                    return
         elif self.state == 'AIM':
             if 'attack' in Knight_Bow.images and Knight_Bow.images['attack']:
                 if self.frame < len(Knight_Bow.images['attack']):
@@ -761,6 +796,7 @@ class Knight_Tackle(Enemy):
 
     def __init__(self, x, y):
         super().__init__(x, y)
+        self.type = 'Knight_Tackle'
         self.max_hp = 150
         self.current_hp = self.max_hp
         self.velocity = ENEMY_WALK_SPEED_PPS * 1.2
