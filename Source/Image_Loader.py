@@ -119,9 +119,13 @@ class Enemy_Image_Loader:
             elif state == 'Tackle':
                 for i in range(3):
                     self.images.append(load_image(os.path.join(self.resource_path, f'Tackle_{i}.png')))
+            elif state == 'Tackle_Effect':
+                for i in range(9):
+                    self.images.append(load_image(os.path.join(self.resource_path, f'Dash_Tackle_{i}.png')))
             elif state == 'Idle':
                 for i in range(5):
                     self.images.append(load_image(os.path.join(self.resource_path, f'Idle_{i}.png')))
+
 
 
 class Boss_Image_Loader:

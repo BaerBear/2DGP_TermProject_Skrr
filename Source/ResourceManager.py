@@ -104,6 +104,7 @@ class ResourceManager:
                 'walk': Enemy_Image_Loader('Knight_Tackle', 'Walk').images,
                 'attack': Enemy_Image_Loader('Knight_Tackle', 'Attack').images,
                 'tackle': Enemy_Image_Loader('Knight_Tackle', 'Tackle').images,
+                'tackle_effect': Enemy_Image_Loader('Knight_Tackle', 'Tackle_Effect').images,
                 'idle': Enemy_Image_Loader('Knight_Tackle', 'Idle').images,
             }
 

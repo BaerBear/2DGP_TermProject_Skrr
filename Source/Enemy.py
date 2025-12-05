@@ -192,7 +192,7 @@ class Enemy:
             if self.is_attacking:
                 self.state = 'ATTACK'
             # 감지 범위 내에서만 새로운 행동 시작
-            elif self.dis_to_player <= detect_range:
+            elif self.dis_to_player <= detect_range and player.y >= self.y - 200 and player.y <= self.y + 200:
                 if self.dis_to_player <= attack_range:
                     if current_time - self.attack_last_use_time >= self.attack_cooldown_time:
                         self.state = 'ATTACK'
@@ -582,7 +582,7 @@ class Knight_Bow(Enemy):
                     self.aim_timer = 0
                     self.attack_last_use_time = current_time
             elif current_time - self.attack_last_use_time >= self.attack_cooldown_time and not self.is_attacking:
-                if self.dis_to_player <= detect_range:
+                if self.dis_to_player <= detect_range and player.y >= self.y - 200 and player.y <= self.y + 200:
                     self.is_aiming = True
                     self.aim_timer = 0
                     self.state = 'AIM'
@@ -898,7 +898,7 @@ class Knight_Tackle(Enemy):
                 self.state = 'ATTACK'
 
             # 감지 범위 내에서만 새로운 행동 시작
-            elif self.dis_to_player <= detect_range:
+            elif self.dis_to_player <= detect_range and player.y >= self.y - 150 and player.y <= self.y + 150:
                 # 새로운 태클 시작
                 if current_time - self.tackle_last_use_time >= self.tackle_cooldown_time:
                     self.is_tackle_ready = True
@@ -1023,5 +1023,12 @@ class Knight_Tackle(Enemy):
             img.clip_draw(0, 0, img.w, img.h, cam_x, cam_y, img.w * self.scale, img.h * self.scale)
         else:
             img.clip_composite_draw(0, 0, img.w, img.h, 0, 'h', cam_x, cam_y, img.w * self.scale, img.h * self.scale)
+
+        if self.is_tackling:
+            effect_img = Knight_Tackle.images['tackle_effect'][int(self.frame_time * self.ATTACK_ACTION_PER_TIME) % len(Knight_Tackle.images['tackle_effect'])]
+            if self.face_dir == 1:
+                effect_img.clip_draw(0, 0, effect_img.w, effect_img.h, cam_x + self.width / 2, cam_y, effect_img.w * self.scale, effect_img.h * 4)
+            else:
+                effect_img.clip_composite_draw(0, 0, effect_img.w, effect_img.h, 0, 'h', cam_x - self.width / 2, cam_y - 30, effect_img.w * self.scale, effect_img.h * 4)
 
         self.draw_collision_box()
