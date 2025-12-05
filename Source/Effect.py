@@ -36,9 +36,7 @@ class HitEffect:
             if frame_index < len(self.images):
                 image = self.images[frame_index]
                 image.opacify(self.alpha)
-                image.composite_draw(0, '', self.x, self.y,
-                                     int(image.w * self.scale),
-                                     int(image.h * self.scale))
+                image.composite_draw(0, '', self.x, self.y, int(image.w * self.scale), int(image.h * self.scale))
 
     def is_done(self):
         return self.done

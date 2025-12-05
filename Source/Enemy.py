@@ -23,6 +23,10 @@ class Enemy:
     ATTACK_ACTION_PER_TIME = 1.0 / ATTACK_TIME_PER_ACTION
     ATTACK_FRAMES_PER_ACTION = 6
 
+    HIT_TIME_PER_ACTION = 0.1
+    HIT_ACTION_PER_TIME = 1.0 / HIT_TIME_PER_ACTION
+    HIT_FRAMES_PER_ACTION = 3
+
     def __init__(self, x, y):
 
         self.x, self.y = x, y
@@ -49,8 +53,10 @@ class Enemy:
 
         self.is_attacking = False
         self.is_hit = False
-        self.attack_cooldown_time = 1.5
-        self.attack_last_use_time = 0
+        self.hit_duration = 0.3  # hit 상태 지속 시간
+        self.hit_timer = 0
+        self.attack_cooldown_time = 2
+        self.attack_last_use_time = get_time()
         self.state = 'IDLE'
         self.prev_state = 'IDLE'
 
@@ -153,6 +159,23 @@ class Enemy:
 
         self.apply_gravity()
 
+        # hit 상태 처리
+        if self.is_hit:
+            self.hit_timer += game_framework.frame_time
+            if self.hit_timer >= self.hit_duration:
+                self.is_hit = False
+                self.hit_timer = 0
+                self.state = 'IDLE'
+            else:
+                self.state = 'HIT'
+                if self.state != self.prev_state:
+                    self.frame_time = 0
+                    self.prev_state = self.state
+                self.frame_time += game_framework.frame_time
+                self.frame = int(self.frame_time * self.HIT_ACTION_PER_TIME * self.HIT_FRAMES_PER_ACTION)
+                self.check_tile_collision()
+                return
+
         player = SKRR.get_player()
         if player:
             # 플레이어가 죽었으면 새로운 공격을 시작하지 않음
@@ -246,6 +269,14 @@ class Enemy:
         if self.current_hp <= 0:
             self.on_death()
             return True
+
+        # 피격 시 hit 상태로 전환하고 쿨다운 타이머 리셋
+        self.is_hit = True
+        self.hit_timer = 0
+        self.attack_last_use_time = get_time() # 공격 쿨다운 타이머 리셋
+        self.state = 'HIT'
+        self.clear_attack_hitbox()
+        self.is_attacking = False
 
         return True
 
@@ -482,6 +513,35 @@ class Knight_Bow(Enemy):
         return (self.x - self.width / 2, self.y - self.height / 2,
                 self.x + self.width / 2, self.y + self.height / 3)
 
+    def take_damage(self, damage, attacker_x):
+        if self.current_hp <= 0:
+            return False
+
+        actual_damage = int(damage * (100 / (100 + self.defense)))
+        damage_variation = max(1, random.randint(actual_damage - int(actual_damage * 0.2),
+                                          actual_damage + int(actual_damage * 0.2)))
+        self.current_hp -= damage_variation
+        print(f'Knight_Bow took {damage_variation} damage, current HP: {self.current_hp}/{self.max_hp}')
+
+        if self.current_hp <= 0:
+            self.on_death()
+            return True
+
+        self.is_hit = True
+        self.hit_timer = 0
+        self.attack_last_use_time = get_time()
+        self.clear_attack_hitbox()
+        self.is_attacking = False
+
+        # 조준 취소
+        if self.is_aiming:
+            self.is_aiming = False
+            self.aim_timer = get_time()
+            self.sign_frame = 0
+            self.state = 'HIT'
+
+        return True
+
     def update(self):
         if not self.is_alive:
             return
@@ -522,7 +582,7 @@ class Knight_Bow(Enemy):
 
                         self.frame = 3
                         attack_duration = len(Knight_Bow.images.get('attack', [])) * self.ATTACK_TIME_PER_ACTION
-                        self.sign_frame = int(self.frame_time * self.SIGN_ACTION_PER_TIME * self.SIGN_FRAMES_PER_ACTION)
+                        self.sign_frame = int(self.frame_time * self.SIGN_ACTION_PER_TIME * self.SIGN_FRAMES_PER_ACTION) % len(Knight_Bow.images['attack_sign'])
 
                         if self.frame_time < 0.2:
                             self.get_attack_hitbox()
@@ -542,7 +602,7 @@ class Knight_Bow(Enemy):
                     if self.state == 'AIM':
                         aim_progress = self.aim_timer / self.aim_duration
                         self.frame = min(int(aim_progress * self.aim_frames), self.aim_frames - 1)
-                        self.sign_frame = int(self.frame_time * self.SIGN_ACTION_PER_TIME * self.SIGN_FRAMES_PER_ACTION)
+                        self.sign_frame = int(self.frame_time * self.SIGN_ACTION_PER_TIME * self.SIGN_FRAMES_PER_ACTION) % len(Knight_Bow.images['attack_sign'])
 
                     return
                 else:
@@ -610,7 +670,7 @@ class Knight_Bow(Enemy):
         elif self.state == 'AIM':
             aim_progress = self.aim_timer / self.aim_duration
             self.frame = min(int(aim_progress * self.aim_frames), self.aim_frames - 1)
-            self.sign_frame = int(self.frame_time * self.SIGN_ACTION_PER_TIME * self.SIGN_FRAMES_PER_ACTION)
+            self.sign_frame = int(self.frame_time * self.SIGN_ACTION_PER_TIME * self.SIGN_FRAMES_PER_ACTION) % len(Knight_Bow.images['attack_sign'])
         elif self.state == 'ATTACK':
             if not self.active_hitbox:
                 sign_img = Knight_Bow.images['attack_sign'][0]
@@ -738,6 +798,29 @@ class Knight_Tackle(Enemy):
         adjusted_width = self.width * width_modifier
         return (self.x - adjusted_width / 2, self.y - self.height / 2,
                 self.x + adjusted_width / 2, self.y + self.height / 4)
+
+    def take_damage(self, damage, attacker_x):
+        if self.current_hp <= 0:
+            return False
+
+        actual_damage = int(damage * (100 / (100 + self.defense)))
+        damage_variation = max(1, random.randint(actual_damage - int(actual_damage * 0.2),
+                                          actual_damage + int(actual_damage * 0.2)))
+        self.current_hp -= damage_variation
+        print(f'Knight_Tackle took {damage_variation} damage, current HP: {self.current_hp}/{self.max_hp}')
+
+        if self.current_hp <= 0:
+            self.on_death()
+            return True
+
+        if self.is_tackling:
+            return True
+
+        self.is_hit = True
+        self.hit_timer = 0
+        self.clear_attack_hitbox()
+
+        return True
 
     def update(self):
         if not self.is_alive:
