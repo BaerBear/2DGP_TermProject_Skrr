@@ -126,29 +126,9 @@ class ResourceManager:
 
     @classmethod
     def _load_effect_images(cls):
-        if 'enemy_dead' not in cls._effect_images:
-            try:
-                effect_path = os.path.join(os.path.dirname(__file__), r'..\Resources\Image\Effect\Enemy_Dead')
-                cls._effect_images['enemy_dead'] = []
-                for i in range(6):
-                    img_path = os.path.join(effect_path, f'Enemy_Dead_{i}.png')
-                    if os.path.exists(img_path):
-                        cls._effect_images['enemy_dead'].append(load_image(img_path))
-            except:
-                print("적 죽음 이펙트 로드 실패")
-                cls._effect_images['enemy_dead'] = []
-
-        if 'hit_effect' not in cls._effect_images:
-            try:
-                effect_path = os.path.join(os.path.dirname(__file__), r'..\Resources\Image\Effect\Hit_Normal')
-                cls._effect_images['hit_effect'] = []
-                for i in range(12):
-                    img_path = os.path.join(effect_path, f'Hit_Normal_{i}.png')
-                    if os.path.exists(img_path):
-                        cls._effect_images['hit_effect'].append(load_image(img_path))
-            except:
-                print("타격 이펙트 로드 실패")
-                cls._effect_images['hit_effect'] = []
+        cls._effect_images = {
+            'enemy_dead': Enemy_Image_Loader('Enemy_Dead').images,
+        }
 
     @classmethod
     def get_player_images(cls):

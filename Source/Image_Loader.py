@@ -162,3 +162,35 @@ class Boss_Image_Loader:
                 for i in range(80):
                     self.images.append(load_image(os.path.join(self.resource_path, r'Skill2', f'GrimReaper_TheStake_Land_{i}.png')))
 
+class Effect_Image_Loader:
+    def __init__(self, effect_type):
+        self.images = []
+        self.resource_path = os.path.join(os.path.dirname(__file__), r'..\Resources\Image\Effect', effect_type)
+
+        if effect_type == 'Enemy_Dead':
+            for i in range(6):
+                self.images.append(load_image(os.path.join(self.resource_path, f'Enemy_Dead_{i}.png')))
+        elif effect_type == 'Enemy_Appearance':
+            for i in range(11):
+                self.images.append(load_image(os.path.join(self.resource_path, f'Enemy_Appearance_{i}.png')))
+        elif effect_type == 'Hit_Normal':
+            for i in range(12):
+                self.images.append(load_image(os.path.join(self.resource_path, f'Hit_Normal_{i}.png')))
+        elif effect_type == 'Hit_Critical':
+            for i in range(8):
+                self.images.append(load_image(os.path.join(self.resource_path, f'Hit_Critical_{i}.png')))
+        elif effect_type == 'Hit_GrimReaper':
+            for i in range(15):
+                self.images.append(load_image(os.path.join(self.resource_path, f'Hit_GrimReaper_{i}.png')))
+        elif effect_type == 'Hit_Skill3':
+            for i in range(14):
+                self.images.append(load_image(os.path.join(self.resource_path, f'Hit_Ninja_{i}.png')))
+        elif effect_type == 'Reward_Spawn':
+            for i in range(40):
+                self.images.append(load_image(os.path.join(self.resource_path, f'MapReward_Spawn_{i}.png')))
+        elif effect_type == 'Skul_Hit':
+            for i in range(10):
+                self.images.append(load_image(os.path.join(self.resource_path, f'Skul_Hit_{i}.png')))
+        elif effect_type == 'Activate':
+            for i in range(80):
+                self.images.append(load_image(os.path.join(self.resource_path, f'Actiavted_Loop_{i}.png')))
