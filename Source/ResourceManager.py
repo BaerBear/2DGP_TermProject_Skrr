@@ -47,6 +47,9 @@ class ResourceManager:
 
         cls._load_object_images()
 
+        # UI 이미지 로드
+        cls._load_ui_images()
+
         cls._initialized = True
         print("리소스 로딩 완료")
 

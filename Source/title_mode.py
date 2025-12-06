@@ -1,7 +1,6 @@
 from pico2d import *
-from Sound_Loader import SoundManager
+import common
 import game_framework
-import play_mode
 
 image = None
 mx, my = 0, 0
@@ -9,10 +8,11 @@ mx, my = 0, 0
 def init():
     global image
     image = []
-    image.append(load_image('../Resources/Image/Title_Art.png'))
-    image.append(load_image('../Resources/Image/Title_Logo.png'))
+    image.append(load_image('../Resources/Image/UI/Title_Art.png'))
     image.append(load_image('../Resources/Image/UI/Mouse_Cursor.png'))
-    SoundManager.play_bgm('main_title', repeat=True)
+
+    sound_manager = common.get_sound_manager()
+    sound_manager.play_bgm('main_title', repeat=True)
 
 def update():
     pass
@@ -21,8 +21,7 @@ def draw():
     clear_canvas()
     hide_cursor()
     image[0].draw(game_framework.width // 2, game_framework.height // 2)
-    image[1].draw(game_framework.width // 2, game_framework.height // 2)
-    image[2].draw(mx + cursor_image[0].w / 2, my - cursor_image[0].h / 2)
+    image[1].draw(mx, my)
     update_canvas()
 
 def finish():

@@ -13,15 +13,13 @@ tile_map = None
 current_stage = 0  # 현재 스테이지 (0: Stage0, 1: Stage1, 2: BossStage)
 stage_gate = None
 mx, my = 0, 0
-cursor_image = []
 
 def init():
     global Skrr, tile_map, current_stage, stage_gate
-    hide_lattice()
+    if not hide_lattice():
+        hide_lattice()
     if not hide_cursor():
         hide_cursor()
-    global cursor_image
-    cursor_image.append(load_image('../Resources/Image/UI/Mouse_Cursor.png'))
 
     sound_manager = common.get_sound_manager()
     sound_manager.stop_bgm()
@@ -264,10 +262,11 @@ def draw():
     if tile_map and game_framework.show_collision_boxes :
         tile_map.draw_collision_boxes()
 
-    # 커서
-    if cursor_image:
-        cursor_image[0].draw(mx + cursor_image[0].w / 2,
-                             my - cursor_image[0].h / 2)
+    # 커서 (UI 인스턴스 가져오기)
+    ui = common.get_ui()
+    if ui:
+        ui.draw_player_info(84, 33)
+        ui.draw_cursor(mx, my)
 
     update_canvas()
 

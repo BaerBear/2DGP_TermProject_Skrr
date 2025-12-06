@@ -6,17 +6,19 @@
 from ResourceManager import ResourceManager
 from Sound_Loader import SoundManager
 from Camera import Camera
+from UI import UI
 
 # 싱글톤 인스턴스들
 _initialized = False
 _resource_manager = None
 _sound_manager = None
 _camera = None
+_UI = None
 
 
 def initialize():
     """모든 싱글톤 매니저를 초기화 (게임 시작 시 한 번만 호출)"""
-    global _initialized, _resource_manager, _sound_manager, _camera
+    global _initialized, _resource_manager, _sound_manager, _camera, _UI
 
     if _initialized:
         print("Common 모듈은 이미 초기화되었습니다.")
@@ -36,6 +38,9 @@ def initialize():
     # Camera 초기화
     print("카메라 초기화...")
     _camera = Camera.get_instance()
+
+    print("UI 초기화...")
+    _UI = UI()
 
     _initialized = True
     print("=== Common 모듈 초기화 완료 ===\n")
@@ -62,6 +67,13 @@ def get_camera():
     return _camera
 
 
+def get_ui():
+    """UI 인스턴스 반환"""
+    if not _initialized:
+        initialize()
+    return _UI
+
+
 def is_initialized():
     """초기화 여부 반환"""
     return _initialized
@@ -86,4 +98,3 @@ def cleanup():
     _initialized = False
 
     print("=== Common 모듈 정리 완료 ===")
-

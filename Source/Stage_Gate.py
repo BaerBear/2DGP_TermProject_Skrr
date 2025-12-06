@@ -57,10 +57,7 @@ class Gate:
 
     def update(self):
         if self.activated:
-            if Gate.o_image and len(Gate.o_image) > 0:
-                self.frame = (self.frame + int(game_framework.frame_time * FRAMES_PER_ACTION * ACTION_PER_TIME)) % len(Gate.o_image)
-            else:
-                self.frame = 0
+            self.frame = (self.frame + int(game_framework.frame_time * FRAMES_PER_ACTION * ACTION_PER_TIME)) % len(Gate.o_image)
         else:
             self.frame = 0
             self.activated = self.check_enemies_cleared()

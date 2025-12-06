@@ -10,12 +10,16 @@ show_collision_boxes = True
 def change_mode(mode):
     global stack
     if (len(stack) > 0):
+        stack[-1].draw()
+
         # execute the current mode's finish function
         stack[-1].finish()
         # remove the current mode
         stack.pop()
     stack.append(mode)
     mode.init()
+
+    mode.draw()
 
 
 def push_mode(mode):
