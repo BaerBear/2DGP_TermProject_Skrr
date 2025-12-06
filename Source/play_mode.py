@@ -69,7 +69,7 @@ def create_stage_gate(stage_num):
     from Stage_Gate import Gate
 
     gate_configs = {
-        0: (1400, 300, 1),  # Stage0: (x, y, next_stage)
+        0: (1450, 300, 1),  # Stage0: (x, y, next_stage)
         1: (350, 1488, 2),  # Stage1: (x, y, next_stage)
     }
 

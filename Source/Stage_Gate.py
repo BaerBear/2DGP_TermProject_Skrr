@@ -22,6 +22,7 @@ class Gate:
         self.height = None
         self.player_in_range = False
         self.frame = 0
+        self.animation_time = 0.0
 
         if Gate.c_image is None:
             c_images = ResourceManager.get_object_images('gate_close')
@@ -57,9 +58,11 @@ class Gate:
 
     def update(self):
         if self.activated:
-            self.frame = (self.frame + int(game_framework.frame_time * FRAMES_PER_ACTION * ACTION_PER_TIME)) % len(Gate.o_image)
+            self.animation_time += game_framework.frame_time
+            self.frame = int(self.animation_time * ACTION_PER_TIME) % FRAMES_PER_ACTION
         else:
             self.frame = 0
+            self.frame_time = 0.0
             self.activated = self.check_enemies_cleared()
 
     def get_bb(self):
