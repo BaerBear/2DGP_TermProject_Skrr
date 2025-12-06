@@ -195,6 +195,12 @@ class ResourceManager:
         return cls._object_images.get(object_name, [])
 
     @classmethod
+    def get_ui_images(cls, ui_element):
+        if not cls._initialized:
+            cls.initialize()
+        return cls._ui_images.get(ui_element, [])
+
+    @classmethod
     def preload_resources(cls):
         cls.initialize()
 

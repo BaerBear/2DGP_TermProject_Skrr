@@ -22,7 +22,7 @@ def draw():
     hide_cursor()
     image[0].draw(game_framework.width // 2, game_framework.height // 2)
     image[1].draw(game_framework.width // 2, game_framework.height // 2)
-    image[2].draw(mx, my)
+    image[2].draw(mx + cursor_image[0].w / 2, my - cursor_image[0].h / 2)
     update_canvas()
 
 def finish():

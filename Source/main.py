@@ -1,6 +1,6 @@
 from pico2d import *
 from Sound_Loader import SoundManager
-import logo_mode as start_mode
+import play_mode as start_mode
 import game_framework
 
 open_canvas(game_framework.width, game_framework.height)
