@@ -16,7 +16,7 @@ GRAVITY = BASE_GRAVITY * GRAVITY_MULTIPLIER
 BASE_JUMP_POWER_PPS = 10.0
 JUMP_POWER_PPS = BASE_JUMP_POWER_PPS * (GRAVITY_MULTIPLIER ** 0.5)
 
-DASH_SPEED_PPS = 10 * 60
+DASH_SPEED_PPS = 10 * 50
 
 
 class Idle:
@@ -398,7 +398,7 @@ class Dash:
         self.skrr = skrr
         self.minX = 0
         self.dash_distance = 0
-        self.max_dash_distance = 175
+        self.max_dash_distance = 200
         self.can_second_dash = False
         self.dash_dir = None
         self.is_air_dash = False
@@ -417,7 +417,6 @@ class Dash:
 
         self.effect_x, self.effect_y = self.skrr.x, self.skrr.y - 10
         self.effect_frame_time = 0
-        self.skrr.is_invincible = True
 
         SoundManager.play_player_sound('Dash')
 
@@ -453,8 +452,6 @@ class Dash:
                     self.skrr.state_machine.handle_event(('DASH_COMPLETE', 'IDLE'))
 
     def exit(self, e):
-        self.skrr.is_invincible = False
-
         if self.skrr.dash_type == 0 or self.skrr.dash_type == 1:
             self.skrr.dash_last_use_time = get_time()
             self.skrr.dash_type = None
@@ -682,11 +679,6 @@ class Reborn:
             'skill3': -12.0
         }
 
-        # 무적 상태 설정 (리스폰 직후 보호)
-        self.skrr.is_invincible = True
-        self.skrr.invincible_start_time = get_time()
-        self.skrr.invincible_duration = 2.0  # 리스폰 후 2초 무적
-
     def do(self):
         self.frame_time += game_framework.frame_time
         self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
@@ -870,7 +862,6 @@ class Skill3:
         self.skrr.frame = 0
         self.frame_time = 0
         self.skrr.use_skill('skill3')
-        self.skrr.is_invincible = True
         self.is_air_skill = not self.skrr.is_grounded and self.skrr.jump_count > 0
         self.traveled_distance = 0
         self.start_x = self.skrr.x
@@ -969,7 +960,6 @@ class Skill3:
                 self.skrr.state_machine.handle_event(('ANIMATION_END', 'FALL'))
 
     def exit(self, e):
-        self.skrr.is_invincible = False
         if self.is_air_skill:
             self.skrr.x = self.start_x
             self.skrr.velocity_y = 0

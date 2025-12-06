@@ -143,7 +143,10 @@ class SKRR:
 
     # 피격
     def get_damage(self, damage):
-        if self.is_invincible or self.state_machine.current_state == self.DEAD:
+        if (self.is_invincible or self.state_machine.current_state == self.DEAD
+            or self.state_machine.current_state == self.REBORN
+            or self.state_machine.current_state == self.DASH
+            or self.state_machine.current_state == self.SKILL3):
             return
 
         actual_damage = int(damage * (100 / (100 + self.defense)))
