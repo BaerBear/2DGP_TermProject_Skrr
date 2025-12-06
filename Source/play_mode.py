@@ -18,7 +18,7 @@ mx = 0
 my = 0
 
 def init():
-    global Skrr, tile_map, current_stage
+    global Skrr, tile_map, current_stage, stage_gate
     hide_lattice()
 
     ResourceManager.preload_resources()
@@ -70,7 +70,7 @@ def create_stage_gate(stage_num):
 
     gate_configs = {
         0: (1400, 300, 1),  # Stage0: (x, y, next_stage)
-        1: (320, 480, 2),  # Stage1: (x, y, next_stage)
+        1: (350, 1488, 2),  # Stage1: (x, y, next_stage)
     }
 
     if stage_num in gate_configs:
@@ -79,7 +79,7 @@ def create_stage_gate(stage_num):
     return None
 
 def load_stage(stage_num):
-    global tile_map, current_stage
+    global tile_map, current_stage, stage_gate
 
     stage_files = {
         0: 'Stage0.tmx',
@@ -95,7 +95,7 @@ def load_stage(stage_num):
 
     StageManager.clear_all_enemies()
 
-    if 'stage_gate' in globals() and stage_gate:
+    if stage_gate:
         game_world.remove_object(stage_gate)
         game_world.remove_collision_object(stage_gate)
 
