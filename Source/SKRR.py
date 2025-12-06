@@ -75,7 +75,7 @@ class SKRR:
 
         # 피격관련
         self.is_invincible = False
-        self.invincible_duration = 1.0  # 무적 시간 우선 1초
+        self.invincible_duration = 1.5  # 무적 시간 우선 1초
         self.invincible_start_time = 0.0
         self.is_hit = False
 

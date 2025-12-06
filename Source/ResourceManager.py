@@ -164,6 +164,7 @@ class ResourceManager:
             'player_info': Image_Loader.UI_Image_Loader('Player_Info').images,
             'cursor': Image_Loader.UI_Image_Loader('Cursor').images,
             'f_key': Image_Loader.UI_Image_Loader('F_Key').images,
+            'player_hp_bar': Image_Loader.UI_Image_Loader('Player_HP_Bar').images,
         }
 
     @classmethod

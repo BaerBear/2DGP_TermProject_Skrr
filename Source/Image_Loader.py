@@ -223,3 +223,5 @@ class UI_Image_Loader:
             self.images.append(load_image(os.path.join(self.resource_path, 'F.png')))
         elif ui_type == 'Player_Info':
             self.images.append(load_image(os.path.join(self.resource_path, 'Player_Info_UI.png')))
+        elif ui_type == 'Player_HP_Bar':
+            self.images.append(load_image(os.path.join(self.resource_path, 'Player_Hp_Bar.png')))

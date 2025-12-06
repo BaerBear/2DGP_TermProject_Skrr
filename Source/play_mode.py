@@ -265,7 +265,7 @@ def draw():
     # 커서 (UI 인스턴스 가져오기)
     ui = common.get_ui()
     if ui:
-        ui.draw_player_info(84, 33)
+        ui.draw_player_info(84, 33, Skrr.current_hp, Skrr.max_hp)
         ui.draw_cursor(mx, my)
 
     update_canvas()
