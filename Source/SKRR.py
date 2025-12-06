@@ -311,6 +311,8 @@ class SKRR:
     def handle_collision(self, group, other):
         if group == 'player:tilemap':
             pass
+        elif group == 'player:gate':
+            pass
 
     def is_dash_ready(self):
         return get_time() - self.dash_last_use_time >= self.dash_cooldown_time

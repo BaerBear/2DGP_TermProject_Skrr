@@ -1,0 +1,104 @@
+from pico2d import *
+from ResourceManager import ResourceManager
+import game_framework
+import game_world
+
+TIME_PER_ACTION = 0.167
+ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+FRAMES_PER_ACTION = 8
+
+class Gate:
+    c_image = None
+    o_image = None
+
+    def __init__(self, x, y, next_stage, current_stage):
+        self.x = x
+        self.y = y
+        self.activated = False
+        self.scale = 1.5
+        self.next_stage = next_stage
+        self.current_stage = current_stage
+        self.width = None
+        self.height = None
+        self.player_in_range = False
+        self.frame = 0
+
+        if Gate.c_image is None:
+            c_images = ResourceManager.get_object_images('gate_close')
+            if isinstance(c_images, list) and len(c_images) > 0:
+                Gate.c_image = c_images[0]
+            else:
+                Gate.c_image = c_images
+
+            if Gate.c_image:
+                self.width = Gate.c_image.w
+                self.height = Gate.c_image.h
+
+        if Gate.o_image is None:
+            Gate.o_image = ResourceManager.get_object_images('gate_open')
+
+        if self.width is None and Gate.c_image:
+            self.width = Gate.c_image.w
+            self.height = Gate.c_image.h
+
+    def check_enemies_cleared(self):
+        enemy_layer = 1
+        if enemy_layer >= len(game_world.world):
+            return True
+
+        enemies = game_world.world[enemy_layer]
+
+        from Boss import GrimReaper
+        normal_enemies = [e for e in enemies if not isinstance(e, GrimReaper)]
+
+        return len(normal_enemies) == 0
+
+    def update(self):
+        if self.activated:
+            if Gate.o_image and len(Gate.o_image) > 0:
+                self.frame = (self.frame + int(game_framework.frame_time * FRAMES_PER_ACTION * ACTION_PER_TIME)) % len(Gate.o_image)
+            else:
+                self.frame = 0
+        else:
+            self.frame = 0
+            self.activated = self.check_enemies_cleared()
+
+    def get_bb(self):
+        if self.width is None or self.height is None:
+            return (0, 0, 0, 0)
+
+        return (self.x - self.width / 2, self.y - self.height / 2,
+                self.x + self.width / 2, self.y + self.height / 2)
+
+    def draw(self):
+        cam_x, cam_y = self.x, self.y
+        if game_world.camera:
+            cam_x, cam_y = game_world.camera.apply(self.x, self.y)
+
+        if self.activated:
+            if Gate.o_image and len(Gate.o_image) > 0:
+                image = Gate.o_image[self.frame]
+                image.clip_draw(0, 0, image.w, image.h, cam_x, cam_y, image.w * self.scale, image.h * self.scale)
+
+                if game_framework.show_collision_boxes:
+                    draw_rectangle(*self.get_bb())
+
+                if self.player_in_range:
+                    pass
+        else:
+            if Gate.c_image:
+                Gate.c_image.clip_draw(0, 0, Gate.c_image.w, Gate.c_image.h, cam_x, cam_y, Gate.c_image.w * self.scale, Gate.c_image.h * self.scale)
+                if game_framework.show_collision_boxes:
+                    draw_rectangle(*self.get_bb())
+
+    def handle_collision(self, group, other):
+        if group == 'player:gate':
+            self.player_in_range = True
+
+    def interact(self):
+        if self.activated and self.player_in_range:
+            # 다음 스테이지로 이동
+            import play_mode
+            play_mode.load_stage(self.next_stage)
+            return True
+        return False

@@ -194,3 +194,20 @@ class Effect_Image_Loader:
         elif effect_type == 'Activate':
             for i in range(80):
                 self.images.append(load_image(os.path.join(self.resource_path, f'Actiavted_Loop_{i}.png')))
+
+class Object_Image_Loader:
+    def __init__(self, object_type):
+        self.images = []
+        self.resource_path = os.path.join(os.path.dirname(__file__), r'..\Resources\Image\Object')
+
+        if object_type == 'Coin':
+            for i in range(30):
+                self.images.append(load_image(os.path.join(self.resource_path, r'Coin', f'Treasure_{i}.png')))
+        elif object_type == 'Chest':
+            for i in range(8):
+                self.images.append(load_image(os.path.join(self.resource_path, r'Chest', f'Deactivate_{i}.png')))
+        elif object_type == 'Gate_Close':
+            self.images.append(load_image(os.path.join(self.resource_path, r'Gate', f'Deactivate_0.png')))
+        elif object_type == 'Gate_Open':
+            for i in range(8):
+                self.images.append(load_image(os.path.join(self.resource_path, r'Gate', f'Activate_{i}.png')))

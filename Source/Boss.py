@@ -1,3 +1,5 @@
+import random
+
 from pico2d import *
 from Enemy import Enemy
 from ResourceManager import ResourceManager
@@ -132,6 +134,22 @@ class GrimReaper(Enemy):
         return (self.x - adjusted_width / 2, self.y - self.height / 2,
                 self.x + adjusted_width / 2, self.y + self.height / 2)
 
+    def take_damage(self, damage, attacker_x):
+        if self.current_hp <= 0:
+            return False
+
+        actual_damage = int(damage * (100 / (100 + self.defense)))
+        damage_variation = max(1, random.randint(actual_damage - int(actual_damage * 0.2),
+                                                 actual_damage + int(actual_damage * 0.2)))
+        self.current_hp -= damage_variation
+        print(f'Boss took {damage_variation} damage, current HP: {self.current_hp}/{self.max_hp}')
+
+        if self.current_hp <= 0:
+            self.on_death()
+            return True
+
+        return True
+
     def update(self):
         if not self.is_alive:
             return
@@ -258,7 +276,6 @@ class GrimReaper(Enemy):
                 self.last_action_time = current_time
 
     def update_frame(self):
-        """프레임 업데이트 (물리 기반 시간 계산)"""
         if self.state == 'IDLE':
             frame_count = len(GrimReaper.images.get('idle', []))
             if frame_count > 0:

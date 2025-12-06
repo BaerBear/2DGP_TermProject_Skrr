@@ -1,7 +1,7 @@
 from pico2d import *
 from ResourceManager import ResourceManager
 import SKRR
-from StageManager import StageManager
+from Stage_Manager import StageManager
 from Sound_Loader import SoundManager
 from Camera import Camera
 from TileMap import TileMap
@@ -13,6 +13,9 @@ import os
 Skrr = None
 tile_map = None
 current_stage = 0  # 현재 스테이지 (0: Stage0, 1: Stage1, 2: BossStage)
+stage_gate = None
+mx = 0
+my = 0
 
 def init():
     global Skrr, tile_map, current_stage
@@ -49,12 +52,31 @@ def init():
     # 스테이지별 적 로드
     StageManager.load_stage_enemies(current_stage, Skrr, tile_map)
 
+    # 게이트 생성
+    stage_gate = create_stage_gate(current_stage)
+    if stage_gate:
+        game_world.add_object(stage_gate, 0)
+        game_world.add_collision_pair('player:gate', Skrr, stage_gate)
+
     # 플레이어 공격 / 적의 충돌
     game_world.add_collision_pair('player_attack:enemy', Skrr, None)
 
     # 적 공격 / 플레이어 충돌
     game_world.add_collision_pair('enemy_attack:player', None, Skrr)
 
+
+def create_stage_gate(stage_num):
+    from Stage_Gate import Gate
+
+    gate_configs = {
+        0: (1400, 300, 1),  # Stage0: (x, y, next_stage)
+        1: (320, 480, 2),  # Stage1: (x, y, next_stage)
+    }
+
+    if stage_num in gate_configs:
+        x, y, next_stage = gate_configs[stage_num]
+        return Gate(x, y, next_stage, stage_num)
+    return None
 
 def load_stage(stage_num):
     global tile_map, current_stage
@@ -72,6 +94,10 @@ def load_stage(stage_num):
     current_stage = stage_num
 
     StageManager.clear_all_enemies()
+
+    if 'stage_gate' in globals() and stage_gate:
+        game_world.remove_object(stage_gate)
+        game_world.remove_collision_object(stage_gate)
 
     if tile_map:
         game_world.remove_collision_object(tile_map)
@@ -100,6 +126,12 @@ def load_stage(stage_num):
     Skrr.y = start_y
 
     StageManager.load_stage_enemies(stage_num, Skrr, tile_map)
+
+    # 게이트 생성
+    stage_gate = create_stage_gate(stage_num)
+    if stage_gate:
+        game_world.add_object(stage_gate, 0)
+        game_world.add_collision_pair('player:gate', Skrr, stage_gate)
 
     if before_stage == 2 and stage_num != 2:
         SoundManager.stop_bgm()
@@ -238,6 +270,10 @@ def handle_events():
             game_framework.quit()
         elif e.type == SDL_KEYDOWN and e.key == SDLK_ESCAPE:
             game_framework.quit()
+        elif e.type == SDL_KEYDOWN and e.key == SDLK_f:
+            # F - 게이트 상호작용
+            if 'stage_gate' in globals() and stage_gate:
+                stage_gate.interact()
         elif e.type == SDL_KEYDOWN and e.key == SDLK_F1:
             # F1 - 충돌 박스 표시 토글
             game_framework.show_collision_boxes = not game_framework.show_collision_boxes
@@ -253,6 +289,9 @@ def handle_events():
             load_stage(2)
         elif e.type == SDL_MOUSEBUTTONDOWN and e.button == SDL_BUTTON_LEFT:
             print(f"Mouse Left Click: ({e.x}, {get_canvas_height() - e.y})")
+        elif e.type == SDL_MOUSEMOTION:
+            global mx, my
+            mx, my = e.x, get_canvas_height() - e.y
         elif e.type == SDL_KEYDOWN:
             Events.handle_key_down(e, Skrr)
         elif e.type == SDL_KEYUP:
