@@ -19,6 +19,7 @@ class ResourceManager:
     _boss_images = {}
     _effect_images = None
     _object_images = None
+    _ui_images = None
 
     def __new__(cls):
         if cls._instance is None:
@@ -144,11 +145,22 @@ class ResourceManager:
         print("  - 오브젝트 이미지 로딩...")
 
         cls._object_images = {
-            # 오브젝트 이미지 로드 추가 예정
             'coin': Image_Loader.Object_Image_Loader('Coin').images,
             'chest': Image_Loader.Object_Image_Loader('Chest').images,
             'gate_open': Image_Loader.Object_Image_Loader('Gate_Open').images,
             'gate_close': Image_Loader.Object_Image_Loader('Gate_Close').images,
+        }
+
+    @classmethod
+    def _load_ui_images(cls):
+        if cls._ui_images is not None:
+            return
+        print("  - UI 이미지 로딩...")
+
+        cls._ui_images = {
+            'player_info': Image_Loader.UI_Image_Loader('Player_Info').images,
+            'cursor': Image_Loader.UI_Image_Loader('Cursor').images,
+            'f_key': Image_Loader.UI_Image_Loader('F_Key').images,
         }
 
     @classmethod

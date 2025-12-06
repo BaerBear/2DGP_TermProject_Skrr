@@ -90,7 +90,7 @@ class Gate:
                                        right - camera_x, top - camera_y)
 
                 if self.player_in_range:
-                    print("[F] 키를 눌러 다음 스테이지로 이동")
+                    pass
         else:
             if Gate.c_image:
                 Gate.c_image.clip_draw(0, 0, Gate.c_image.w, Gate.c_image.h, cam_x, cam_y, Gate.c_image.w * self.scale, Gate.c_image.h * self.scale)

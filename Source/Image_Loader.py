@@ -211,3 +211,15 @@ class Object_Image_Loader:
         elif object_type == 'Gate_Open':
             for i in range(8):
                 self.images.append(load_image(os.path.join(self.resource_path, r'Gate', f'Activate_{i}.png')))
+
+class UI_Image_Loader:
+    def __init__(self, ui_type):
+        self.images = []
+        self.resource_path = os.path.join(os.path.dirname(__file__), r'..\Resources\Image\UI')
+
+        if ui_type == 'Cursor':
+            self.images.append(load_image(os.path.join(self.resource_path, 'Mouse_Cursor.png')))
+        elif ui_type == 'F_key':
+            self.images.append(load_image(os.path.join(self.resource_path, 'F.png')))
+        elif ui_type == 'Player_Info':
+            self.images.append(load_image(os.path.join(self.resource_path, 'Player_Info_UI.png')))

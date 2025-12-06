@@ -1,9 +1,7 @@
 from pico2d import *
-from ResourceManager import ResourceManager
+import common
 import SKRR
 from Stage_Manager import StageManager
-from Sound_Loader import SoundManager
-from Camera import Camera
 from TileMap import TileMap
 import game_framework
 import game_world
@@ -14,16 +12,15 @@ Skrr = None
 tile_map = None
 current_stage = 0  # 현재 스테이지 (0: Stage0, 1: Stage1, 2: BossStage)
 stage_gate = None
-mx = 0
-my = 0
+mx, my = 0, 0
 
 def init():
     global Skrr, tile_map, current_stage, stage_gate
     hide_lattice()
 
-    ResourceManager.preload_resources()
-    SoundManager.stop_bgm()
-    SoundManager.play_bgm('chapter1', repeat=True)
+    sound_manager = common.get_sound_manager()
+    sound_manager.stop_bgm()
+    sound_manager.play_bgm('chapter1', repeat=True)
 
     current_stage = 0
     tmx_path = os.path.join(os.path.dirname(__file__), '..', 'Tilemap_work', 'Stage0.tmx')
@@ -32,7 +29,7 @@ def init():
     Skrr = SKRR.SKRR()
     Skrr.set_tile_map(tile_map)
 
-    camera = Camera.get_instance()
+    camera = common.get_camera()
     camera.set_target(Skrr)
     camera.set_bounds(
         0,
@@ -108,7 +105,7 @@ def load_stage(stage_num):
     Skrr.set_tile_map(tile_map)
 
     # 카메라 범위 업데이트
-    camera = Camera.get_instance()
+    camera = common.get_camera()
     camera.set_bounds(
         0,
         tile_map.map_width * tile_map.tile_width,
@@ -133,12 +130,14 @@ def load_stage(stage_num):
         game_world.add_object(stage_gate, 0)
         game_world.add_collision_pair('player:gate', Skrr, stage_gate)
 
+    # BGM 변경
+    sound_manager = common.get_sound_manager()
     if before_stage == 2 and stage_num != 2:
-        SoundManager.stop_bgm()
-        SoundManager.play_bgm('chapter1', repeat=True)
+        sound_manager.stop_bgm()
+        sound_manager.play_bgm('chapter1', repeat=True)
     elif current_stage == 2:
-        SoundManager.stop_bgm()
-        SoundManager.play_bgm('chapter1_boss', repeat=True)
+        sound_manager.stop_bgm()
+        sound_manager.play_bgm('chapter1_boss', repeat=True)
 
     print(f"Stage {stage_num} loaded: {stage_files[stage_num]} at position ({start_x}, {start_y})")
 
@@ -192,9 +191,8 @@ def check_attack_collision():
                 is_multi_hit = player.active_hitbox.get('multi_hit', False)
                 hit_interval = player.active_hitbox.get('hit_interval', 0.0)
                 if enemy.type == 'Knight_Bow' or enemy.type == 'Knight_Sword' or enemy.type == 'Knight_Tackle':
-                    SoundManager.play_enemy_sound('enemy_hit')
-                else:
-                    pass
+                    sound_manager = common.get_sound_manager()
+                    sound_manager.play_enemy_sound('enemy_hit')
                 print(f"플레이어 공격 적중! 데미지: {damage} (다중 히트: {is_multi_hit}, 간격: {hit_interval}초)")
 
 
@@ -260,6 +258,8 @@ def draw():
 
     if tile_map and game_framework.show_collision_boxes :
         tile_map.draw_collision_boxes()
+
+
 
     update_canvas()
 
