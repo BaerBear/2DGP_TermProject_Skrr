@@ -268,6 +268,21 @@ def draw():
                 screen_x, screen_y = camera.apply(Skrr.x, Skrr.y + Skrr.default_w + 10)
                 ui.draw_f_key(screen_x, screen_y)
 
+        global current_stage
+        if current_stage == 2:
+            # 보스 스테이지에서 보스 HP 표시
+            from Boss import GrimReaper
+            boss = None
+            # Layer 1에서 보스 찾기
+            if len(game_world.world) > 1:
+                for obj in game_world.world[1]:
+                    if isinstance(obj, GrimReaper):
+                        boss = obj
+                        break
+
+            if boss and boss.is_alive:
+                ui.draw_boss_hp(boss.current_hp, boss.max_hp)
+
         ui.draw_cursor(mx, my)
 
     update_canvas()

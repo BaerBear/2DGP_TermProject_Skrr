@@ -166,6 +166,9 @@ class ResourceManager:
             'f_key': Image_Loader.UI_Image_Loader('F_key').images,
             'player_hp_bar': Image_Loader.UI_Image_Loader('Player_HP_Bar').images,
             'gold_icon': Image_Loader.UI_Image_Loader('Gold_Icon').images,
+            'boss_hp_bar': Image_Loader.UI_Image_Loader('Boss_Hp_Bar').images,
+            'boss_hp_info': Image_Loader.UI_Image_Loader('Boss_Hp_Info').images,
+            'boss_name_info': Image_Loader.UI_Image_Loader('Boss_Name_Info').images,
         }
 
     @classmethod

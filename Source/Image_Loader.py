@@ -227,3 +227,9 @@ class UI_Image_Loader:
             self.images.append(load_image(os.path.join(self.resource_path, 'Player_Hp_Bar.png')))
         elif ui_type == 'Gold_Icon':
             self.images.append(load_image(os.path.join(self.resource_path, 'Gold.png')))
+        elif ui_type == 'Boss_Hp_Bar':
+            self.images.append(load_image(os.path.join(self.resource_path, 'Boss_Hp_Bar.png')))
+        elif ui_type == 'Boss_Hp_Info':
+            self.images.append(load_image(os.path.join(self.resource_path, 'Boss_Hp_Info.png')))
+        elif ui_type == 'Boss_Name_Info':
+            self.images.append(load_image(os.path.join(self.resource_path, 'Boss_Name_Info.png')))

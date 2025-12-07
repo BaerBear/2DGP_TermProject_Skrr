@@ -1,6 +1,7 @@
 from pico2d import *
 
 from ResourceManager import ResourceManager
+import game_framework
 
 
 class UI:
@@ -10,6 +11,9 @@ class UI:
     player_info_image = None
     player_hp_bar_image = None
     gold_image = None
+    boss_hp_bar_image = None
+    boss_hp_info_image = None
+    boss_name_info_image = None
     font = None
 
     def __init__(self):
@@ -20,7 +24,9 @@ class UI:
             UI.player_hp_bar_image = ResourceManager.get_ui_images('player_hp_bar')
             UI.gold_image = ResourceManager.get_ui_images('gold_icon')
             UI.font = load_font(r'..\Resources\font\Perfect_DOS_VGA_437.ttf', 24)
-
+            UI.boss_hp_bar_image = ResourceManager.get_ui_images('boss_hp_bar')
+            UI.boss_hp_info_image = ResourceManager.get_ui_images('boss_hp_info')
+            UI.boss_name_info_image = ResourceManager.get_ui_images('boss_name_info')
             UI.initialized = True
 
     def draw_cursor(self, x, y):
@@ -71,3 +77,36 @@ class UI:
             if UI.font:
                 gold_text = f'{gold_amount}'
                 UI.font.draw(x + (UI.gold_image[0].w / 2) + 14, y, gold_text, (255, 255, 255))
+
+    def draw_boss_hp(self, current_hp, max_hp):
+        percent = current_hp / max_hp
+        if UI.boss_hp_bar_image:
+            x = game_framework.width / 2
+            y = game_framework.height - 20
+            if percent > 0:
+                bar_width = UI.boss_hp_bar_image[0].w * 10
+                current_width = bar_width * percent
+                offset_x = (bar_width - current_width) / 2
+
+                UI.boss_name_info_image[0].clip_draw(0,0 , UI.boss_name_info_image[0].w, UI.boss_name_info_image[0].h,
+                                                     x, y, UI.boss_name_info_image[0].w * 2, UI.boss_name_info_image[0].h * 2.0)
+
+                UI.boss_hp_info_image[0].clip_draw(0,0, UI.boss_hp_info_image[0].w, UI.boss_hp_info_image[0].h,
+                                                  x, y - 30, bar_width, UI.boss_hp_info_image[0].h * 2)
+
+                UI.boss_hp_bar_image[0].clip_draw(0, 0, UI.boss_hp_bar_image[0].w, UI.boss_hp_bar_image[0].h,
+                    x - offset_x, y - 30, current_width, UI.boss_hp_bar_image[0].h * 2)
+
+            if UI.font:
+                hp_text = f'{current_hp}' + '/' + f'{max_hp}'
+                name_text = f'{"Grim Reaper"}'
+                if current_hp >= 1000:
+                    offset = 0
+                elif current_hp >= 100:
+                    offset = 14
+                elif current_hp >= 10:
+                    offset = 28
+                else:
+                    offset = 42
+                UI.font.draw(x + offset - 60, y - 30, hp_text, (255, 255, 255))
+                UI.font.draw(x - 75, y + 1, name_text, (255, 255, 255))
