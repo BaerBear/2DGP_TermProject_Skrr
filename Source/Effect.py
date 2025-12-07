@@ -2,8 +2,9 @@ from pico2d import *
 from ResourceManager import ResourceManager
 import game_framework
 import game_world
+import random
 
-TIME_PER_ACTION = 0.3
+TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 
 
@@ -56,7 +57,7 @@ class HitEffect:
 
 
 def create_player_hit_effect(x, y):
-    effect = HitEffect('hit_normal', x, y, scale=1.5)
+    effect = HitEffect('hit_normal', x, y, scale=2.0)
     game_world.add_object(effect, 3)
     return effect
 
@@ -69,12 +70,12 @@ def create_enemy_hit_effect(x, y, enemy_direction):
 
 
 def create_skill3_hit_effect(x, y):
-    effect = HitEffect('hit_skill3', x, y, scale=2.5)
+    effect = HitEffect('hit_skill3', x, y, scale=2, flip_h=random.choice([True, False]))
     game_world.add_object(effect, 3)
     return effect
 
 
 def create_boss_hit_effect(x, y):
-    effect = HitEffect('hit_grimReaper', x, y, scale=2.5)
+    effect = HitEffect('hit_grimReaper', x, y, scale=2, flip_h=random.choice([True, False]))
     game_world.add_object(effect, 3)
     return effect
