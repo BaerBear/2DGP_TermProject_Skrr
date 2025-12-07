@@ -73,6 +73,9 @@ class SKRR:
         self.attack_power = 10
         self.defense = 10
 
+        # 재화
+        self.gold_amount = 0
+
         # 피격관련
         self.is_invincible = False
         self.invincible_duration = 1.5  # 무적 시간 우선 1초

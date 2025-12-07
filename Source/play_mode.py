@@ -266,6 +266,7 @@ def draw():
     ui = common.get_ui()
     if ui:
         ui.draw_player_info(84, 33, Skrr.current_hp, Skrr.max_hp)
+        ui.draw_gold_icon(435, 33, Skrr.gold_amount)
         ui.draw_cursor(mx, my)
 
     update_canvas()

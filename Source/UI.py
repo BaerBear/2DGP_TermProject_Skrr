@@ -9,6 +9,7 @@ class UI:
     f_key_image = None
     player_info_image = None
     player_hp_bar_image = None
+    gold_image = None
     font = None
 
     def __init__(self):
@@ -17,6 +18,7 @@ class UI:
             UI.f_key_image = ResourceManager.get_ui_images('f_key')
             UI.player_info_image = ResourceManager.get_ui_images('player_info')
             UI.player_hp_bar_image = ResourceManager.get_ui_images('player_hp_bar')
+            UI.gold_image = ResourceManager.get_ui_images('gold_icon')
             UI.font = load_font(r'..\Resources\font\Perfect_DOS_VGA_437.ttf', 24)
 
             UI.initialized = True
@@ -59,3 +61,12 @@ class UI:
                 else:
                     offset = 28
                 UI.font.draw(x * 2.5 + offset, y * 2.5 - 39.5, hp_text, (255, 255, 255))
+
+    def draw_gold_icon(self, x, y, gold_amount):
+        if UI.gold_image:
+            UI.gold_image[0].clip_draw(0, 0, UI.gold_image[0].w, UI.gold_image[0].h, x, y,
+                                       UI.gold_image[0].w * 2.5, UI.gold_image[0].h* 2.5)
+
+            if UI.font:
+                gold_text = f'{gold_amount}'
+                UI.font.draw(x + (UI.gold_image[0].w / 2) + 14, y, gold_text, (255, 255, 255))
