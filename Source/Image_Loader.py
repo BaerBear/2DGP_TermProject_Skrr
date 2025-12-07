@@ -233,3 +233,9 @@ class UI_Image_Loader:
             self.images.append(load_image(os.path.join(self.resource_path, 'Boss_Hp_Info.png')))
         elif ui_type == 'Boss_Name_Info':
             self.images.append(load_image(os.path.join(self.resource_path, 'Boss_Name_Info.png')))
+        elif ui_type == 'Skill1_Icon':
+            self.images.append(load_image(os.path.join(self.resource_path, 'Skill1_Icon.png')))
+        elif ui_type == 'Skill2_Icon':
+            self.images.append(load_image(os.path.join(self.resource_path, 'BuddhaCyclone_icon.png')))
+        elif ui_type == 'Skill3_Icon':
+            self.images.append(load_image(os.path.join(self.resource_path, 'FlashBladeDance_icon.png')))

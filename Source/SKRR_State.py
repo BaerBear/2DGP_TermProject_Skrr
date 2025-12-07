@@ -808,6 +808,8 @@ class Skill2:
         self.effect_frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
         self.start_frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
 
+        if self.effect_frame % 3 == 0:
+            SoundManager.play_player_sound('Skill2_hit')
 
         if self.skrr.frame >= self.total_frames:
             print('skill2 end')

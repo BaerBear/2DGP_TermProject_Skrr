@@ -33,6 +33,7 @@ class SoundManager:
         cls.player_sounds['Dead'] = load_wav(os.path.join(skul_path, 'Default_Dead.wav'))
         cls.player_sounds['Skill3_air'] = load_wav(os.path.join(skul_path, 'Ninja_Shuriken_Large.wav'))
         cls.player_sounds['Skill3_ground'] = load_wav(os.path.join(skul_path, 'Ninja_Shuriken_Small.wav'))
+        cls.player_sounds['Skill2_hit'] = load_wav(os.path.join(skul_path, 'Hit_Skill2.wav'))
 
         for sound in cls.player_sounds.values():
             sound.set_volume(cls.Effect_Volume)
@@ -45,6 +46,9 @@ class SoundManager:
         cls.enemy_sounds['arrow_ready'] = load_wav(os.path.join(Enemy_path, 'Crossbow_Ready.wav'))
         cls.enemy_sounds['arrow_fire'] = load_wav(os.path.join(Enemy_path, 'Crossbow_Fire.wav'))
         cls.enemy_sounds['sword_attack'] = load_wav(os.path.join(Enemy_path, 'Attack_Sword.wav'))
+        cls.enemy_sounds['maa_attack'] = load_wav(os.path.join(Enemy_path, 'MAA_Atk_Ready.wav'))
+        cls.enemy_sounds['maa_tackle_ready'] = load_wav(os.path.join(Enemy_path, 'Recruit_Atk_Ready01.wav'))
+        cls.enemy_sounds['maa_tackle_attack'] = load_wav(os.path.join(Enemy_path, 'Default_Dash_Tackle.wav'))
         cls.enemy_sounds['enemy_hit'] = load_wav(os.path.join(Enemy_path, 'Enemy_Hit.wav'))
         cls.enemy_sounds['boss_attack'] = load_wav(os.path.join(Enemy_path, 'GrimReaper_AtkA.wav'))
         cls.enemy_sounds['boss_skill1'] = load_wav(os.path.join(Enemy_path, 'GrimReaper_Sentence.wav'))

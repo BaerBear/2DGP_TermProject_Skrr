@@ -139,6 +139,15 @@ class ResourceManager:
 
         cls._effect_images = {
             'enemy_dead': Image_Loader.Effect_Image_Loader('Enemy_Dead').images,
+            'enemy_appearance': Image_Loader.Effect_Image_Loader('Enemy_Appearance').images,
+
+            'hit_normal': Image_Loader.Effect_Image_Loader('Hit_Normal').images,
+            'hit_grimReaper': Image_Loader.Effect_Image_Loader('Hit_GrimReaper').images,
+            'hit_skill3': Image_Loader.Effect_Image_Loader('Hit_Skill3').images,
+            'skul_hit': Image_Loader.Effect_Image_Loader('Skul_Hit').images,
+
+            'activate': Image_Loader.Effect_Image_Loader('Activate').images,
+            'reward_spawn': Image_Loader.Effect_Image_Loader('Reward_Spawn').images,
         }
 
     @classmethod

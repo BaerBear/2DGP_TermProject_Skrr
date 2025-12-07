@@ -293,11 +293,10 @@ class Enemy:
         else:
             pass
 
-        # 골드 생성
-        gold_amount = random.randint(8, 20)  # 적마다 랜덤 골드량
+        gold_amount = random.randint(8, 20)
         gold = Gold(self.x, self.y, gold_amount)
-        gold.set_tile_map(self.tile_map)  # 타일맵 정보 전달
-        game_world.add_object(gold, 1)  # 레이어 1에 추가
+        gold.set_tile_map(self.tile_map)
+        game_world.add_object(gold, 1)
 
         game_world.remove_object(self)
         pass
@@ -873,14 +872,13 @@ class Knight_Tackle(Enemy):
 
         player = SKRR.get_player()
         if player:
-            # 플레이어가 죽었을 때는 새로운 공격/태클을 시작하지 않음
             if not player.is_alive():
-                # 태클 중이거나 공격 중이면 완료될 때까지 계속 진행
                 if self.is_tackle_ready or self.is_tackling or self.is_tackle_end or self.is_attacking:
                     # 태클 준비 중
                     if self.is_tackle_ready:
                         self.state = 'TACKLE_READY'
                         self.tackle_ready_timer += game_framework.frame_time
+                        SoundManager.play_enemy_sound('maa_tackle_ready')
 
                         if self.tackle_ready_timer >= self.tackle_ready_duration:
                             self.is_tackle_ready = False
@@ -888,6 +886,7 @@ class Knight_Tackle(Enemy):
                             self.tackle_ready_timer = 0
                             self.tackle_traveled = 0
                             self.state = 'TACKLE'
+                            SoundManager.play_enemy_sound('maa_tackle_attack')
 
                     # 태클 실행 중
                     elif self.is_tackling:
@@ -992,6 +991,7 @@ class Knight_Tackle(Enemy):
                     self.tackle_ready_timer = 0
                     self.tackle_traveled = 0
                     self.state = 'TACKLE'
+                    SoundManager.play_enemy_sound('maa_tackle_attack')
 
             # 태클 실행 중 - 범위와 관계없이 완료
             elif self.is_tackling:
@@ -1029,6 +1029,7 @@ class Knight_Tackle(Enemy):
                     self.is_tackle_ready = True
                     self.tackle_ready_timer = 0
                     self.state = 'TACKLE_READY'
+                    SoundManager.play_enemy_sound('maa_tackle_ready')
                 else:
                     attack_range = 80
                     detect_range_normal = 400
@@ -1038,6 +1039,7 @@ class Knight_Tackle(Enemy):
                             self.state = 'ATTACK'
                             self.is_attacking = True
                             self.attack_last_use_time = current_time
+                            SoundManager.play_enemy_sound('maa_attack')
                         else:
                             self.state = 'IDLE'
                     elif self.dis_to_player <= detect_range_normal:
