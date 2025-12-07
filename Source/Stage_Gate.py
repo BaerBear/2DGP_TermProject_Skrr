@@ -65,6 +65,35 @@ class Gate:
             self.frame_time = 0.0
             self.activated = self.check_enemies_cleared()
 
+        # 플레이어와의 거리 체크
+        self.check_player_range()
+
+    def check_player_range(self):
+        if not self.activated:
+            self.player_in_range = False
+            return
+
+        # play_mode에서 플레이어 가져오기
+        import play_mode
+        player = play_mode.Skrr
+        if not player:
+            self.player_in_range = False
+            return
+
+        gate_bb = self.get_bb()
+        player_bb = player.get_bb()
+
+        gate_left, gate_bottom, gate_right, gate_top = gate_bb
+        player_left, player_bottom, player_right, player_top = player_bb
+
+        if (gate_left < player_right and
+            gate_right > player_left and
+            gate_bottom < player_top and
+            gate_top > player_bottom):
+            self.player_in_range = True
+        else:
+            self.player_in_range = False
+
     def get_bb(self):
         if self.width is None or self.height is None:
             return (0, 0, 0, 0)
@@ -88,9 +117,6 @@ class Gate:
                         camera_x, camera_y = game_world.camera.get_position()
                         draw_rectangle(left - camera_x, bottom - camera_y,
                                        right - camera_x, top - camera_y)
-
-                if self.player_in_range:
-                    pass
         else:
             if Gate.c_image:
                 Gate.c_image.clip_draw(0, 0, Gate.c_image.w, Gate.c_image.h, cam_x, cam_y, Gate.c_image.w * self.scale, Gate.c_image.h * self.scale)
@@ -104,7 +130,7 @@ class Gate:
 
     def handle_collision(self, group, other):
         if group == 'player:gate':
-            self.player_in_range = True
+            pass
 
     def interact(self):
         if self.activated and self.player_in_range:

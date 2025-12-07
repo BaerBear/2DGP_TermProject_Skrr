@@ -262,11 +262,17 @@ def draw():
     if tile_map and game_framework.show_collision_boxes :
         tile_map.draw_collision_boxes()
 
-    # 커서 (UI 인스턴스 가져오기)
     ui = common.get_ui()
-    if ui:
+    if ui and Skrr:
         ui.draw_player_info(84, 33, Skrr.current_hp, Skrr.max_hp)
         ui.draw_gold_icon(435, 33, Skrr.gold_amount)
+
+        if stage_gate and stage_gate.player_in_range:
+            camera = common.get_camera()
+            if camera:
+                screen_x, screen_y = camera.apply(Skrr.x, Skrr.y + Skrr.default_w + 10)
+                ui.draw_f_key(screen_x, screen_y)
+
         ui.draw_cursor(mx, my)
 
     update_canvas()
@@ -285,7 +291,6 @@ def handle_events():
         elif e.type == SDL_KEYDOWN and e.key == SDLK_F1:
             # F1 - 충돌 박스 표시 토글
             game_framework.show_collision_boxes = not game_framework.show_collision_boxes
-            print(f"Collision boxes: {'ON' if game_framework.show_collision_boxes  else 'OFF'}")
         elif e.type == SDL_KEYDOWN and e.key == SDLK_F2:
             # F2 - Stage0 로드
             load_stage(0)

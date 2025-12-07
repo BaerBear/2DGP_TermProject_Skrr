@@ -163,7 +163,7 @@ class ResourceManager:
         cls._ui_images = {
             'player_info': Image_Loader.UI_Image_Loader('Player_Info').images,
             'cursor': Image_Loader.UI_Image_Loader('Cursor').images,
-            'f_key': Image_Loader.UI_Image_Loader('F_Key').images,
+            'f_key': Image_Loader.UI_Image_Loader('F_key').images,
             'player_hp_bar': Image_Loader.UI_Image_Loader('Player_HP_Bar').images,
             'gold_icon': Image_Loader.UI_Image_Loader('Gold_Icon').images,
         }

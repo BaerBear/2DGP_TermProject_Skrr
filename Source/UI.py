@@ -30,7 +30,8 @@ class UI:
 
     def draw_f_key(self, x, y):
         if UI.f_key_image:
-            UI.f_key_image[0].clip_draw(0, 0, UI.f_key_image[0].w, UI.f_key_image[0].h, x, y)
+            UI.f_key_image[0].clip_draw(0, 0, UI.f_key_image[0].w, UI.f_key_image[0].h, x, y
+                                        , UI.f_key_image[0].w * 1.5, UI.f_key_image[0].h * 1.5)
 
     def draw_player_info(self, x, y, current_hp, max_hp):
         percent = current_hp / max_hp
@@ -70,3 +71,4 @@ class UI:
             if UI.font:
                 gold_text = f'{gold_amount}'
                 UI.font.draw(x + (UI.gold_image[0].w / 2) + 14, y, gold_text, (255, 255, 255))
+
