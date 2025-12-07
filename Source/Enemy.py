@@ -5,6 +5,7 @@ import random
 import game_framework
 import game_world
 from Sound_Loader import SoundManager
+from Gold import Gold
 
 ENEMY_WALK_SPEED_PPS = 100.0
 
@@ -291,6 +292,12 @@ class Enemy:
             SoundManager.play_enemy_sound('enemy_big_dead')
         else:
             pass
+
+        # 골드 생성
+        gold_amount = random.randint(8, 20)  # 적마다 랜덤 골드량
+        gold = Gold(self.x, self.y, gold_amount)
+        game_world.add_object(gold, 1)  # 레이어 1에 추가
+
         game_world.remove_object(self)
         pass
 

@@ -8,6 +8,7 @@ from BossSkill import FireField
 import SKRR
 import game_framework
 import game_world
+from Gold import Gold
 
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel = 30 cm
 GRAVITY_MULTIPLIER = 5.0
@@ -154,6 +155,15 @@ class GrimReaper(Enemy):
             return True
 
         return True
+
+    def on_death(self):
+        self.is_alive = False
+        SoundManager.play_enemy_sound('enemy_big_dead')
+
+        # 골드 드랍
+        gold_amount = random.randint(50, 100)
+        gold = Gold(self.x, self.y, gold_amount)
+        game_world.add_object(gold, 1)
 
     def update(self):
         if not self.is_alive:

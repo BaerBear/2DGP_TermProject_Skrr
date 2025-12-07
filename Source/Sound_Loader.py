@@ -57,7 +57,7 @@ class SoundManager:
         # 오브젝트 사운드
         Object_path = os.path.join(audio_path, 'Object')
         cls.object_sounds = {}
-        cls.object_sounds['gain_gold'] = load_wav(os.path.join(Object_path, 'Object_GainGold.wav'))
+        cls.object_sounds['drop_gold'] = load_wav(os.path.join(Object_path, 'Object_DropGold.wav'))
         cls.object_sounds['gain_item'] = load_wav(os.path.join(Object_path, 'Object_GainItem.wav'))
         cls.object_sounds['open_box'] = load_wav(os.path.join(Object_path, 'Object_OpenBox.wav'))
 

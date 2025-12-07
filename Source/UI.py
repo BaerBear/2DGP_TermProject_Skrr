@@ -71,4 +71,3 @@ class UI:
             if UI.font:
                 gold_text = f'{gold_amount}'
                 UI.font.draw(x + (UI.gold_image[0].w / 2) + 14, y, gold_text, (255, 255, 255))
-
