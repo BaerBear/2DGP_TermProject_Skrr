@@ -42,6 +42,15 @@ def update():
         for o in layer:
             o.update()
 
+    if len(world) > 3:
+        effects_to_remove = []
+        for o in world[3]:
+            if hasattr(o, 'is_done') and o.is_done():
+                effects_to_remove.append(o)
+
+        for effect in effects_to_remove:
+            remove_object(effect)
+
 def render():
     for layer in world:
         for o in layer:

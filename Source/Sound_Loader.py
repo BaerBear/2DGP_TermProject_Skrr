@@ -34,6 +34,7 @@ class SoundManager:
         cls.player_sounds['Skill3_air'] = load_wav(os.path.join(skul_path, 'Ninja_Shuriken_Large.wav'))
         cls.player_sounds['Skill3_ground'] = load_wav(os.path.join(skul_path, 'Ninja_Shuriken_Small.wav'))
         cls.player_sounds['Skill2_hit'] = load_wav(os.path.join(skul_path, 'Hit_Skill2.wav'))
+        cls.player_sounds['Skill1_hit'] = load_wav(os.path.join(skul_path, 'Hit_Skill1.wav'))
 
         for sound in cls.player_sounds.values():
             sound.set_volume(cls.Effect_Volume)
@@ -96,7 +97,7 @@ class SoundManager:
         cls._initialized = True
 
     @classmethod
-    def play_player_sound(cls, sound_name):
+    def play_player_sound(cls, sound_name, repeat=False):
         if cls.player_sounds and sound_name in cls.player_sounds:
             cls.player_sounds[sound_name].play()
 

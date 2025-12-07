@@ -185,12 +185,12 @@ class Effect_Image_Loader:
         elif effect_type == 'Hit_Skill3':
             for i in range(14):
                 self.images.append(load_image(os.path.join(self.resource_path, f'Hit_Ninja_{i}.png')))
-        elif effect_type == 'Reward_Spawn':
+        elif effect_type == 'Reward':
             for i in range(40):
                 self.images.append(load_image(os.path.join(self.resource_path, f'MapReward_Spawn_{i}.png')))
         elif effect_type == 'Skul_Hit':
             for i in range(10):
-                self.images.append(load_image(os.path.join(self.resource_path, f'Skul_Hit_{i}.png')))
+                self.images.append(load_image(os.path.join(self.resource_path, f'Hit_Skul_{i}.png')))
         elif effect_type == 'Activate':
             for i in range(80):
                 self.images.append(load_image(os.path.join(self.resource_path, f'Actiavted_Loop_{i}.png')))

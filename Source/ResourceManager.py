@@ -147,7 +147,7 @@ class ResourceManager:
             'skul_hit': Image_Loader.Effect_Image_Loader('Skul_Hit').images,
 
             'activate': Image_Loader.Effect_Image_Loader('Activate').images,
-            'reward_spawn': Image_Loader.Effect_Image_Loader('Reward_Spawn').images,
+            'reward': Image_Loader.Effect_Image_Loader('Reward_Spawn').images,
         }
 
     @classmethod

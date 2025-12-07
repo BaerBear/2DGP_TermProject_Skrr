@@ -709,10 +709,12 @@ class Skill1:
         self.skrr = skrr
         self.frame_time = 0
         self.total_frames = 7 * 3
+        self.prev_frame = -1
 
     def enter(self, e):
         self.skrr.frame = 0
         self.frame_time = 0
+        self.prev_frame = -1
         self.skrr.use_skill('skill1')  # 쿨타임 기록
 
         self.skrr.set_attack_hitbox(
@@ -726,6 +728,10 @@ class Skill1:
         minX = self.skrr.images['Walk'][0].w * self.skrr.scale // 2 - 20
         self.frame_time += game_framework.frame_time
         self.skrr.frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
+
+        if self.skrr.frame % 3 == 0 and self.skrr.frame != self.prev_frame:
+            SoundManager.play_player_sound('Skill1_hit')
+        self.prev_frame = self.skrr.frame
 
         if self.skrr.tile_map:
             max_x = self.skrr.tile_map.map_width * self.skrr.tile_map.tile_width
@@ -788,11 +794,13 @@ class Skill2:
         self.effect_total_frame = len(self.skrr.images['Skill2_Effect']) * 3
         self.start_frame = 0
         self.start_total_frame = len(self.skrr.images['Skill2_Start'])
+        self.prev_frame = -1
 
     def enter(self, e):
         self.skrr.frame = 0
         self.frame_time = 0
         self.skrr.use_skill('skill2')  # 쿨타임 기록
+        self.prev_frame = -1
 
         self.skrr.set_attack_hitbox(
             width=500, height=100,
@@ -808,8 +816,9 @@ class Skill2:
         self.effect_frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
         self.start_frame = int(self.frame_time * self.ACTION_PER_TIME * self.FRAMES_PER_ACTION)
 
-        if self.effect_frame % 3 == 0:
+        if self.skrr.frame % 2 == 0 and self.skrr.frame != self.prev_frame:
             SoundManager.play_player_sound('Skill2_hit')
+        self.prev_frame = self.skrr.frame
 
         if self.skrr.frame >= self.total_frames:
             print('skill2 end')
