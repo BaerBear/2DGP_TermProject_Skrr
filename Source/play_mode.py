@@ -191,14 +191,18 @@ def check_attack_collision():
 
                 player.add_hit_target(enemy)
 
+                dir = 0
+
                 # 히트 위치 계산 - 적 기준 히트박스 가장자리 (플레이어 방향)
                 enemy_center_x = (enemy_left + enemy_right) / 2
                 if player.x < enemy_center_x:
                     # 플레이어가 왼쪽에서 공격 -> 적의 왼쪽 가장자리
                     hit_x = enemy_left
+                    dir = 1
                 else:
                     # 플레이어가 오른쪽에서 공격 -> 적의 오른쪽 가장자리
                     hit_x = enemy_right
+                    dir = -1
 
                 hit_y = (enemy_bottom + enemy_top) / 2
 
@@ -209,7 +213,7 @@ def check_attack_collision():
                     create_skill3_hit_effect(hit_x, hit_y)
                 else:
                     # 일반 공격, 점프공격, 스킬1, 스킬2는 Skul_Hit 이펙트
-                    create_enemy_hit_effect(hit_x, hit_y)
+                    create_enemy_hit_effect(hit_x, hit_y, dir)
 
                 is_multi_hit = player.active_hitbox.get('multi_hit', False)
                 hit_interval = player.active_hitbox.get('hit_interval', 0.0)
@@ -221,7 +225,7 @@ def check_attack_collision():
 
 def check_player_damage():
     player = SKRR.get_player()
-    if not player or player.is_invincible:
+    if not player:
         return
 
     player_bb = player.get_bb()
@@ -252,6 +256,10 @@ def check_player_damage():
                 hitbox_bottom < player_top and
                 hitbox_top > player_bottom):
 
+            # 무적 상태면 데미지, 이펙트, 히트 타겟 추가 모두 무시
+            if player.is_invincible:
+                continue
+
             damage = enemy.active_hitbox.get('damage', enemy.attack_power)
             player.get_damage(damage)
 
@@ -268,15 +276,11 @@ def check_player_damage():
 
             hit_y = (player_bottom + player_top) / 2
 
-            # 적의 타입에 따라 적절한 이펙트 생성
             from Boss import GrimReaper
             if isinstance(enemy, GrimReaper):
-                # 보스 공격은 Hit_GrimReaper 이펙트
                 create_boss_hit_effect(hit_x, hit_y)
             else:
-                # 일반 적(tackle, sword, bow)은 Hit_Normal 이펙트
-                # 플레이어 가장자리 위치에 표시
-                create_player_hit_effect(hit_x, hit_y, Skrr.face_dir)
+                create_player_hit_effect(hit_x, hit_y)
 
             print(f"플레이어 피격! 데미지: {damage}, 남은 HP: {player.current_hp}/{player.max_hp}")
 

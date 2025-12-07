@@ -16,7 +16,7 @@ class HitEffect:
             HitEffect.images[effect_type] = ResourceManager.get_effect_images(effect_type)
         self.images = HitEffect.images[effect_type]
         self.FRAMES_PER_ACTION = len(self.images)
-        self.x = x
+        self.x = x - self.images[0].w / 2 * flip_h
         self.y = y
         self.scale = scale
         self.flip_h = flip_h  # 수평 뒤집기 여부
@@ -55,35 +55,26 @@ class HitEffect:
         return self.done
 
 
-# 히트 이펙트 생성 헬퍼 함수들
-def create_player_hit_effect(x, y, enemy_direction):
-    """플레이어가 피격당했을 때의 이펙트 (Hit_Normal)
-    enemy_direction: 적의 face_dir (1: 오른쪽, -1: 왼쪽)
-    이미지는 기본적으로 왼쪽을 보고 있으므로, 적이 오른쪽을 보고 있으면(1) flip
-    """
-    # 적이 오른쪽을 보고 있으면 이미지를 뒤집어야 함
-    flip = (enemy_direction == 1)
-    effect = HitEffect('hit_normal', x, y, scale=2.0, flip_h=flip)
+def create_player_hit_effect(x, y):
+    effect = HitEffect('hit_normal', x, y, scale=1.5)
     game_world.add_object(effect, 3)
     return effect
 
 
-def create_enemy_hit_effect(x, y):
-    """플레이어의 일반 공격/점프공격/스킬1/스킬2가 적에게 히트했을 때 (Skul_Hit)"""
-    effect = HitEffect('skul_hit', x, y, scale=2.0)
+def create_enemy_hit_effect(x, y, enemy_direction):
+    flip = (enemy_direction == 1)
+    effect = HitEffect('skul_hit', x, y, scale=1.5, flip_h=flip)
     game_world.add_object(effect, 3)
     return effect
 
 
 def create_skill3_hit_effect(x, y):
-    """플레이어의 스킬3이 적에게 히트했을 때 (Hit_Skill3)"""
     effect = HitEffect('hit_skill3', x, y, scale=2.5)
     game_world.add_object(effect, 3)
     return effect
 
 
 def create_boss_hit_effect(x, y):
-    """보스의 공격이 플레이어에게 히트했을 때 (Hit_GrimReaper)"""
     effect = HitEffect('hit_grimReaper', x, y, scale=2.5)
     game_world.add_object(effect, 3)
     return effect
