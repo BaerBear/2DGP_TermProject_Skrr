@@ -107,7 +107,7 @@ def load_stage(stage_num):
 
     Skrr.set_tile_map(tile_map)
 
-    # 카메라 범위 업데이트
+    # 카메라 업데이트
     camera = common.get_camera()
     camera.set_bounds(
         0,
@@ -149,7 +149,6 @@ def finish():
 
 
 def check_attack_collision():
-    """플레이어 공격과 적 충돌 체크"""
     player = SKRR.get_player()
     if not player:
         return
@@ -170,7 +169,7 @@ def check_attack_collision():
         if not player.can_hit_target(enemy):
             continue
 
-        # 적의 바운딩 박스 가져오기
+        # 적 바운딩 박스
         if not hasattr(enemy, 'get_bb'):
             continue
 
@@ -180,7 +179,7 @@ def check_attack_collision():
         except:
             continue
 
-        # AABB 충돌 검사
+        # 충돌 검사
         if (hitbox_left < enemy_right and
                 hitbox_right > enemy_left and
                 hitbox_bottom < enemy_top and
@@ -200,7 +199,6 @@ def check_attack_collision():
 
 
 def check_player_damage():
-    """적의 공격과 플레이어 충돌 체크"""
     player = SKRR.get_player()
     if not player or player.is_invincible:
         return
@@ -208,7 +206,6 @@ def check_player_damage():
     player_bb = player.get_bb()
     player_left, player_bottom, player_right, player_top = player_bb
 
-    # Layer 1의 모든 적 확인
     enemy_layer = 1
     if enemy_layer >= len(game_world.world):
         return
@@ -219,7 +216,6 @@ def check_player_damage():
         if not hasattr(enemy, 'get_attack_hitbox'):
             continue
 
-        # 적이 타격 가능한지 확인
         if not enemy.can_hit_target(player):
             continue
 
@@ -227,18 +223,17 @@ def check_player_damage():
         if enemy_hitbox is None:
             continue
 
-        # AABB 충돌 검사
+        # 충돌 검사
         hitbox_left, hitbox_bottom, hitbox_right, hitbox_top = enemy_hitbox
 
         if (hitbox_left < player_right and
                 hitbox_right > player_left and
                 hitbox_bottom < player_top and
                 hitbox_top > player_bottom):
-            # 플레이어 피격
+
             damage = enemy.active_hitbox.get('damage', enemy.attack_power)
             player.get_damage(damage)
 
-            # 적의 타격 기록에 플레이어 추가
             enemy.add_hit_target(player)
 
             print(f"플레이어 피격! 데미지: {damage}, 남은 HP: {player.current_hp}/{player.max_hp}")

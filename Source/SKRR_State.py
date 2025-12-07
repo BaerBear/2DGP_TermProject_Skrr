@@ -592,6 +592,8 @@ class Dead:
         # 사망 시 물리 상태 초기화
         self.skrr.velocity_y = 0
         self.skrr.clear_attack_hitbox()
+        self.skrr.dash_type = None
+        self.skrr.jump_count = 0
 
     def do(self):
         self.frame_time += game_framework.frame_time

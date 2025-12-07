@@ -70,7 +70,7 @@ class SKRR:
         # 스탯
         self.max_hp = 150
         self.current_hp = self.max_hp
-        self.attack_power = 10
+        self.attack_power = 15
         self.defense = 10
 
         # 재화

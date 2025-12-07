@@ -3,6 +3,7 @@ import random
 from pico2d import *
 from Enemy import Enemy
 from ResourceManager import ResourceManager
+from Sound_Loader import SoundManager
 from BossSkill import FireField
 import SKRR
 import game_framework
@@ -66,7 +67,7 @@ SKILL1_READY_TIME = 0.1
 SKILL1_LANDING_TIME = 0.7
 SKILL1_LANDING_FRAMES = 7
 
-SKILL2_TIME_PER_ACTION = 0.1
+SKILL2_TIME_PER_ACTION = 0.15
 SKILL2_ACTION_PER_TIME = 1.0 / SKILL2_TIME_PER_ACTION
 
 class GrimReaper(Enemy):
@@ -78,7 +79,11 @@ class GrimReaper(Enemy):
 
         self.max_hp = 1000
         self.current_hp = self.max_hp
-        self.scale = 3
+        self.scale = 2.5
+
+        # 데미지
+        self.basic_attack_damage = 30
+        self.skill1_damage = 30
 
         self.walk_speed = BOSS_WALK_SPEED_PPS
         self.dash_speed = BOSS_DASH_SPEED_PPS
@@ -192,14 +197,28 @@ class GrimReaper(Enemy):
 
         elif self.dis_to_player <= DETECT_RANGE_PPS:
             if current_time - self.last_action_time < self.action_delay:
-                self.state = 'IDLE'
+                if self.dis_to_player >= ATTACK_RANGE_PPS:
+                    self.state = 'WALK'
+                    self.x += self.walk_speed * self.face_dir * game_framework.frame_time
+                else:
+                    self.state = 'IDLE'
             else:
                 if self.dis_to_player <= SKILL_RANGE_PPS:
                     if current_time - self.skill1_last_use >= self.skill1_cooldown:
                         self.use_skill1()
+                        SoundManager.play_enemy_sound('boss_skill1')
+                        self.set_attack_hitbox(
+                            width=250,
+                            height=self.height * 1.2,
+                            center_offset_x= 100,
+                            center_offset_y=0,
+                            damage=self.skill1_damage,
+                            multi_hit=False
+                        )
                         return
                     elif current_time - self.skill2_last_use >= self.skill2_cooldown:
                         self.use_skill2()
+                        SoundManager.play_enemy_sound('boss_skill2')
                         return
 
                 if DASH_RANGE_MIN_PPS <= self.dis_to_player <= DASH_RANGE_MAX_PPS:
@@ -209,6 +228,7 @@ class GrimReaper(Enemy):
 
                 if self.dis_to_player <= ATTACK_RANGE_PPS:
                     if current_time - self.attack_last_use_time >= self.attack_cooldown_time:
+                        SoundManager.play_enemy_sound('boss_attack')
                         self.state = 'ATTACK'
                         self.is_attacking = True
                         self.attack_last_use_time = current_time
@@ -221,8 +241,8 @@ class GrimReaper(Enemy):
             # 감지 범위 밖이면 IDLE
             self.state = 'IDLE'
 
-        # 맵 경계 체크
-        if self.tile_map:
+        # 일반 상태의 맵 경계 체크 (스킬1은 위에서 이미 처리됨)
+        if self.tile_map and not (self.is_using_skill and self.current_skill == 'SKILL1'):
             map_width_pixels = self.tile_map.map_width * self.tile_map.tile_width
             hit_boundary = False
 
@@ -239,11 +259,8 @@ class GrimReaper(Enemy):
                     self.is_dashing = False
                     self.dash_traveled = 0
                     self.state = 'IDLE'
+                    self.clear_attack_hitbox()
                     self.last_action_time = get_time()
-                elif self.is_using_skill and self.current_skill == 'SKILL1':
-                    if self.skill1_phase == 'DASHING':
-                        self.skill1_phase = 'LANDING'
-                        self.skill1_landing_timer = 0
 
         if self.state != self.prev_state:
             self.frame_time = 0
@@ -254,20 +271,19 @@ class GrimReaper(Enemy):
         self.update_frame()
 
         if self.state == 'ATTACK' and self.is_attacking:
-            # 공격 히트박스 설정
-            if self.frame_time < game_framework.frame_time:
+            # 공격 프레임 중에만 히트박스 활성화
+            if 4 <= self.frame < 6:
                 self.set_attack_hitbox(
-                    width=150,
-                    height=self.height * 0.8,
+                    width=200,
+                    height=self.height * 1.1,
                     center_offset_x=75,
                     center_offset_y=0,
-                    damage=int(self.attack_power * 1.5),
+                    damage=self.basic_attack_damage,
                     multi_hit=False
                 )
-
-            # 공격 프레임 중에만 히트박스 활성화
-            if 3 <= self.frame < 7:
                 self.get_attack_hitbox()
+            else:
+                self.attack_bounding_box = None
 
             attack_duration = len(GrimReaper.images.get('attack', [])) * ATTACK_TIME_PER_ACTION
             if self.frame_time >= attack_duration:
@@ -305,16 +321,21 @@ class GrimReaper(Enemy):
             # 준비 단계: 0번 모션 유지
             self.frame = 0
             self.skill1_ready_timer += game_framework.frame_time
+            self.get_attack_hitbox()
 
             # 준비 시간이 지나면 돌진 시작
             if self.skill1_ready_timer >= SKILL1_READY_TIME:
                 self.skill1_phase = 'DASHING'
                 self.skill1_ready_timer = 0
                 self.skill1_effect_timer = 0  # 이펙트 타이머 초기화
+                print(f"[SKILL1] Phase: READY -> DASHING")
 
         elif self.skill1_phase == 'DASHING':
             # 이펙트 타이머 업데이트
             self.skill1_effect_timer += game_framework.frame_time
+
+            # 돌진 중 히트박스 활성화
+            self.get_attack_hitbox()
 
             # 돌진 중: 목표 지점까지 고속 이동 (물리 기반 속도)
             dx = self.skill1_target_x - self.x
@@ -323,21 +344,96 @@ class GrimReaper(Enemy):
 
             if distance > 10:  # 아직 도착 안함
                 move_distance = self.skill1_dash_speed * game_framework.frame_time
+
                 if move_distance >= distance:
                     # 도착
                     self.x = self.skill1_target_x
                     self.y = self.skill1_target_y
                     self.skill1_phase = 'LANDING'
                     self.skill1_landing_timer = 0
+                    self.clear_attack_hitbox()
+                    print(f"[SKILL1] Phase: DASHING -> LANDING (도착)")
                 else:
-                    # 계속 이동
+                    # 다음 위치 계산
                     ratio = move_distance / distance
-                    self.x += dx * ratio
-                    self.y += dy * ratio
+                    next_x = self.x + dx * ratio
+                    next_y = self.y + dy * ratio
+
+                    # 타일 충돌 체크: 다음 위치에서 충돌하는지 확인
+                    can_move = True
+                    if self.tile_map:
+                        # 다음 위치의 바운딩 박스 계산
+                        next_left = next_x - self.width / 2
+                        next_bottom = next_y - self.height / 2
+                        next_right = next_x + self.width / 2
+                        next_top = next_y + self.height / 2
+
+                        # 타일 충돌 체크
+                        colliding_tiles = self.tile_map.check_collision(next_left, next_bottom, next_right, next_top)
+
+                        # 벽 타일(tile 레이어)과 충돌하는지 확인
+                        for tile in colliding_tiles:
+                            if tile['layer'] == 'tile':
+                                # 타일의 경계
+                                tile_left = tile['left']
+                                tile_right = tile['right']
+                                tile_bottom = tile['bottom']
+                                tile_top = tile['top']
+
+                                # 현재 위치의 바운딩 박스
+                                current_bottom = self.y - self.height / 2
+                                current_top = self.y + self.height / 2
+                                current_left = self.x - self.width / 2
+                                current_right = self.x + self.width / 2
+
+                                # y축 겹침 확인
+                                y_overlap = not (current_top < tile_bottom or current_bottom > tile_top)
+
+                                if y_overlap:
+                                    # 오른쪽으로 이동 중 타일의 왼쪽 벽에 충돌
+                                    if self.face_dir == 1 and current_right <= tile_left and next_right > tile_left:
+                                        can_move = False
+                                        self.x = tile_left - self.width / 2 - 1
+                                        print(f"[SKILL1] 타일 충돌 감지 (오른쪽 이동, 벽 x={tile_left})")
+                                        break
+                                    # 왼쪽으로 이동 중 타일의 오른쪽 벽에 충돌
+                                    elif self.face_dir == -1 and current_left >= tile_right and next_left < tile_right:
+                                        can_move = False
+                                        self.x = tile_right + self.width / 2 + 1
+                                        print(f"[SKILL1] 타일 충돌 감지 (왼쪽 이동, 벽 x={tile_right})")
+                                        break
+
+                        # 맵 경계 체크
+                        if can_move and self.tile_map:
+                            map_width_pixels = self.tile_map.map_width * self.tile_map.tile_width
+
+                            if self.face_dir == 1:
+                                if next_right >= map_width_pixels - 5:
+                                    can_move = False
+                                    self.x = map_width_pixels - self.width / 2 - 5
+                                    print(f"[SKILL1] 맵 경계 충돌 (오른쪽)")
+                            else:
+                                if next_left <= 5:
+                                    can_move = False
+                                    self.x = self.width / 2 + 5
+                                    print(f"[SKILL1] 맵 경계 충돌 (왼쪽)")
+
+                    if can_move:
+                        # 이동 가능하면 계속 이동
+                        self.x = next_x
+                        self.y = next_y
+                    else:
+                        # 벽/타일에 도달하면 즉시 착지
+                        self.skill1_phase = 'LANDING'
+                        self.skill1_landing_timer = 0
+                        self.clear_attack_hitbox()
+                        print(f"[SKILL1] Phase: DASHING -> LANDING (벽/타일 도달)")
             else:
                 # 도착
                 self.skill1_phase = 'LANDING'
                 self.skill1_landing_timer = 0
+                self.clear_attack_hitbox()
+                print(f"[SKILL1] Phase: DASHING -> LANDING (거리 10 이하)")
 
         elif self.skill1_phase == 'LANDING':
             # 착지 모션: 1-6번 프레임 재생 (물리 기반 타이밍)
@@ -351,7 +447,8 @@ class GrimReaper(Enemy):
                 self.current_skill = None
                 self.skill1_phase = 'READY'
                 self.state = 'IDLE'
-                self.last_action_time = get_time()  # 스킬 후 행동 간격 시작
+                self.last_action_time = get_time()
+                print(f"[SKILL1] Phase: LANDING -> IDLE (스킬 완료)")
 
     def update_skill2(self):
         """Skill2 업데이트 - 물리 기반"""

@@ -3,19 +3,21 @@ from ResourceManager import ResourceManager
 import game_framework
 import game_world
 import SKRR
+from Sound_Loader import SoundManager
 
 FIRE_TIME_PER_ACTION = 0.05
 FIRE_ACTION_PER_TIME = 1.0 / FIRE_TIME_PER_ACTION
 FIRE_DURATION = 3.0
-FIRE_DAMAGE = 50
-FIRE_DAMAGE_INTERVAL = 0.5
+
+FIRE_DAMAGE = 10               # 불장판 데미지
+FIRE_DAMAGE_INTERVAL = 0.5     # 피격 간격
 
 class FireField:
     def __init__(self, x, y, boss_images):
         self.x = x
         self.y = y - 80
-        self.scale_w = 3
-        self.scale_h = 1.5
+        self.scale_w = 2.5
+        self.scale_h = 1.25
         self.frame = 0
         self.frame_time = 0
         self.alive_time = 0
@@ -23,11 +25,12 @@ class FireField:
 
         self.fire_images = boss_images.get('skill2_fire', [])
 
-        # 데미지
-        self.last_damage_time = 0
-        self.damaged_entities = set()  # 이미 데미지를 입은 엔티티 추적
+        # 멀티히트 데미지 시스템
+        self.hit_targets = {}  # 타겟별 마지막 히트 시간 기록
+        self.damage = FIRE_DAMAGE
+        self.damage_interval = FIRE_DAMAGE_INTERVAL
 
-        # 크기
+        # 히트박스 크기 (조절 가능)
         if self.fire_images and len(self.fire_images) > 0:
             sample_img = self.fire_images[0]
             self.width = sample_img.w * self.scale_w
@@ -37,9 +40,9 @@ class FireField:
             self.height = 50 * self.scale_h
 
     def get_bb(self):
-        """데미지 판정 박스"""
-        return (self.x - self.width / 2, self.y - self.height / 2,
-                self.x + self.width / 2, self.y + self.height / 2)
+        """데미지 판정 박스 (히트박스)"""
+        return (self.x - self.width / 2.5, self.y - self.height / 2.5,
+                self.x + self.width / 2.5, self.y + self.height / 2.5)
 
     def update(self):
         if not self.is_alive:
@@ -59,14 +62,16 @@ class FireField:
             frame_count = len(self.fire_images)
             self.frame = int(self.frame_time * FIRE_ACTION_PER_TIME) % frame_count
 
-        # 플레이어와 충돌 체크 (데미지 간격마다)
+        # 플레이어와 멀티히트 충돌 체크
         current_time = get_time()
-        if current_time - self.last_damage_time >= FIRE_DAMAGE_INTERVAL:
-            player = SKRR.get_player()
-            if player and hasattr(player, 'get_bb'):
-                if self.check_collision(player):
+        player = SKRR.get_player()
+        if player and hasattr(player, 'get_bb'):
+            if self.check_collision(player):
+                # 플레이어를 아직 때리지 않았거나, 히트 간격이 지났으면 데미지 적용
+                if (player not in self.hit_targets or
+                    (current_time - self.hit_targets[player]) >= self.damage_interval):
                     self.apply_damage_to_player(player)
-                    self.last_damage_time = current_time
+                    self.hit_targets[player] = current_time
 
     def check_collision(self, entity):
         """엔티티와의 충돌 체크"""
@@ -82,9 +87,10 @@ class FireField:
 
     def apply_damage_to_player(self, player):
         """플레이어에게 데미지 적용"""
-        if hasattr(player, 'take_damage'):
-            player.take_damage(FIRE_DAMAGE)
-            print(f"FireField: Player takes {FIRE_DAMAGE} damage!")
+        if hasattr(player, 'get_damage'):
+            player.get_damage(self.damage)
+            SoundManager.play_enemy_sound('boss_hit_skill2')
+            print(f"FireField: Player takes {self.damage} damage! (Multi-hit)")
 
     def draw(self):
         if not self.is_alive:
@@ -111,4 +117,3 @@ class FireField:
                 left, bottom, right, top = self.get_bb()
                 draw_rectangle(left - camera_x, bottom - camera_y,
                                right - camera_x, top - camera_y)
-

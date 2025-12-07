@@ -12,7 +12,7 @@ class SoundManager:
     current_bgm = None
 
     Effect_Volume = 7
-    BGM_Volume = 8
+    BGM_Volume = 7
 
     @classmethod
     def initialize(cls):
@@ -46,6 +46,10 @@ class SoundManager:
         cls.enemy_sounds['arrow_fire'] = load_wav(os.path.join(Enemy_path, 'Crossbow_Fire.wav'))
         cls.enemy_sounds['sword_attack'] = load_wav(os.path.join(Enemy_path, 'Attack_Sword.wav'))
         cls.enemy_sounds['enemy_hit'] = load_wav(os.path.join(Enemy_path, 'Enemy_Hit.wav'))
+        cls.enemy_sounds['boss_attack'] = load_wav(os.path.join(Enemy_path, 'GrimReaper_AtkA.wav'))
+        cls.enemy_sounds['boss_skill1'] = load_wav(os.path.join(Enemy_path, 'GrimReaper_Sentence.wav'))
+        cls.enemy_sounds['boss_skill2'] = load_wav(os.path.join(Enemy_path, 'Common_Flame.wav'))
+        cls.enemy_sounds['boss_hit_skill2'] = load_wav(os.path.join(Enemy_path, 'Hit_Flame_Short.wav'))
 
         for sound in cls.enemy_sounds.values():
             sound.set_volume(cls.Effect_Volume)
