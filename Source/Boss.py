@@ -157,13 +157,17 @@ class GrimReaper(Enemy):
         return True
 
     def on_death(self):
+        """보스가 죽을 때 더 많은 골드 드롭"""
         self.is_alive = False
         SoundManager.play_enemy_sound('enemy_big_dead')
 
-        # 골드 드랍
+        # 보스는 더 많은 골드를 떨어뜨림
         gold_amount = random.randint(50, 100)
         gold = Gold(self.x, self.y, gold_amount)
+        gold.set_tile_map(self.tile_map)  # 타일맵 정보 전달
         game_world.add_object(gold, 1)
+
+        game_world.remove_object(self)
 
     def update(self):
         if not self.is_alive:

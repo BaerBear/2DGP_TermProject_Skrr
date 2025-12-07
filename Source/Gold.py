@@ -29,15 +29,87 @@ class Gold:
         self.creation_time = get_time()
         self.is_collected = False
 
-    def update(self):
-        self.frame = (self.frame + Gold.FRAMES_PER_ACTION * Gold.ACTION_PER_TIME * game_framework.frame_time) % Gold.FRAMES_PER_ACTION
+        self.velocity_y = 0
+        self.gravity = -1000  # 중력 가속도
+        self.is_grounded = False
+        self.tile_map = None
 
-        # 2초 체크
+        self.width = 16 * self.scale
+        self.height = 16 * self.scale
+
+    def set_tile_map(self, tile_map):
+        self.tile_map = tile_map
+
+    def get_bb(self):
+        return (self.x - self.width / 2, self.y - self.height / 2,
+                self.x + self.width / 2, self.y + self.height / 2)
+
+    def apply_gravity(self):
+        if not self.is_grounded:
+            self.velocity_y += self.gravity * game_framework.frame_time
+            self.y += self.velocity_y * game_framework.frame_time
+
+    def check_tile_collision(self):
+        if not self.tile_map:
+            return
+
+        left, bottom, right, top = self.get_bb()
+        colliding_tiles = self.tile_map.check_collision(left, bottom, right, top)
+
+        has_ground_collision = False
+
+        for tile in colliding_tiles:
+            if tile['layer'] == 'tile':
+                if self.handle_tile_collision(tile):
+                    has_ground_collision = True
+            elif tile['layer'] == 'flatform':
+                if self.handle_platform_collision(tile):
+                    has_ground_collision = True
+
+        was_grounded = self.is_grounded
+        self.is_grounded = has_ground_collision
+
+        if self.is_grounded and not was_grounded:
+            self.velocity_y = 0
+
+    def handle_tile_collision(self, tile):
+        left, bottom, right, top = self.get_bb()
+
+        overlap_left = right - tile['left']
+        overlap_right = tile['right'] - left
+        overlap_top = tile['top'] - bottom
+        overlap_bottom = top - tile['bottom']
+
+        min_overlap = min(overlap_left, overlap_right, overlap_top, overlap_bottom)
+
+        if min_overlap == overlap_top and self.velocity_y <= 0:
+            self.y = tile['top'] + self.height / 2
+            self.velocity_y = 0
+            return True
+
+        return False
+
+    def handle_platform_collision(self, tile):
+        left, bottom, right, top = self.get_bb()
+
+        if self.velocity_y <= 0 and bottom <= tile['top'] and bottom >= tile['top'] - 10:
+            self.y = tile['top'] + self.height / 2
+            self.velocity_y = 0
+            return True
+
+        return False
+
+    def update(self):
+        self.apply_gravity()
+
+        self.check_tile_collision()
+
+        self.frame = (self.frame + Gold.FRAMES_PER_ACTION *
+                     Gold.ACTION_PER_TIME * game_framework.frame_time) % Gold.FRAMES_PER_ACTION
+
         elapsed_time = get_time() - self.creation_time
         if elapsed_time >= Gold.LIFETIME and not self.is_collected:
             self.collect()
-
-
 
     def collect(self):
         if self.is_collected:
@@ -48,7 +120,6 @@ class Gold:
         player = SKRR.get_player()
         if player:
             player.gold_amount += self.gold_amount
-            print(f"Gold collected: +{self.gold_amount}, Total: {player.gold_amount}")
 
         SoundManager.play_object_sound('drop_gold')
 
@@ -64,11 +135,6 @@ class Gold:
             Gold.images[frame_index].draw(cam_x, cam_y,
                                          Gold.images[frame_index].w * self.scale,
                                          Gold.images[frame_index].h * self.scale)
-
-    def get_bb(self):
-        size = 16 * self.scale
-        return (self.x - size / 2, self.y - size / 2,
-                self.x + size / 2, self.y + size / 2)
 
     def handle_collision(self, group, other):
         pass

@@ -296,6 +296,7 @@ class Enemy:
         # 골드 생성
         gold_amount = random.randint(8, 20)  # 적마다 랜덤 골드량
         gold = Gold(self.x, self.y, gold_amount)
+        gold.set_tile_map(self.tile_map)  # 타일맵 정보 전달
         game_world.add_object(gold, 1)  # 레이어 1에 추가
 
         game_world.remove_object(self)
