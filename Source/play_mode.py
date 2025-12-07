@@ -191,8 +191,6 @@ def check_attack_collision():
 
                 player.add_hit_target(enemy)
 
-                dir = 0
-
                 enemy_center_x = (enemy_left + enemy_right) / 2
                 if player.x < enemy_center_x:
                     hit_x = enemy_left
@@ -250,33 +248,25 @@ def check_player_damage():
                 hitbox_bottom < player_top and
                 hitbox_top > player_bottom):
 
-            # 무적 상태면 데미지, 이펙트, 히트 타겟 추가 모두 무시
-            if player.is_invincible:
-                continue
-
             damage = enemy.active_hitbox.get('damage', enemy.attack_power)
-            player.get_damage(damage)
+            if player.get_damage(damage):
+                enemy.add_hit_target(player)
 
-            enemy.add_hit_target(player)
+                player_center_x = (player_left + player_right) / 2
+                if enemy.x < player_center_x:
+                    hit_x = player_left
+                else:
+                    hit_x = player_right
 
-            # 히트 위치 계산 - 플레이어 기준 히트박스 가장자리 (적 방향)
-            player_center_x = (player_left + player_right) / 2
-            if enemy.x < player_center_x:
-                # 적이 왼쪽에서 공격 -> 플레이어의 왼쪽 가장자리
-                hit_x = player_left
-            else:
-                # 적이 오른쪽에서 공격 -> 플레이어의 오른쪽 가장자리
-                hit_x = player_right
+                hit_y = (player_bottom + player_top) / 2
 
-            hit_y = (player_bottom + player_top) / 2
+                from Boss import GrimReaper
+                if isinstance(enemy, GrimReaper):
+                    create_boss_hit_effect(hit_x, hit_y)
+                else:
+                    create_player_hit_effect(hit_x, hit_y)
 
-            from Boss import GrimReaper
-            if isinstance(enemy, GrimReaper):
-                create_boss_hit_effect(hit_x, hit_y)
-            else:
-                create_player_hit_effect(hit_x, hit_y)
-
-            print(f"플레이어 피격! 데미지: {damage}, 남은 HP: {player.current_hp}/{player.max_hp}")
+                print(f"플레이어 피격! 데미지: {damage}, 남은 HP: {player.current_hp}/{player.max_hp}")
 
 
 def update():

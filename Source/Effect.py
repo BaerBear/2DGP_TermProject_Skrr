@@ -17,7 +17,10 @@ class HitEffect:
             HitEffect.images[effect_type] = ResourceManager.get_effect_images(effect_type)
         self.images = HitEffect.images[effect_type]
         self.FRAMES_PER_ACTION = len(self.images)
-        self.x = x - self.images[0].w / 2 * flip_h
+        if flip_h:
+            self.x = x - self.images[0].w * 0.67
+        else:
+            self.x = x + self.images[0].w * 0.67
         self.y = y
         self.scale = scale
         self.flip_h = flip_h  # 수평 뒤집기 여부

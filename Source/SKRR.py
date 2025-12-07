@@ -150,7 +150,7 @@ class SKRR:
             or self.state_machine.current_state == self.REBORN
             or self.state_machine.current_state == self.DASH
             or self.state_machine.current_state == self.SKILL3):
-            return
+            return False  # 데미지 안받음
 
         actual_damage = int(damage * (100 / (100 + self.defense)))
         self.current_hp -= random.randint(actual_damage - int(actual_damage * 0.1),
@@ -162,6 +162,7 @@ class SKRR:
 
         self.is_invincible = True
         self.invincible_start_time = get_time()
+        return True  # 데미지 받음
 
     # 공격 히트박스 설정
     def set_attack_hitbox(self, width, height, center_offset_x=0, center_offset_y=0, damage=None, multi_hit=False, hit_interval=0.0):
