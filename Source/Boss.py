@@ -403,13 +403,13 @@ class GrimReaper(Enemy):
 
                                 if y_overlap:
                                     # 오른쪽으로 이동 중 타일의 왼쪽 벽에 충돌
-                                    if self.face_dir == 1 and current_right <= tile_left and next_right > tile_left:
+                                    if self.face_dir == 1 and current_right < tile_left and next_right >= tile_left:
                                         can_move = False
                                         self.x = tile_left - self.width / 2 - 1
                                         print(f"[SKILL1] 타일 충돌 감지 (오른쪽 이동, 벽 x={tile_left})")
                                         break
                                     # 왼쪽으로 이동 중 타일의 오른쪽 벽에 충돌
-                                    elif self.face_dir == -1 and current_left >= tile_right and next_left < tile_right:
+                                    elif self.face_dir == -1 and current_left > tile_right and next_left <= tile_right:
                                         can_move = False
                                         self.x = tile_right + self.width / 2 + 1
                                         print(f"[SKILL1] 타일 충돌 감지 (왼쪽 이동, 벽 x={tile_right})")

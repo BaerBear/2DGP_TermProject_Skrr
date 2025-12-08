@@ -270,6 +270,8 @@ class SKRR:
     def handle_tile_collision(self, tile):
         left, bottom, right, top = self.get_bb()
 
+        COLLISION_MARGIN = 2  # 충돌 여백 추가
+
         overlap_left = right - tile['left']
         overlap_right = tile['right'] - left
         overlap_top = tile['top'] - bottom
@@ -280,7 +282,7 @@ class SKRR:
         if min_overlap == overlap_bottom and self.velocity_y > 0:
             horizontal_overlap = min(overlap_left, overlap_right)
             if horizontal_overlap > self.width * 0.5:
-                self.y = tile['bottom'] - self.height / 2
+                self.y = tile['bottom'] - self.height / 2 - COLLISION_MARGIN
                 self.velocity_y = 0
                 return False
         elif min_overlap == overlap_top and self.velocity_y <= 0:
@@ -288,10 +290,10 @@ class SKRR:
             self.velocity_y = 0
             return True
         elif min_overlap == overlap_left:
-            self.x = tile['left'] - self.width / 2
+            self.x = tile['left'] - self.width / 2 - COLLISION_MARGIN
             return False
         elif min_overlap == overlap_right:
-            self.x = tile['right'] + self.width / 2
+            self.x = tile['right'] + self.width / 2 + COLLISION_MARGIN
             return False
 
         return False

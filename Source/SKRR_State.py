@@ -870,6 +870,7 @@ class Skill3:
         self.target_distance = 150
         self.traveled_distance = 0
         self.movement_stopped = False
+        self.COLLISION_MARGIN = 2  # 충돌 여백
 
     def enter(self, e):
         self.skrr.frame = 0
@@ -913,23 +914,59 @@ class Skill3:
                 max_x = self.skrr.tile_map.map_width * self.skrr.tile_map.tile_width
                 min_x = max(0, self.minX)
 
-                if new_x < min_x:
-                    self.skrr.x = min_x
+                if new_x < min_x + self.COLLISION_MARGIN:
+                    self.skrr.x = min_x + self.COLLISION_MARGIN
                     self.movement_stopped = True
-                elif new_x > max_x - self.minX:
-                    self.skrr.x = max_x - self.minX
+                elif new_x > max_x - self.minX - self.COLLISION_MARGIN:
+                    self.skrr.x = max_x - self.minX - self.COLLISION_MARGIN
                     self.movement_stopped = True
                 else:
-                    self.skrr.x = new_x
-                    self.traveled_distance += actual_move
+                    can_move = True
+
+                    next_left = new_x - self.skrr.width / 2
+                    next_bottom = self.skrr.y - self.skrr.height / 2
+                    next_right = new_x + self.skrr.width / 2
+                    next_top = self.skrr.y + self.skrr.height / 2
+
+                    colliding_tiles = self.skrr.tile_map.check_collision(next_left, next_bottom, next_right, next_top)
+
+                    for tile in colliding_tiles:
+                        if tile['layer'] == 'tile':
+                            tile_left = tile['left']
+                            tile_right = tile['right']
+                            tile_bottom = tile['bottom']
+                            tile_top = tile['top']
+
+                            current_bottom = self.skrr.y - self.skrr.height / 2
+                            current_top = self.skrr.y + self.skrr.height / 2
+                            current_left = self.skrr.x - self.skrr.width / 2
+                            current_right = self.skrr.x + self.skrr.width / 2
+
+                            y_overlap = not (current_top < tile_bottom or current_bottom > tile_top)
+
+                            if y_overlap:
+                                if self.skrr.face_dir == 1 and current_right <= tile_left and next_right > tile_left:
+                                    can_move = False
+                                    self.skrr.x = tile_left - self.skrr.width / 2 - self.COLLISION_MARGIN
+                                    self.movement_stopped = True
+                                    break
+                                elif self.skrr.face_dir == -1 and current_left >= tile_right and next_left < tile_right:
+                                    can_move = False
+                                    self.skrr.x = tile_right + self.skrr.width / 2 + self.COLLISION_MARGIN
+                                    self.movement_stopped = True
+                                    break
+
+                    if can_move:
+                        self.skrr.x = new_x
+                        self.traveled_distance += actual_move
             else:
                 min_x = max(0, self.minX)
 
-                if new_x < min_x:
-                    self.skrr.x = min_x
+                if new_x < min_x + self.COLLISION_MARGIN:
+                    self.skrr.x = min_x + self.COLLISION_MARGIN
                     self.movement_stopped = True
-                elif new_x > get_canvas_width() - self.minX:
-                    self.skrr.x = get_canvas_width() - self.minX
+                elif new_x > get_canvas_width() - self.minX - self.COLLISION_MARGIN:
+                    self.skrr.x = get_canvas_width() - self.minX - self.COLLISION_MARGIN
                     self.movement_stopped = True
                 else:
                     self.skrr.x = new_x
