@@ -82,7 +82,7 @@ class Enemy:
 
     def apply_gravity(self):
         """중력 적용"""
-        if not self.is_grounded:
+        if not self.is_grounded and self.is_alive:
             self.velocity_y += self.gravity * game_framework.frame_time
             self.y += self.velocity_y * game_framework.frame_time
 
