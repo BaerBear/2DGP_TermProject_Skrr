@@ -90,12 +90,12 @@ class UI:
                     offset = 28
                 UI.font.draw(x * 2.5 + offset, y * 2.5 - 39.5, hp_text, (255, 255, 255))
 
-    def draw_gold_icon(self, x, y, gold_amount):
+    def draw_gold_icon(self, x, y, gold_amount, draw_font=True):
         if UI.gold_image:
             UI.gold_image[0].clip_draw(0, 0, UI.gold_image[0].w, UI.gold_image[0].h, x, y,
                                        UI.gold_image[0].w * 2.5, UI.gold_image[0].h* 2.5)
 
-            if UI.font:
+            if UI.font and draw_font:
                 gold_text = f'{gold_amount}'
                 UI.font.draw(x + (UI.gold_image[0].w / 2) + 14, y, gold_text, (255, 255, 255))
 
@@ -137,12 +137,23 @@ class UI:
         x = x_pos[num - 1]
         y = 97
         if is_unlocked:
+            if num == 1:
+                self.draw_a_key(x, y + 35)
+            elif num == 2:
+                self.draw_s_key(x, y + 35)
+            elif num == 3:
+                self.draw_d_key(x, y + 35)
             return
         else:
             if UI.locked_slot_image:
                 UI.locked_slot_image[0].clip_draw(0, 0, UI.locked_slot_image[0].w, UI.locked_slot_image[0].h,
                                                   x, y, UI.locked_slot_image[0].w * 2, UI.locked_slot_image[0].h * 2)
-
+                import SKRR
+                Skrr = SKRR.get_player()
+                amount = Skrr.skill_prices['skill' + str(num)]
+                self.draw_gold_icon(x - 17, y, amount, draw_font=False)
+                font = load_font(r'..\Resources\font\Perfect_DOS_VGA_437.ttf', 20)
+                font.draw(x, y, f'{amount}', (255, 255, 255))
         if num == 1:
             self.draw_a_key(x, y + 35)
         elif num == 2:

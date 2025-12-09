@@ -293,7 +293,7 @@ class Enemy:
         else:
             pass
 
-        gold_amount = random.randint(8, 20)
+        gold_amount = random.randint(15, 25)
         gold = Gold(self.x, self.y, gold_amount)
         gold.set_tile_map(self.tile_map)
         game_world.add_object(gold, 1)

@@ -246,4 +246,4 @@ class UI_Image_Loader:
         elif ui_type == 'Skill3_Icon':
             self.images.append(load_image(os.path.join(self.resource_path, 'FlashBladeDance_icon.png')))
         elif ui_type == 'Locked_Slot':
-            self.images.append(load_image(os.path.join(self.resource_path, 'Locked_Slot.png')))
+            self.images.append(load_image(os.path.join(self.resource_path, 'Locked_Slot_new.png')))
