@@ -19,7 +19,7 @@ class StateMachine:
         for check_event in self.rules[self.current_state].keys():
             if check_event(state_event):
                 next_state = self.rules[self.current_state][check_event]
-                print(f'State Change: {self.current_state.__class__.__name__} -> {next_state.__class__.__name__}')
+                # print(f'State Change: {self.current_state.__class__.__name__} -> {next_state.__class__.__name__}')
                 self.current_state.exit(state_event)
                 self.current_state = next_state
                 self.current_state.enter(state_event)

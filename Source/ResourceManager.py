@@ -31,7 +31,7 @@ class ResourceManager:
         if cls._initialized:
             return
 
-        print("리소스 로딩 시작")
+        # print("리소스 로딩 시작")
 
         # 플레이어 이미지 로드
         cls._load_player_images()
@@ -51,14 +51,14 @@ class ResourceManager:
         cls._load_ui_images()
 
         cls._initialized = True
-        print("리소스 로딩 완료")
+        # print("리소스 로딩 완료")
 
     @classmethod
     def _load_player_images(cls):
         if cls._player_images is not None:
             return
 
-        print("  - 플레이어 이미지 로딩...")
+        # print("  - 플레이어 이미지 로딩...")
         cls._player_images = {
             'Idle': Image_Loader.SKRR_Image_Loader('Idle').images,
             'Wait': Image_Loader.SKRR_Image_Loader('Wait').images,
@@ -84,7 +84,7 @@ class ResourceManager:
 
     @classmethod
     def _load_enemy_images(cls):
-        print("  - 적 이미지 로딩...")
+        # print("  - 적 이미지 로딩...")
 
         # Knight_Sword
         if 'Knight_Sword' not in cls._enemy_images:
@@ -117,7 +117,7 @@ class ResourceManager:
 
     @classmethod
     def _load_boss_images(cls):
-        print("  - 보스 이미지 로딩...")
+        # print("  - 보스 이미지 로딩...")
 
         # GrimReaper
         if 'GrimReaper' not in cls._boss_images:
@@ -135,7 +135,7 @@ class ResourceManager:
     def _load_effect_images(cls):
         if cls._effect_images is not None:
             return
-        print("  - 이펙트 이미지 로딩...")
+        # print("  - 이펙트 이미지 로딩...")
 
         cls._effect_images = {
             'enemy_dead': Image_Loader.Effect_Image_Loader('Enemy_Dead').images,
@@ -154,7 +154,7 @@ class ResourceManager:
     def _load_object_images(cls):
         if cls._object_images is not None:
             return
-        print("  - 오브젝트 이미지 로딩...")
+        # print("  - 오브젝트 이미지 로딩...")
 
         cls._object_images = {
             'coin': Image_Loader.Object_Image_Loader('Coin').images,
@@ -167,7 +167,7 @@ class ResourceManager:
     def _load_ui_images(cls):
         if cls._ui_images is not None:
             return
-        print("  - UI 이미지 로딩...")
+        # print("  - UI 이미지 로딩...")
 
         cls._ui_images = {
             'player_info': Image_Loader.UI_Image_Loader('Player_Info').images,
@@ -228,12 +228,12 @@ class ResourceManager:
 
     @classmethod
     def clear_cache(cls):
-        print("캐시 클리어")
+        # print("캐시 클리어")
         cls._image_cache.clear()
 
     @classmethod
     def unload_all(cls):
-        print("모든 리소스 언로드")
+        # print("모든 리소스 언로드")
         cls._image_cache.clear()
         cls._player_images = None
         cls._enemy_images.clear()

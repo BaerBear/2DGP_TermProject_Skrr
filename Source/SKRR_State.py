@@ -821,7 +821,7 @@ class Skill2:
         self.prev_frame = self.skrr.frame
 
         if self.skrr.frame >= self.total_frames:
-            print('skill2 end')
+            # print('skill2 end')
             if self.skrr.key_pressed['left']:
                 self.skrr.face_dir = -1
                 self.skrr.state_machine.handle_event(('ANIMATION_END', 'WALK'))

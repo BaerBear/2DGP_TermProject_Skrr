@@ -21,29 +21,29 @@ def initialize():
     global _initialized, _resource_manager, _sound_manager, _camera, _UI
 
     if _initialized:
-        print("Common 모듈은 이미 초기화되었습니다.")
+        #print("Common 모듈은 이미 초기화되었습니다.")
         return
 
-    print("=== Common 모듈 초기화 시작 ===")
+    #print("=== Common 모듈 초기화 시작 ===")
 
     # ResourceManager 초기화
-    print("리소스 매니저 초기화...")
+    #print("리소스 매니저 초기화...")
     _resource_manager = ResourceManager
     _resource_manager.preload_resources()
 
     # SoundManager 초기화
-    print("사운드 매니저 초기화...")
+    #print("사운드 매니저 초기화...")
     _sound_manager = SoundManager
 
     # Camera 초기화
-    print("카메라 초기화...")
+    #print("카메라 초기화...")
     _camera = Camera.get_instance()
 
-    print("UI 초기화...")
+    #print("UI 초기화...")
     _UI = UI()
 
     _initialized = True
-    print("=== Common 모듈 초기화 완료 ===\n")
+    #print("=== Common 모듈 초기화 완료 ===\n")
 
 
 def get_resource_manager():

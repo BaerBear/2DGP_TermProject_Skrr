@@ -34,7 +34,7 @@ class Gate:
             if Gate.c_image:
                 self.width = Gate.c_image.w
                 self.height = Gate.c_image.h
-                print (f"Gate width set to {self.width}, height set to {self.height}")
+                # print (f"Gate width set to {self.width}, height set to {self.height}")
 
         if Gate.o_image is None:
             Gate.o_image = ResourceManager.get_object_images('gate_open')
@@ -42,7 +42,7 @@ class Gate:
         if self.width is None and Gate.c_image:
             self.width = Gate.c_image.w
             self.height = Gate.c_image.h
-            print (f"Gate width set to {self.width}, height set to {self.height}")
+            # print (f"Gate width set to {self.width}, height set to {self.height}")
 
     def check_enemies_cleared(self):
         enemy_layer = 1

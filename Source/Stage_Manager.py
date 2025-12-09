@@ -35,7 +35,7 @@ class StageManager:
         enemies = []
 
         if stage_num not in StageManager.STAGE_ENEMIES:
-            print(f"Warning: Stage {stage_num} has no enemy configuration")
+            # print(f"Warning: Stage {stage_num} has no enemy configuration")
             return enemies
 
         player_start_x, player_start_y = SKRR.stage_start_positions.get(stage_num, (100, 600))
@@ -65,9 +65,9 @@ class StageManager:
             game_world.add_collision_pair('player_attack:enemy', None, enemy)
 
             enemies.append(enemy)
-            print(f"  - Spawned {enemy_class.__name__} at ({x}, {y})")
+            # print(f"  - Spawned {enemy_class.__name__} at ({x}, {y})")
 
-        print(f"Stage {stage_num}: Loaded {len(enemies)} enemies")
+        # print(f"Stage {stage_num}: Loaded {len(enemies)} enemies")
         return enemies
 
     @staticmethod
@@ -76,4 +76,4 @@ class StageManager:
         objects_to_remove = game_world.world[1].copy() if len(game_world.world) > 1 else []
         for obj in objects_to_remove:
             game_world.remove_object(obj)
-        print("All enemies cleared")
+        # print("All enemies cleared")

@@ -361,7 +361,8 @@ def handle_events():
             # F4 - BossStage 로드
             load_stage(2)
         elif e.type == SDL_MOUSEBUTTONDOWN and e.button == SDL_BUTTON_LEFT:
-            print(f"Mouse Left Click: ({e.x}, {get_canvas_height() - e.y})")
+            # print(f"Mouse Left Click: ({e.x}, {get_canvas_height() - e.y})")
+            pass
         elif e.type == SDL_MOUSEMOTION:
             global mx, my
             mx, my = e.x, get_canvas_height() - e.y
