@@ -18,6 +18,7 @@ class UI:
     boss_hp_info_image = None
     boss_name_info_image = None
     locked_slot_image = None
+    skill_slot_image = None
     font = None
 
     def __init__(self):
@@ -35,6 +36,7 @@ class UI:
             UI.boss_hp_info_image = ResourceManager.get_ui_images('boss_hp_info')
             UI.boss_name_info_image = ResourceManager.get_ui_images('boss_name_info')
             UI.locked_slot_image = ResourceManager.get_ui_images('locked_slot')
+            UI.skill_slot_image = ResourceManager.get_ui_images('skill_slot')
             UI.initialized = True
 
     def draw_cursor(self, x, y):
@@ -133,19 +135,13 @@ class UI:
                 UI.font.draw(x - 75, y + 1, name_text, (255, 255, 255))
 
     def draw_locked_slot(self, is_unlocked, num):
-        x_pos = [176, 263, 350]
-        x = x_pos[num - 1]
-        y = 97
         if is_unlocked:
-            if num == 1:
-                self.draw_a_key(x, y + 35)
-            elif num == 2:
-                self.draw_s_key(x, y + 35)
-            elif num == 3:
-                self.draw_d_key(x, y + 35)
             return
         else:
             if UI.locked_slot_image:
+                x_pos = [176, 263, 350]
+                x = x_pos[num - 1]
+                y = 97
                 UI.locked_slot_image[0].clip_draw(0, 0, UI.locked_slot_image[0].w, UI.locked_slot_image[0].h,
                                                   x, y, UI.locked_slot_image[0].w * 2, UI.locked_slot_image[0].h * 2)
                 import SKRR
@@ -154,9 +150,28 @@ class UI:
                 self.draw_gold_icon(x - 17, y, amount, draw_font=False)
                 font = load_font(r'..\Resources\font\Perfect_DOS_VGA_437.ttf', 20)
                 font.draw(x, y, f'{amount}', (255, 255, 255))
-        if num == 1:
-            self.draw_a_key(x, y + 35)
-        elif num == 2:
-            self.draw_s_key(x, y + 35)
-        elif num == 3:
-            self.draw_d_key(x, y + 35)
+
+    def draw_skill_cooldown(self, skill_num, remaining_cooldown, total_cooldown):
+        x_pos = [176, 263, 350]
+        x = x_pos[skill_num - 1]
+        y = 97
+
+        if remaining_cooldown > 0:
+            UI.skill_slot_image[0].opacify(0.5)
+            UI.skill_slot_image[0].clip_draw(0, 0, UI.skill_slot_image[0].w, UI.skill_slot_image[0].h,
+                                                  x, y, UI.skill_slot_image[0].w * 2.5, UI.skill_slot_image[0].h * 2.5)
+
+            UI.skill_slot_image[0].opacify(1.0)
+
+            cooldown_font = load_font(r'..\Resources\font\Perfect_DOS_VGA_437.ttf', 28)
+            cooldown_text = f'{remaining_cooldown:.1f}'
+
+            offset = 30 if remaining_cooldown >= 10 else 22
+
+            cooldown_font.draw(x - offset, y, cooldown_text, (255, 255, 255))
+
+    def draw_skill_key(self):
+        x_pos = [176, 263, 350]
+        self.draw_a_key(x_pos[0], 132)
+        self.draw_s_key(x_pos[1], 132)
+        self.draw_d_key(x_pos[2], 132)

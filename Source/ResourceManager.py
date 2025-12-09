@@ -182,6 +182,7 @@ class ResourceManager:
             'boss_hp_info': Image_Loader.UI_Image_Loader('Boss_Hp_Info').images,
             'boss_name_info': Image_Loader.UI_Image_Loader('Boss_Name_Info').images,
             'locked_slot': Image_Loader.UI_Image_Loader('Locked_Slot').images,
+            'skill_slot': Image_Loader.UI_Image_Loader('Skill_Slot').images,
         }
 
     @classmethod

@@ -293,6 +293,24 @@ def draw():
         ui.draw_locked_slot(Skrr.skill_unlocked['skill1'], 1)
         ui.draw_locked_slot(Skrr.skill_unlocked['skill2'], 2)
         ui.draw_locked_slot(Skrr.skill_unlocked['skill3'], 3)
+
+        if Skrr.skill_unlocked['skill1']:
+            remaining = Skrr.get_skill_cooldown_remaining('skill1')
+            if remaining > 0:
+                ui.draw_skill_cooldown(1, remaining, Skrr.skill_cooldowns['skill1'])
+
+        if Skrr.skill_unlocked['skill2']:
+            remaining = Skrr.get_skill_cooldown_remaining('skill2')
+            if remaining > 0:
+                ui.draw_skill_cooldown(2, remaining, Skrr.skill_cooldowns['skill2'])
+
+        if Skrr.skill_unlocked['skill3']:
+            remaining = Skrr.get_skill_cooldown_remaining('skill3')
+            if remaining > 0:
+                ui.draw_skill_cooldown(3, remaining, Skrr.skill_cooldowns['skill3'])
+
+        ui.draw_skill_key()
+
         ui.draw_gold_icon(435, 33, Skrr.gold_amount, True)
         if stage_gate and stage_gate.player_in_range:
             camera = common.get_camera()
