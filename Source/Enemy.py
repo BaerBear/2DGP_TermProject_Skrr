@@ -416,6 +416,8 @@ class Knight_Sword(Enemy):
 
     def update(self):
         super().update()
+        if not self.is_alive:
+            return
 
         player = SKRR.get_player()
         if player and not player.is_alive():

@@ -40,7 +40,8 @@ def handle_right_down(skrr, event):
     if (skrr.state_machine.current_state != skrr.DASH
         and not skrr.state_machine.current_state == skrr.SKILL1
         and not skrr.state_machine.current_state == skrr.SKILL2
-        and not skrr.state_machine.current_state == skrr.SKILL3):
+        and not skrr.state_machine.current_state == skrr.SKILL3
+        and not skrr.state_machine.current_state == skrr.DEAD):
         skrr.face_dir = 1
     skrr.is_moving = True
     skrr.handle_event(('INPUT', event))
@@ -51,7 +52,8 @@ def handle_left_down(skrr, event):
     if (skrr.state_machine.current_state != skrr.DASH
         and not skrr.state_machine.current_state == skrr.SKILL1
         and not skrr.state_machine.current_state == skrr.SKILL2
-        and not skrr.state_machine.current_state == skrr.SKILL3):
+        and not skrr.state_machine.current_state == skrr.SKILL3
+        and not skrr.state_machine.current_state == skrr.DEAD):
         skrr.face_dir = -1
     skrr.is_moving = True
     skrr.handle_event(('INPUT', event))
@@ -64,7 +66,8 @@ def handle_attack(skrr, event):
     # 스킬 사용 중에는 공격 불가
     if (skrr.state_machine.current_state == skrr.SKILL1
         or skrr.state_machine.current_state == skrr.SKILL2
-        or skrr.state_machine.current_state == skrr.SKILL3):
+        or skrr.state_machine.current_state == skrr.SKILL3
+        or skrr.state_machine.current_state == skrr.DASH):
         return
 
     if skrr.state_machine.current_state == skrr.ATTACK and skrr.attack_type == 'A' and 18 <= skrr.frame < 30:

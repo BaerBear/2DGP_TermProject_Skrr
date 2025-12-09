@@ -149,7 +149,7 @@ class TileMap:
                                 'left': left,
                                 'bottom': bottom,
                                 'right': right,
-                                'top': top,
+                                'top': top - 8 if layer['name'] == 'tile' else top - 4,
                                 'x': x,
                                 'y': y,
                                 'layer': layer['name']

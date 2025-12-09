@@ -221,6 +221,12 @@ class UI_Image_Loader:
             self.images.append(load_image(os.path.join(self.resource_path, 'Mouse_Cursor.png')))
         elif ui_type == 'F_key':
             self.images.append(load_image(os.path.join(self.resource_path, 'F.png')))
+        elif ui_type == 'A_key':
+            self.images.append(load_image(os.path.join(self.resource_path, 'A.png')))
+        elif ui_type == 'S_key':
+            self.images.append(load_image(os.path.join(self.resource_path, 'S.png')))
+        elif ui_type == 'D_key':
+            self.images.append(load_image(os.path.join(self.resource_path, 'D.png')))
         elif ui_type == 'Player_Info':
             self.images.append(load_image(os.path.join(self.resource_path, 'Player_Info_UI.png')))
         elif ui_type == 'Player_HP_Bar':
@@ -239,3 +245,5 @@ class UI_Image_Loader:
             self.images.append(load_image(os.path.join(self.resource_path, 'BuddhaCyclone_icon.png')))
         elif ui_type == 'Skill3_Icon':
             self.images.append(load_image(os.path.join(self.resource_path, 'FlashBladeDance_icon.png')))
+        elif ui_type == 'Locked_Slot':
+            self.images.append(load_image(os.path.join(self.resource_path, 'Locked_Slot.png')))

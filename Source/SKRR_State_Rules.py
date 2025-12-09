@@ -32,13 +32,13 @@ def Get_State_Rules(skrr):
 
     # 스킬 전환 조건 (쿨타임 체크 포함)
     def can_use_skill1(e):
-        return skill1_down(e) and skrr.is_skill_ready('skill1')
+        return skill1_down(e) and skrr.skill_unlocked['skill1'] and skrr.is_skill_ready('skill1')
 
     def can_use_skill2(e):
-        return skill2_down(e) and skrr.is_skill_ready('skill2')
+        return skill2_down(e) and skrr.skill_unlocked['skill2'] and skrr.is_skill_ready('skill2')
 
     def can_use_skill3(e):
-        return skill3_down(e) and skrr.is_skill_ready('skill3')
+        return skill3_down(e) and skrr.skill_unlocked['skill3'] and skrr.is_skill_ready('skill3')
 
     def skill_to_idle(e):
         return animation_end(e) and e[1] == 'IDLE'

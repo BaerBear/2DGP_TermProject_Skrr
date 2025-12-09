@@ -290,8 +290,10 @@ def draw():
     ui = common.get_ui()
     if ui and Skrr:
         ui.draw_player_info(84, 33, Skrr.current_hp, Skrr.max_hp)
+        ui.draw_locked_slot(Skrr.skill_unlocked['skill1'], 1)
+        ui.draw_locked_slot(Skrr.skill_unlocked['skill2'], 2)
+        ui.draw_locked_slot(Skrr.skill_unlocked['skill3'], 3)
         ui.draw_gold_icon(435, 33, Skrr.gold_amount)
-
         if stage_gate and stage_gate.player_in_range:
             camera = common.get_camera()
             if camera:

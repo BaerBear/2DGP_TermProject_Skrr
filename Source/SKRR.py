@@ -90,17 +90,27 @@ class SKRR:
 
         # 스킬 시스템
         self.skill_cooldowns = {
-            # 'skill1': 5.0,   # 스킬1 쿨타임 (초)
-            # 'skill2': 8.0,   # 스킬2 쿨타임 (초)
-            # 'skill3': 12.0   # 스킬3 쿨타임 (초)
-            'skill1': 1.0,  # 디버깅용
-            'skill2': 1.0,  # 디버깅용
-            'skill3': 1.0   # 디버깅용
+            'skill1': 5.0,   # 스킬1 쿨타임 (초)
+            'skill2': 8.0,   # 스킬2 쿨타임 (초)
+            'skill3': 12.0   # 스킬3 쿨타임 (초)
+            # 'skill1': 1.0,  # 디버깅용
+            # 'skill2': 1.0,  # 디버깅용
+            # 'skill3': 1.0   # 디버깅용
         }
         self.skill_last_use_time = {
             'skill1': -5.0,
             'skill2': -8.0,
             'skill3': -12.0
+        }
+        self.skill_unlocked = {
+            'skill1': False,
+            'skill2': False,
+            'skill3': False
+        }
+        self.skill_prices = {
+            'skill1': 30,
+            'skill2': 100,
+            'skill3': 200
         }
 
         # State
@@ -143,6 +153,16 @@ class SKRR:
         if self.is_invincible:
             if get_time() - self.invincible_start_time >= self.invincible_duration:
                 self.is_invincible = False
+
+        self.check_skill_unlocks(self.gold_amount)
+
+    def check_skill_unlocks(self, gold_amount):
+        if self.skill_unlocked['skill3']:
+            return
+
+        for skill, price in self.skill_prices.items():
+            if not self.skill_unlocked[skill] and gold_amount >= price:
+                self.skill_unlocked[skill] = True
 
     # 피격
     def get_damage(self, damage):
