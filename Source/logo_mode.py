@@ -8,7 +8,7 @@ logo_start_time = 0.0
 
 def init():
     global image, logo_start_time
-    image = load_image('../Resources/Image/Skrr_Ai_image_fill.png')
+    image = load_image('../Resources/Image/UI/Title_Art.png')
     logo_start_time = get_time()
     sound_manager = common.get_sound_manager()
     sound_manager.play_bgm('logo', repeat=False)
@@ -16,7 +16,7 @@ def init():
     common.initialize()
 
 def update():
-    if get_time() - logo_start_time > 2.0:
+    if get_time() - logo_start_time > 3.0:
         game_framework.change_mode(title_mode)
 
 def draw():

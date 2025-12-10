@@ -9,7 +9,6 @@ def init():
     global image
     image = []
     image.append(load_image('../Resources/Image/UI/Ending_Title.png'))
-    image.append(load_image('../Resources/Image/UI/Mouse_Cursor.png'))
 
     sound_manager = common.get_sound_manager()
     sound_manager.stop_bgm()
@@ -21,8 +20,10 @@ def update():
 def draw():
     clear_canvas()
     hide_cursor()
+    ui = common.get_ui()
     image[0].draw(game_framework.width // 2, game_framework.height // 2)
-    image[1].draw(mx, my)
+    ui.draw_press_space(game_framework.width // 2 - 230, 70)
+    ui.draw_cursor(mx, my)
     update_canvas()
 
 def finish():

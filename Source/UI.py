@@ -175,3 +175,9 @@ class UI:
         self.draw_a_key(x_pos[0], 132)
         self.draw_s_key(x_pos[1], 132)
         self.draw_d_key(x_pos[2], 132)
+
+    def draw_press_space(self, x, y):
+        if UI.font:
+            press_text = 'Press Space to Continue'
+            font = load_font(r'..\Resources\font\Perfect_DOS_VGA_437.ttf', 36)
+            font.draw(x, y, press_text, (255, 255, 255))
