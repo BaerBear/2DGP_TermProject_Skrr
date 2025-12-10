@@ -346,7 +346,8 @@ def handle_events():
             game_framework.quit()
         elif e.type == SDL_KEYDOWN and e.key == SDLK_f:
             # F - 게이트 상호작용
-            if 'stage_gate' in globals() and stage_gate:
+            global stage_gate
+            if stage_gate and stage_gate.activated and stage_gate.player_in_range:
                 stage_gate.interact()
         elif e.type == SDL_KEYDOWN and e.key == SDLK_F1:
             # F1 - 충돌 박스 표시 토글

@@ -134,7 +134,12 @@ class Gate:
 
     def interact(self):
         if self.activated and self.player_in_range:
-            # 다음 스테이지로 이동
+            if self.next_stage == -1:
+                import game_framework
+                import ending_mode
+                game_framework.change_mode(ending_mode)
+                return True
+
             import play_mode
             play_mode.load_stage(self.next_stage)
             return True

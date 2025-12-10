@@ -90,7 +90,7 @@ class FireField:
         if hasattr(player, 'get_damage'):
             player.get_damage(self.damage)
             SoundManager.play_enemy_sound('boss_hit_skill2')
-            print(f"FireField: Player takes {self.damage} damage! (Multi-hit)")
+            #print(f"FireField: Player takes {self.damage} damage! (Multi-hit)")
 
     def draw(self):
         if not self.is_alive:
