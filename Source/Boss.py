@@ -78,7 +78,7 @@ class GrimReaper(Enemy):
     def __init__(self, x, y):
         super().__init__(x, y)
 
-        self.max_hp = 20
+        self.max_hp = 1000
         self.current_hp = self.max_hp
         self.scale = 2.5
 
