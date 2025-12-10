@@ -10,7 +10,8 @@ def init():
     global image, logo_start_time
     image = load_image('../Resources/Image/Skrr_Ai_image_fill.png')
     logo_start_time = get_time()
-
+    sound_manager = common.get_sound_manager()
+    sound_manager.play_bgm('logo', repeat=False)
     # 모든 싱글톤 리소스 미리 로딩
     common.initialize()
 
@@ -36,7 +37,8 @@ def handle_events():
         elif e.type == SDL_KEYDOWN and e.key == SDLK_ESCAPE:
             game_framework.quit()
         elif e.type == SDL_MOUSEBUTTONDOWN and e.button == SDL_BUTTON_LEFT:
-            print(f"Mouse Left Click: ({e.x}, {get_canvas_height() - e.y})")
+            #print(f"Mouse Left Click: ({e.x}, {get_canvas_height() - e.y})")
+            pass
 
 def pause():
     pass

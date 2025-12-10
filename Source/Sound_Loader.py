@@ -87,6 +87,7 @@ class SoundManager:
         # 배경 음악
         Bgm_path = os.path.join(audio_path, 'Bgm')
         cls.bgms = {}
+        cls.bgms['logo'] = load_music(os.path.join(Bgm_path, 'Logo.wav'))
         cls.bgms['chapter1'] = load_music(os.path.join(Bgm_path, 'Chapter1.wav'))
         cls.bgms['chapter1_boss'] = load_music(os.path.join(Bgm_path, 'Chapter1_Boss.wav'))
         cls.bgms['main_title'] = load_music(os.path.join(Bgm_path, 'MainTitle_Hardmode.wav'))
