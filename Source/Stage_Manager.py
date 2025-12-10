@@ -19,10 +19,23 @@ class StageManager:
             (Knight_Bow, 1200, 256),
         ],
         1: [  # Stage1
+            # First Wave - 시작 지점
             (Knight_Sword, 700, 608),
             (Knight_Bow, 600, 608),
-            (Knight_Tackle, 1300, 672),
+
+            # Second Wave - 중간 지점
+            (Knight_Tackle, 1700, 672),
             (Knight_Sword, 1500, 608),
+            (Knight_Bow, 1600, 608),
+            (Knight_Sword, 1800, 608),
+
+            # Third Wave - 상단 플랫폼
+            (Knight_Sword, 700, 1440),
+            (Knight_Bow, 600, 1440),
+            (Knight_Tackle, 1100, 1376),
+            (Knight_Sword, 1400, 1312),
+            (Knight_Bow, 1600, 1312),
+
         ],
         2: [  # BossStage
             (GrimReaper, 1400, 320),

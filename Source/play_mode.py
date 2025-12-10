@@ -143,7 +143,7 @@ def load_stage(stage_num):
         sound_manager.stop_bgm()
         sound_manager.play_bgm('chapter1_boss', repeat=True)
 
-    print(f"Stage {stage_num} loaded: {stage_files[stage_num]} at position ({start_x}, {start_y})")
+    #print(f"Stage {stage_num} loaded: {stage_files[stage_num]} at position ({start_x}, {start_y})")
 
 def finish():
     game_world.clear()
