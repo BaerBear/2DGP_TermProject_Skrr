@@ -34,7 +34,7 @@ class StageManager:
             (Knight_Bow, 600, 1440),
             (Knight_Tackle, 1100, 1376),
             (Knight_Sword, 1400, 1312),
-            (Knight_Bow, 1600, 1312),
+            (Knight_Bow, 1200, 1312),
 
         ],
         2: [  # BossStage
