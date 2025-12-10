@@ -27,7 +27,7 @@ def init():
     sound_manager.play_bgm('chapter1', repeat=True)
 
     current_stage = 0
-    tmx_path = os.path.join(os.path.dirname(__file__), '..', 'Tilemap_work', 'Stage0.tmx')
+    tmx_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), r'Tilemap_work', 'Stage0.tmx')
     tile_map = TileMap(tmx_path)
 
     Skrr = SKRR.SKRR()
@@ -102,8 +102,7 @@ def load_stage(stage_num):
 
     if tile_map:
         game_world.remove_collision_object(tile_map)
-
-    tmx_path = os.path.join(os.path.dirname(__file__), '..', 'Tilemap_work', stage_files[stage_num])
+    tmx_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), r'Tilemap_work', stage_files[stage_num])
     tile_map = TileMap(tmx_path)
 
     Skrr.set_tile_map(tile_map)

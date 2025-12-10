@@ -8,7 +8,8 @@ logo_start_time = 0.0
 
 def init():
     global image, logo_start_time
-    image = load_image('../Resources/Image/UI/Title_Art.png')
+    image_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), r'Resources', 'Image', 'UI', 'Title_Art.png')
+    image = load_image(image_path)
     logo_start_time = get_time()
     sound_manager = common.get_sound_manager()
     sound_manager.play_bgm('logo', repeat=False)

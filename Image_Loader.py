@@ -6,7 +6,7 @@ from pico2d import load_image
 class SKRR_Image_Loader:
     def __init__(self, state):
         self.images = []
-        self.resource_path = os.path.join(os.path.dirname(__file__), r'..\Resources\Image\Object', 'Skul')
+        self.resource_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), r'Resources', 'Image', 'Object', 'Skul')
         if state == 'Idle':
             for i in range(4):
                 self.images.append(load_image(os.path.join(self.resource_path, r'Idle', f'Idle_{i}.png')))
@@ -76,8 +76,7 @@ class SKRR_Image_Loader:
 class Enemy_Image_Loader:
     def __init__(self, enemy_type, state):
         self.images = []
-        self.resource_path = os.path.join(os.path.dirname(__file__), r'..\Resources\Image\Object', enemy_type)
-
+        self.resource_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), r'Resources', 'Image', 'Object', enemy_type)
         if enemy_type == 'Knight_Sword':
             if state == 'Walk':
                 for i in range(8):
@@ -131,7 +130,7 @@ class Enemy_Image_Loader:
 class Boss_Image_Loader:
     def __init__(self, boss_type, state):
         self.images = []
-        self.resource_path = os.path.join(os.path.dirname(__file__), r'..\Resources\Image\Object', boss_type)
+        self.resource_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), r'Resources', 'Image', 'Object', boss_type)
 
         if boss_type == 'GrimReaper':
             if state == 'Idle':
@@ -165,7 +164,7 @@ class Boss_Image_Loader:
 class Effect_Image_Loader:
     def __init__(self, effect_type):
         self.images = []
-        self.resource_path = os.path.join(os.path.dirname(__file__), r'..\Resources\Image\Effect', effect_type)
+        self.resource_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), r'Resources', 'Image', 'Effect', effect_type)
 
         if effect_type == 'Enemy_Dead':
             for i in range(6):
@@ -198,7 +197,7 @@ class Effect_Image_Loader:
 class Object_Image_Loader:
     def __init__(self, object_type):
         self.images = []
-        self.resource_path = os.path.join(os.path.dirname(__file__), r'..\Resources\Image\Object')
+        self.resource_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), r'Resources', 'Image', 'Object')
 
         if object_type == 'Coin':
             for i in range(30):
@@ -215,7 +214,7 @@ class Object_Image_Loader:
 class UI_Image_Loader:
     def __init__(self, ui_type):
         self.images = []
-        self.resource_path = os.path.join(os.path.dirname(__file__), r'..\Resources\Image\UI')
+        self.resource_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), r'Resources', 'Image', 'UI')
 
         if ui_type == 'Cursor':
             self.images.append(load_image(os.path.join(self.resource_path, 'Mouse_Cursor.png')))

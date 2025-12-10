@@ -9,7 +9,7 @@ mx, my = 0, 0
 def init():
     global image
     image = []
-    image.append(load_image('../Resources/Image/UI/Skrr_Ai_image_fill.png'))
+    image.append(load_image(os.path.join(os.path.dirname(os.path.abspath(__file__)), r'Resources', 'Image', 'UI', 'Skrr_Ai_image_fill.png')))
 
     sound_manager = common.get_sound_manager()
     sound_manager.play_bgm('main_title', repeat=True)

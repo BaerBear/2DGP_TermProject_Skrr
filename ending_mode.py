@@ -8,7 +8,7 @@ mx, my = 0, 0
 def init():
     global image
     image = []
-    image.append(load_image('../Resources/Image/UI/Ending_Title.png'))
+    image.append(load_image(os.path.join(os.path.dirname(os.path.abspath(__file__)), r'Resources', 'Image', 'UI', 'Ending_Title.png')))
 
     sound_manager = common.get_sound_manager()
     sound_manager.stop_bgm()

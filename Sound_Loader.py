@@ -19,7 +19,7 @@ class SoundManager:
         if cls._initialized:
             return
 
-        audio_path = os.path.join(os.path.dirname(__file__), r'..\Resources\audio')
+        audio_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), r'Resources', 'audio')
         skul_path = os.path.join(audio_path, 'Skul')
 
         # 플레이어 사운드

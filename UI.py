@@ -31,7 +31,7 @@ class UI:
             UI.player_info_image = ResourceManager.get_ui_images('player_info')
             UI.player_hp_bar_image = ResourceManager.get_ui_images('player_hp_bar')
             UI.gold_image = ResourceManager.get_ui_images('gold_icon')
-            UI.font = load_font(r'..\Resources\font\Perfect_DOS_VGA_437.ttf', 24)
+            UI.font = load_font(os.path.join(os.path.dirname(os.path.abspath(__file__)), r'Resources', 'font', 'Perfect_DOS_VGA_437.ttf'), 24)
             UI.boss_hp_bar_image = ResourceManager.get_ui_images('boss_hp_bar')
             UI.boss_hp_info_image = ResourceManager.get_ui_images('boss_hp_info')
             UI.boss_name_info_image = ResourceManager.get_ui_images('boss_name_info')
@@ -148,7 +148,7 @@ class UI:
                 Skrr = SKRR.get_player()
                 amount = Skrr.skill_prices['skill' + str(num)]
                 self.draw_gold_icon(x - 17, y, amount, draw_font=False)
-                font = load_font(r'..\Resources\font\Perfect_DOS_VGA_437.ttf', 20)
+                font = load_font(os.path.join(os.path.dirname(os.path.abspath(__file__)), r'Resources', 'font', 'Perfect_DOS_VGA_437.ttf'), 20)
                 font.draw(x, y, f'{amount}', (255, 255, 255))
 
     def draw_skill_cooldown(self, skill_num, remaining_cooldown, total_cooldown):
@@ -163,7 +163,7 @@ class UI:
 
             UI.skill_slot_image[0].opacify(1.0)
 
-            cooldown_font = load_font(r'..\Resources\font\Perfect_DOS_VGA_437.ttf', 28)
+            cooldown_font = load_font(os.path.join(os.path.dirname(os.path.abspath(__file__)), r'Resources', 'font', 'Perfect_DOS_VGA_437.ttf'), 28)
             cooldown_text = f'{remaining_cooldown:.1f}'
 
             offset = 30 if remaining_cooldown >= 10 else 22
@@ -179,5 +179,5 @@ class UI:
     def draw_press_space(self, x, y):
         if UI.font:
             press_text = 'Press Space to Continue'
-            font = load_font(r'..\Resources\font\Perfect_DOS_VGA_437.ttf', 36)
+            font = load_font(os.path.join(os.path.dirname(os.path.abspath(__file__)), r'Resources', 'font', 'Perfect_DOS_VGA_437.ttf'), 36)
             font.draw(x, y, press_text, (255, 255, 255))
