@@ -22,7 +22,7 @@ def draw():
     hide_cursor()
     ui = common.get_ui()
     image[0].draw(game_framework.width // 2, game_framework.height // 2)
-    ui.draw_press_space(game_framework.width // 2 - 230, 70)
+    ui.draw_press_space(game_framework.width // 2 - 230, 100)
     ui.draw_cursor(mx, my)
     update_canvas()
 
