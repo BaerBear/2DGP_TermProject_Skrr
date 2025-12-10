@@ -212,7 +212,7 @@ def check_attack_collision():
                 if enemy.type == 'Knight_Bow' or enemy.type == 'Knight_Sword' or enemy.type == 'Knight_Tackle':
                     sound_manager = common.get_sound_manager()
                     sound_manager.play_enemy_sound('enemy_hit')
-                print(f"플레이어 공격 적중! 데미지: {damage} (다중 히트: {is_multi_hit}, 간격: {hit_interval}초)")
+                #print(f"플레이어 공격 적중! 데미지: {damage} (다중 히트: {is_multi_hit}, 간격: {hit_interval}초)")
 
 
 def check_player_damage():
@@ -266,7 +266,7 @@ def check_player_damage():
                 else:
                     create_player_hit_effect(hit_x, hit_y)
 
-                print(f"플레이어 피격! 데미지: {damage}, 남은 HP: {player.current_hp}/{player.max_hp}")
+                #print(f"플레이어 피격! 데미지: {damage}, 남은 HP: {player.current_hp}/{player.max_hp}")
 
 
 def update():

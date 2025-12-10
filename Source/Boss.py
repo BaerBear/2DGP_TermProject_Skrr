@@ -148,7 +148,7 @@ class GrimReaper(Enemy):
         damage_variation = max(1, random.randint(actual_damage - int(actual_damage * 0.2),
                                                  actual_damage + int(actual_damage * 0.2)))
         self.current_hp -= damage_variation
-        print(f'Boss took {damage_variation} damage, current HP: {self.current_hp}/{self.max_hp}')
+        #print(f'Boss took {damage_variation} damage, current HP: {self.current_hp}/{self.max_hp}')
 
         if self.current_hp <= 0:
             self.on_death()
@@ -357,7 +357,8 @@ class GrimReaper(Enemy):
                 self.skill1_phase = 'DASHING'
                 self.skill1_ready_timer = 0
                 self.skill1_effect_timer = 0  # 이펙트 타이머 초기화
-                print(f"[SKILL1] Phase: READY -> DASHING")
+                # 엔딩 게이트인 경우 ending_mode로 전환
+                #print(f"[SKILL1] Phase: READY -> DASHING")
 
         elif self.skill1_phase == 'DASHING':
             # 이펙트 타이머 업데이트
@@ -381,7 +382,7 @@ class GrimReaper(Enemy):
                     self.skill1_phase = 'LANDING'
                     self.skill1_landing_timer = 0
                     self.clear_attack_hitbox()
-                    print(f"[SKILL1] Phase: DASHING -> LANDING (도착)")
+                    #(f"[SKILL1] Phase: DASHING -> LANDING (도착)")
                 else:
                     # 다음 위치 계산
                     ratio = move_distance / distance
@@ -423,13 +424,13 @@ class GrimReaper(Enemy):
                                     if self.face_dir == 1 and current_right < tile_left and next_right >= tile_left:
                                         can_move = False
                                         self.x = tile_left - self.width / 2 - 1
-                                        print(f"[SKILL1] 타일 충돌 감지 (오른쪽 이동, 벽 x={tile_left})")
+                                        #print(f"[SKILL1] 타일 충돌 감지 (오른쪽 이동, 벽 x={tile_left})")
                                         break
                                     # 왼쪽으로 이동 중 타일의 오른쪽 벽에 충돌
                                     elif self.face_dir == -1 and current_left > tile_right and next_left <= tile_right:
                                         can_move = False
                                         self.x = tile_right + self.width / 2 + 1
-                                        print(f"[SKILL1] 타일 충돌 감지 (왼쪽 이동, 벽 x={tile_right})")
+                                        #print(f"[SKILL1] 타일 충돌 감지 (왼쪽 이동, 벽 x={tile_right})")
                                         break
 
                         # 맵 경계 체크
@@ -440,12 +441,12 @@ class GrimReaper(Enemy):
                                 if next_right >= map_width_pixels - 5:
                                     can_move = False
                                     self.x = map_width_pixels - self.width / 2 - 5
-                                    print(f"[SKILL1] 맵 경계 충돌 (오른쪽)")
+                                    #print(f"[SKILL1] 맵 경계 충돌 (오른쪽)")
                             else:
                                 if next_left <= 5:
                                     can_move = False
                                     self.x = self.width / 2 + 5
-                                    print(f"[SKILL1] 맵 경계 충돌 (왼쪽)")
+                                    #print(f"[SKILL1] 맵 경계 충돌 (왼쪽)")
 
                     if can_move:
                         # 이동 가능하면 계속 이동
@@ -456,13 +457,13 @@ class GrimReaper(Enemy):
                         self.skill1_phase = 'LANDING'
                         self.skill1_landing_timer = 0
                         self.clear_attack_hitbox()
-                        print(f"[SKILL1] Phase: DASHING -> LANDING (벽/타일 도달)")
+                        #print(f"[SKILL1] Phase: DASHING -> LANDING (벽/타일 도달)")
             else:
                 # 도착
                 self.skill1_phase = 'LANDING'
                 self.skill1_landing_timer = 0
                 self.clear_attack_hitbox()
-                print(f"[SKILL1] Phase: DASHING -> LANDING (거리 10 이하)")
+                #print(f"[SKILL1] Phase: DASHING -> LANDING (거리 10 이하)")
 
         elif self.skill1_phase == 'LANDING':
             # 착지 모션: 1-6번 프레임 재생 (물리 기반 타이밍)
@@ -477,7 +478,7 @@ class GrimReaper(Enemy):
                 self.skill1_phase = 'READY'
                 self.state = 'IDLE'
                 self.last_action_time = get_time()
-                print(f"[SKILL1] Phase: LANDING -> IDLE (스킬 완료)")
+                #print(f"[SKILL1] Phase: LANDING -> IDLE (스킬 완료)")
 
     def update_skill2(self):
         """Skill2 업데이트 - 물리 기반"""

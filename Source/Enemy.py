@@ -268,7 +268,7 @@ class Enemy:
         damage_variation = max(1, random.randint(actual_damage - int(actual_damage * 0.2),
                                           actual_damage + int(actual_damage * 0.2)))
         self.current_hp -= damage_variation
-        print(f'Enemy took {damage_variation} damage, current HP: {self.current_hp}/{self.max_hp}')
+        #print(f'Enemy took {damage_variation} damage, current HP: {self.current_hp}/{self.max_hp}')
 
         if self.current_hp <= 0:
             self.on_death()
@@ -537,7 +537,7 @@ class Knight_Bow(Enemy):
         damage_variation = max(1, random.randint(actual_damage - int(actual_damage * 0.2),
                                           actual_damage + int(actual_damage * 0.2)))
         self.current_hp -= damage_variation
-        print(f'Knight_Bow took {damage_variation} damage, current HP: {self.current_hp}/{self.max_hp}')
+        #print(f'Knight_Bow took {damage_variation} damage, current HP: {self.current_hp}/{self.max_hp}')
 
         if self.current_hp <= 0:
             self.on_death()
@@ -850,7 +850,7 @@ class Knight_Tackle(Enemy):
         damage_variation = max(1, random.randint(actual_damage - int(actual_damage * 0.2),
                                           actual_damage + int(actual_damage * 0.2)))
         self.current_hp -= damage_variation
-        print(f'Knight_Tackle took {damage_variation} damage, current HP: {self.current_hp}/{self.max_hp}')
+        #print(f'Knight_Tackle took {damage_variation} damage, current HP: {self.current_hp}/{self.max_hp}')
 
         if self.current_hp <= 0:
             self.on_death()
