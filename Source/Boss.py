@@ -78,7 +78,7 @@ class GrimReaper(Enemy):
     def __init__(self, x, y):
         super().__init__(x, y)
 
-        self.max_hp = 1000
+        self.max_hp = 20
         self.current_hp = self.max_hp
         self.scale = 2.5
 
@@ -165,7 +165,24 @@ class GrimReaper(Enemy):
         gold.set_tile_map(self.tile_map)
         game_world.add_object(gold, 1)
 
+        self.spawn_ending_gate()
+
         game_world.remove_object(self)
+
+    def spawn_ending_gate(self):
+        from Stage_Gate import Gate
+        import play_mode
+
+        gate_x = 800
+        gate_y = 300
+
+        ending_gate = Gate(gate_x, gate_y, -1, 2)
+        game_world.add_object(ending_gate, 0)
+
+        if play_mode.Skrr:
+            game_world.add_collision_pair('player:gate', play_mode.Skrr, ending_gate)
+
+        play_mode.stage_gate = ending_gate
 
     def update(self):
         if not self.is_alive:

@@ -1,7 +1,6 @@
 from pico2d import *
 import common
 import game_framework
-import play_mode
 
 image = None
 mx, my = 0, 0
@@ -9,10 +8,11 @@ mx, my = 0, 0
 def init():
     global image
     image = []
-    image.append(load_image('../Resources/Image/UI/Title_Art.png'))
+    image.append(load_image('../Resources/Image/UI/Ending_Title.png'))
     image.append(load_image('../Resources/Image/UI/Mouse_Cursor.png'))
 
     sound_manager = common.get_sound_manager()
+    sound_manager.stop_bgm()
     sound_manager.play_bgm('main_title', repeat=True)
 
 def update():
@@ -32,13 +32,12 @@ def handle_events():
     events = get_events()
     for e in events:
         if e.type == SDL_KEYDOWN and e.key == SDLK_SPACE:
-            game_framework.change_mode(play_mode)
+            import title_mode
+            game_framework.change_mode(title_mode)
         elif e.type == SDL_QUIT:
             game_framework.quit()
         elif e.type == SDL_KEYDOWN and e.key == SDLK_ESCAPE:
             game_framework.quit()
-        elif e.type == SDL_MOUSEBUTTONDOWN and e.button == SDL_BUTTON_LEFT:
-            pass
         elif e.type == SDL_MOUSEMOTION:
             global mx, my
             mx, my = e.x, get_canvas_height() - e.y
@@ -48,3 +47,4 @@ def pause():
 
 def resume():
     pass
+
