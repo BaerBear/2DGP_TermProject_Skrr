@@ -429,7 +429,7 @@ class Knight_Sword(Enemy):
             self._handle_attack_frames()
 
     def _handle_attack_frames(self):
-        if not self.active_hitbox and self.frame == 10:
+        if not self.active_hitbox and self.frame == 6:
             self.set_attack_hitbox(
                 width=80,
                 height=self.height * 0.8,
@@ -438,7 +438,7 @@ class Knight_Sword(Enemy):
                 damage=self.attack_power,
                 multi_hit=False
             )
-        elif self.frame == 15:
+        elif self.active_hitbox and self.frame == 7:
             self.clear_attack_hitbox()
 
         attack_duration = len(Knight_Sword.images.get('attack', [])) * self.ATTACK_TIME_PER_ACTION
